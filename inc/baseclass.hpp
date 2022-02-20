@@ -32,7 +32,7 @@ typedef PackModule* PPackModule;
 typedef MIntegrator* PMIntegrator;
 typedef MOutput* PMOutput;
 typedef MUnitDelay* PMUnitDelay;
-typedef std::vector<double>& vecdble;
+typedef std::vector<double> vecdble;
 
 
 
@@ -42,14 +42,15 @@ Used to provide another method to replace the pointer to a function.
 class UserFunc
 {
 public:
+    // Used for MFCN module.
     virtual double Function(double u) const { return u; };
+    // Used for MFCNMISO module.
     virtual double Function(double *u) const { return u[0]; };
 };
 
 
 /**********************
 Base class of every unit modules.
-Each module should be connected to at least one other unit module.
 **********************/
 class UnitModule
 {
@@ -58,13 +59,12 @@ public:
     UnitModule(std::string name="module");
     virtual ~UnitModule();
     virtual double Get_OutValue() const = 0;
+    // Get the name of this module, which will be used in errors and warnings prompt.
     std::string Get_Name();
 
 protected:
-
-    // Name of this module, which will be used in errors and warnings prompt.
+    // Name of this module.
     std::string _name;
-
     // Which simulator does this module belongs to.
     PSimulator _sim = nullptr;
 
@@ -109,7 +109,7 @@ public:
 protected:
     std::string _name;
 private:
-    // Get nth input(output) module of this PackModule.
+    // Get nth input/output module of this PackModule.
     // It is used to build connections with other modules.
     virtual PUnitModule Get_InputPort(int n=0) const = 0;
     virtual PUnitModule Get_OutputPort(int n=0) const = 0;
@@ -121,6 +121,7 @@ Simulator
 **********************/
 class Simulator
 {
+    // Here are all kinds of modules.
     friend class MConnector;
     friend class MConstant;
     friend class MFcn;

@@ -1,7 +1,9 @@
 #ifndef MISCELLANEOUS_H
 #define MISCELLANEOUS_H
 #include "unitmodules.hpp"
+#ifdef USE_ZHNMAT
 #include "zhnmat.hpp"
+#endif
 NAMESPACE_SIMUCPP_L
 
 /**********************
@@ -56,6 +58,7 @@ private:
     double _T;
 };
 
+#ifdef USE_ZHNMAT
 /*********************
 SISO state space module.
 **********************/
@@ -72,6 +75,7 @@ private:
     MSum *sumy = nullptr;
     MConnector *in1 = nullptr;
 };
+#endif
 
 NAMESPACE_SIMUCPP_R
 #endif

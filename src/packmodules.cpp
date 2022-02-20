@@ -124,6 +124,7 @@ PUnitModule DiscreteIntegrator::Get_InputPort(int n) const { return n==0?in1:nul
 PUnitModule DiscreteIntegrator::Get_OutputPort(int n) const { return n==0?delay1:nullptr; }
 
 
+#ifdef USE_ZHNMAT
 /**********************
 SISO state space module.
 **********************/
@@ -131,18 +132,19 @@ StateSpaceSISO::StateSpaceSISO(Simulator *sim, const zhnmat::Mat& A, const zhnma
     const zhnmat::Mat& C, double D, std::string name) :PackModule(name)
 {
     int order = A.row();
-    SIMUCPP_ASSERT_ERROR(A.col()==order, "Order mismatch!");
-    SIMUCPP_ASSERT_ERROR(B.col()==1, "Order mismatch!");
-    SIMUCPP_ASSERT_ERROR(C.row()==1, "Order mismatch!");
-    SIMUCPP_ASSERT_ERROR(B.row()==order, "Order mismatch!");
-    SIMUCPP_ASSERT_ERROR(C.col()==order, "Order mismatch!");
+    SIMUCPP_ASSERT_ERROR(A.col()==order, "Shape of matrix A error!");
+    SIMUCPP_ASSERT_ERROR(B.col()==1, "Shape of matrix B error!");
+    SIMUCPP_ASSERT_ERROR(C.row()==1, "Shape of matrix C error!");
+    SIMUCPP_ASSERT_ERROR(B.row()==order, "Shape of matrix B error!");
+    SIMUCPP_ASSERT_ERROR(C.col()==order, "Shape of matrix C error!");
     integrators = new MIntegrator*[order];
     sumx = new MSum*[order];
-    sumy = new MSum(sim, name+"_sum");
+    sumy = new MSum(sim, name+"_sumy");
+    in1 = new MConnector(sim, name+"_in1");
     for (int i=0; i<order; ++i)
-        integrators[i] = new MIntegrator(sim, _name+"_int"+std::to_string(i));
+        integrators[i] = new MIntegrator(sim, name+"_int"+std::to_string(i));
     for (int i=0; i<order; ++i) {
-        sumx[i] = new MSum(sim, _name+"_int"+std::to_string(i));
+        sumx[i] = new MSum(sim, name+"_sumx"+std::to_string(i));
         for (int j=0; j<order; ++j) {
             sim->connect(integrators[j], sumx[i]);
             sumx[i]->Set_InputGain(A.at(i, j));
@@ -160,5 +162,5 @@ StateSpaceSISO::StateSpaceSISO(Simulator *sim, const zhnmat::Mat& A, const zhnma
 }
 PUnitModule StateSpaceSISO::Get_InputPort(int n) const { return n==0?in1:nullptr; }
 PUnitModule StateSpaceSISO::Get_OutputPort(int n) const { return n==0?sumy:nullptr; }
-
+#endif
 NAMESPACE_SIMUCPP_R
