@@ -1,81 +1,55 @@
 #ifndef MISCELLANEOUS_H
 #define MISCELLANEOUS_H
-#include "unitmodules.hpp"
-#ifdef USE_ZHNMAT
-#include "zhnmat.hpp"
-#endif
-NAMESPACE_SIMUCPP_L
+#include "packmodules.hpp"
+#include "config.h"
 
-/**********************
-Continuous transfer function module.
-**********************/
-class TransferFcn: public PackModule
-{
-public:
-    TransferFcn(Simulator *sim, const vecdble numerator, const vecdble denominator, std::string name="tf");
-    virtual PUnitModule Get_InputPort(int n=0) const;
-    virtual PUnitModule Get_OutputPort(int n=0) const;
-private:
-    MIntegrator **integrators = nullptr;
-    MSum *sum1 = nullptr;
-    MSum *sum2 = nullptr;
+#define SIMUCPP_CONTINUOUS                        true
+#define SIMUCPP_DISCRETE                          false
+
+#define SMConnector(x, sim)                       x=new MConnector(sim, #x)
+#define SMConstant(x, sim)                        x=new MConstant(sim, #x)
+#define SMFcn(x, sim)                             x=new MFcn(sim, #x)
+#define SMFcnMISO(x, sim)                         x=new MFcnMISO(sim, #x)
+#define SMGain(x, sim)                            x=new MGain(sim, #x)
+#define SMInput(x, sim)                           x=new MInput(sim, #x)
+#define SMIntegrator(x, sim)                      x=new MIntegrator(sim, #x)
+#define SMNoise(x, sim)                           x=new MNoise(sim, #x)
+#define SMOutput(x, sim)                          x=new MOutput(sim, #x)
+#define SMProduct(x, sim)                         x=new MProduct(sim, #x)
+#define SMSum(x, sim)                             x=new MSum(sim, #x)
+#define SMTransportDelay(x, sim)                  x=new MTransportDelay(sim, #x)
+#define SMUnitDelay(x, sim)                       x=new MUnitDelay(sim, #x)
+#define SMZOH(x, sim)                             x=new MZOH(sim, #x)
+
+#define FMConnector(x, sim)       MConnector      *SMConnector(x, sim)     
+#define FMConstant(x, sim)        MConstant       *SMConstant(x, sim)     
+#define FMFcn(x, sim)             MFcn            *SMFcn(x, sim)           
+#define FMFcnMISO(x, sim)         MFcnMISO        *SMFcnMISO(x, sim)       
+#define FMGain(x, sim)            MGain           *SMGain(x, sim)          
+#define FMInput(x, sim)           MInput          *SMInput(x, sim)         
+#define FMIntegrator(x, sim)      MIntegrator     *SMIntegrator(x, sim)    
+#define FMNoise(x, sim)           MNoise          *SMNoise(x, sim)         
+#define FMOutput(x, sim)          MOutput         *SMOutput(x, sim)        
+#define FMProduct(x, sim)         MProduct        *SMProduct(x, sim)       
+#define FMSum(x, sim)             MSum            *SMSum(x, sim)           
+#define FMTransportDelay(x, sim)  MTransportDelay *SMTransportDelay(x, sim)
+#define FMUnitDelay(x, sim)       MUnitDelay      *SMUnitDelay(x, sim)     
+#define FMZOH(x, sim)             MZOH            *SMZOH(x, sim)           
+
+#define CLASS_USERFUNC_SISO(funcname, funccontent) \
+class funcname:public UserFunc { \
+public: \
+    virtual double Function(double u)const{ funccontent; } \
+};
+#define CLASS_USERFUNC_MISO(funcname, funccontent) \
+class funcname:public UserFunc { \
+public: \
+    virtual double Function(double *u)const{ funccontent; } \
 };
 
-
-/**********************
-Discrete transfer function module.
-**********************/
-class DiscreteTransferFcn: public PackModule
-{
-public:
-    DiscreteTransferFcn(Simulator *sim, const vecdble numerator, const vecdble denominator, std::string name="dtf");
-    virtual PUnitModule Get_InputPort(int n=0) const;
-    virtual PUnitModule Get_OutputPort(int n=0) const;
-    void Set_SampleTime(double time);
-private:
-    MUnitDelay **delays = nullptr;
-    MSum *sum1 = nullptr;
-    MSum *sum2 = nullptr;
-    int _order;
-};
-
-
-/*********************
-Discrete time integrator module.
-**********************/
-class DiscreteIntegrator: public PackModule
-{
-public:
-    DiscreteIntegrator(Simulator *sim, std::string name="disint");
-    virtual PUnitModule Get_InputPort(int n=0) const;
-    virtual PUnitModule Get_OutputPort(int n=0) const;
-    void Set_SampleTime(double time);
-private:
-    MUnitDelay *delay1 = nullptr;
-    MZOH *zoh1 = nullptr;
-    MSum *sum1 = nullptr;
-    MConnector *in1 = nullptr;
-    double _T;
-};
-
-#ifdef USE_ZHNMAT
-/*********************
-SISO state space module.
-**********************/
-class StateSpaceSISO: public PackModule
-{
-public:
-    StateSpaceSISO(Simulator *sim, const zhnmat::Mat& A, const zhnmat::Mat& B,
-        const zhnmat::Mat& C, double D, std::string name="space");
-    virtual PUnitModule Get_InputPort(int n=0) const;
-    virtual PUnitModule Get_OutputPort(int n=0) const;
-private:
-    MIntegrator **integrators = nullptr;
-    MSum **sumx = nullptr;
-    MSum *sumy = nullptr;
-    MConnector *in1 = nullptr;
-};
-#endif
-
-NAMESPACE_SIMUCPP_R
+#define STRING_DIRECT(x)    #x
+#define STRING(x)           STRING_DIRECT(x)
+#define SIMUCPP_VERSION     "V" STRING(simucpp_VERSION_MAJOR) \
+                            "." STRING(simucpp_VERSION_MINOR) \
+                            "." STRING(simucpp_VERSION_PATCH)
 #endif

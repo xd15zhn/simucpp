@@ -19,13 +19,17 @@ Simulator::Simulator(double duration)
     DISCRETE_INITIALIZE(-1);
     _errlevel = 0;
     _fp = nullptr;
+    for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
 }
 Simulator::~Simulator()
 {
     for(int i=0; i<4; ++i) {
+        if (!_ode4K[i]) continue;
         delete _ode4K[i]; _ode4K[i] = nullptr;
     }
     if (!_print) return;
+    if (!_fp) return;
+    if (!_fp->is_open()) return;
     _fp->close();
     delete _fp; _fp = nullptr;
 }
