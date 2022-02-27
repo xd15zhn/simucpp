@@ -1,5 +1,6 @@
 #include <fstream>
 #include <stack>
+#include <cmath>
 #include "unitmodules.hpp"
 #include "definitions.hpp"
 NAMESPACE_SIMUCPP_L
@@ -289,15 +290,9 @@ int Simulator::Simulate_OneStep()
             _H/3*(_ode4K[0][i] + _ode4K[1][i] + _ode4K[1][i] + _ode4K[2][i] + _ode4K[2][i] + _ode4K[3][i]);
 
     // Convergence and divergence check
-    for (PMIntegrator m: _integrators)
-        if (m->_outvalue > SIMUCPP_INFINITE1)
-            return 1;
-    for (PMUnitDelay m: _unitdelays)
-        if (m->_outvalue > SIMUCPP_INFINITE1)
-            return 1;
-    for (PMOutput m: _outputs)
-        if (m->_outvalue > SIMUCPP_INFINITE1)
-            return 1;
+    CHECK_CONVERGENCE(PMIntegrator, _integrators);
+    CHECK_CONVERGENCE(PMUnitDelay, _unitdelays);
+    CHECK_CONVERGENCE(PMOutput, _outputs);
     return 0;
 }
 

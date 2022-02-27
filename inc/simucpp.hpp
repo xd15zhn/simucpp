@@ -5,6 +5,7 @@
 
 #define SIMUCPP_CONTINUOUS                        true
 #define SIMUCPP_DISCRETE                          false
+#define PRINT_VALUE(x)                            std::cout << x << std::endl
 
 #define SMConnector(x, sim)                       x=new MConnector(sim, #x)
 #define SMConstant(x, sim)                        x=new MConstant(sim, #x)
