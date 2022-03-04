@@ -1,7 +1,6 @@
 #ifndef MISCELLANEOUS_H
 #define MISCELLANEOUS_H
 #include "packmodules.hpp"
-#include "config.h"
 
 #define SIMUCPP_CONTINUOUS                        true
 #define SIMUCPP_DISCRETE                          false
@@ -48,9 +47,4 @@ public: \
     virtual double Function(double *u)const{ funccontent; } \
 };
 
-#define STRING_DIRECT(x)    #x
-#define STRING(x)           STRING_DIRECT(x)
-#define SIMUCPP_VERSION     "V" STRING(simucpp_VERSION_MAJOR) \
-                            "." STRING(simucpp_VERSION_MINOR) \
-                            "." STRING(simucpp_VERSION_PATCH)
 #endif

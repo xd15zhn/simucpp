@@ -372,6 +372,7 @@ double Simulator::Get_Duration() { return _duration; }
 void Simulator::Set_SimStep(double step) { _H=0.5*step; }
 double Simulator::Get_SimStep() { return _H+_H; }
 void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
+void Simulator::VERSION() { std::cout << SIMUCPP_VERSION << std::endl; }
 void Simulator::Set_EnableStore(bool store) {
     for (int i=0; i<_cntO; ++i) _outputs[i]->Set_EnableStore(store); }
 void Simulator::Set_PrintPrecision(unsigned int n) {

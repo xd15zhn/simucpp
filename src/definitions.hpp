@@ -1,5 +1,6 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
+#include "config.h"
 
 /**********************
 global
@@ -92,5 +93,11 @@ simulator.cpp
         if (m->_outvalue < -SIMUCPP_INFINITE1) return 1; \
         if (std::isnan(m->_outvalue)) return 1; \
     }
+
+#define STRING_DIRECT(x)    #x
+#define STRING(x)           STRING_DIRECT(x)
+#define SIMUCPP_VERSION     "V" STRING(simucpp_VERSION_MAJOR) \
+                            "." STRING(simucpp_VERSION_MINOR) \
+                            "." STRING(simucpp_VERSION_PATCH)
 
 #endif // DEFINITIONS_H

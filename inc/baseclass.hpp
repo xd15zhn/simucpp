@@ -191,6 +191,8 @@ public:
     // -1: any warning will be considered an error.
     void Set_WarningLevel(uint8_t level=0);
 
+    static void VERSION();
+
 private:
     // Add a module to this simulator.
     void Add_Module(const PUnitModule m);

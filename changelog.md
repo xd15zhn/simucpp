@@ -10,3 +10,4 @@ Fix some bugs in destructor of Simulator.
 
 # V1.7.3
 Additional considerations are added to the convergence check
+Add version() function to Simulator.
