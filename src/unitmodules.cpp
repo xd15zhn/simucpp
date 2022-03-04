@@ -298,8 +298,8 @@ PUnitModule MOutput::Get_child(unsigned int n) const { return n==0?_next:nullptr
 void MOutput::connect(const PUnitModule m) { _next=m;_enable=true; }
 std::vector<double>& MOutput::Get_StoredData() { return _values; }
 void MOutput::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
-void MOutput::Set_EnablePrint(bool print) { _print=print; }
 void MOutput::Set_EnableStore(bool store) { _store=store; }
+void MOutput::Set_EnablePlot(bool print) { _plot=print; }
 void MOutput::Set_InputGain(double inputgain) { _ingain=inputgain; }
 void MOutput::Set_MaxDataStorage(int n) { _maxstorage=n; }
 MOutput::MOutput(Simulator *sim, std::string name): UnitModule(name)
@@ -308,8 +308,7 @@ MOutput::MOutput(Simulator *sim, std::string name): UnitModule(name)
     _outvalue = 0;
     _ingain = 1;
     _maxstorage = -1;
-    _print = true;
-    _store = false;
+    _store = _plot = true;
     _next = nullptr;
     ADD_SIMULATOR();
 }

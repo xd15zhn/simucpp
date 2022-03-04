@@ -202,8 +202,8 @@ public:
 
     // Used to control whether simulation data is printed to file or stored to memory.
     // Simulation may speed up if they are disabled.
-    void Set_EnablePrint(bool print=true);
     void Set_EnableStore(bool store=false);
+    void Set_EnablePlot(bool print=true);
 
     // all input data will be multiplied by "inputgain" before stored.
     void Set_InputGain(double inputgain=1);
@@ -219,9 +219,9 @@ private:
     // Stored data.
     std::vector<double> _values;
 
-    // See public member function "Set_EnablePrint" and "Set_EnableStore".
+    // See public member function "Set_EnableStore" and "Set_EnablePlot".
     // @_maxstorage: How many samples will it store.
-    bool _print, _store;
+    bool _store, _plot;
     int _maxstorage;
 
     // @_outvalue: value of its latest sample point.

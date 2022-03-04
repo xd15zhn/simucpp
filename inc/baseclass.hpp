@@ -169,9 +169,8 @@ public:
 
     // Used to control whether simulation data is printed to file or stored to memory.
     // Simulation may speed up if they are disabled.
-    void Set_EnablePrint(bool print=true);
     void Set_EnableStore(bool store=false);
-    void Set_PrintPrecision(unsigned int n=8);
+    void Set_EnablePlot(bool print=true);
 
     // Get and set current simulation time.
     void Set_t(double t);
@@ -182,8 +181,6 @@ public:
     // Get and set simulation step.
     void Set_SimStep(double step=0.001);
     double Get_SimStep();
-    // Set print duration.
-    void Set_SampleTime(double time=-1);
 
     // Change the warning level in self-check procedure.
     // 0: Default;
@@ -191,6 +188,7 @@ public:
     // -1: any warning will be considered an error.
     void Set_WarningLevel(uint8_t level=0);
 
+    // Print current Simucpp version.
     static void VERSION();
 
 private:
@@ -224,11 +222,8 @@ private:
     std::vector<std::vector<int>> _integIDs, _delayIDs, _outIDs;
     std::vector<int> _discIDs;
 
-    // See public member function "Set_EnablePrint" and "Set_EnableStore".
-    bool _print, _store;
-    int _precision;
-    std::fstream *_fp;
-    DISCRETE_VARIABLES();
+    // See public member function "Set_EnableStore" and "Set_EnablePlot".
+    bool _store, _plot;
 
     // See public member function "Set_t" and "Get_t".
     double _t;

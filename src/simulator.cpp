@@ -1,4 +1,3 @@
-#include <fstream>
 #include <stack>
 #include <cmath>
 #include "unitmodules.hpp"
@@ -14,12 +13,8 @@ Simulator::Simulator(double duration)
     _duration = duration;
     _cntM = 0;
     _t = 0;
-    _print = true;
-    _store = false;
-    _precision = 8;
-    DISCRETE_INITIALIZE(-1);
+    _store = _plot = true;
     _errlevel = 0;
-    _fp = nullptr;
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
 }
 Simulator::~Simulator()
@@ -28,11 +23,6 @@ Simulator::~Simulator()
         if (!_ode4K[i]) continue;
         delete _ode4K[i]; _ode4K[i] = nullptr;
     }
-    if (!_print) return;
-    if (!_fp) return;
-    if (!_fp->is_open()) return;
-    _fp->close();
-    delete _fp; _fp = nullptr;
 }
 
 
@@ -116,7 +106,6 @@ Simulation initialization procedure, which includes the following steps:
  - step 2: Delete CONNECTOR module;
  - step 3: Build sequence table.
  - step 4: Index for discrete modules.
- - step 5: Initialize a data file for storage.
 **********************/
 void Simulator::Initialize()
 {
@@ -215,12 +204,6 @@ void Simulator::Initialize()
     }
     SIMUCPP_ASSERT_WARNING(_cntO>0, "You haven't add any OUTPUT modules.");
 
-    /*step 5: Initialize a data file for storage.*/
-    if (!_print) return;
-    _fp = new std::fstream;
-    _fp->open("data.csv", std::ios::out);
-    SIMUCPP_ASSERT_ERROR(_fp->is_open(), "Failed to open data file!");
-    _fp->precision(_precision);
 }
 
 
@@ -243,7 +226,6 @@ int Simulator::Simulate_FinalStep()
     MODULE_INTEGRATOR_UPDATE();
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
-    PRINT_OUTPUT();
     return 0;
 }
 int Simulator::Simulate_OneStep()
@@ -259,7 +241,6 @@ int Simulator::Simulate_OneStep()
     SET_DISCRETE_ENABLE(false);
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
-    PRINT_OUTPUT();
 
     _t += _H;
     for(int i=0; i<_cntI; ++i)
@@ -364,19 +345,16 @@ void Simulator::Simulation_Reset()
 
 /**********************
 **********************/
-void Simulator::Set_EnablePrint(bool print) { _print=print; }
+void Simulator::Set_EnableStore(bool store) {
+    for (int i=0; i<_cntO; ++i) _outputs[i]->Set_EnableStore(store); }
+void Simulator::Set_EnablePlot(bool print) { _plot=print; }
 void Simulator::Set_t(double t) { _t = t; }
 double Simulator::Get_t() { return _t; }
 void Simulator::Set_Duration(double t) { _duration=t; }
 double Simulator::Get_Duration() { return _duration; }
 void Simulator::Set_SimStep(double step) { _H=0.5*step; }
 double Simulator::Get_SimStep() { return _H+_H; }
-void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void Simulator::VERSION() { std::cout << SIMUCPP_VERSION << std::endl; }
-void Simulator::Set_EnableStore(bool store) {
-    for (int i=0; i<_cntO; ++i) _outputs[i]->Set_EnableStore(store); }
-void Simulator::Set_PrintPrecision(unsigned int n) {
-    _precision = SIMUCPP_LIMIT(n, 2, 20); }
 void Simulator::Set_WarningLevel(uint8_t level) {
     _errlevel=(level>0)?SIMUCPP_INFINITE1:((level<0)?-SIMUCPP_INFINITE1:0); }
 

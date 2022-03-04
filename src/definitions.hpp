@@ -74,16 +74,6 @@ simulator.cpp
 #define CHECK_SIMULATOR(x) \
     SIMUCPP_ASSERT_ERROR(x->_sim==this, \
         "Module \"" << x->_name << "\" was added to a wrong simulator!")
-#define PRINT_OUTPUT() \
-    if ((_print) && (_t-_ltn>=_T-SIMUCPP_DBL_EPSILON)) { \
-        _ltn += _T; \
-        *_fp << _t; \
-        for (int i=0; i<_cntO; ++i){ \
-            if (!_outputs[i]->_print) continue; \
-            *_fp << ',' << _outputs[i]->_outvalue; \
-        } \
-        *_fp << '\n'; \
-    }
 #define SET_DISCRETE_ENABLE(x) \
     for (int i: _discIDs) \
         _modules[i]->Set_Enable(x)
