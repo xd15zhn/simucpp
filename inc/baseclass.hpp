@@ -168,10 +168,12 @@ public:
     int Simulate_FinalStep();
 
     // Used to control whether simulation data is stored to every OUTPUT modules
-    //  and draw a waveform plot after simulation finished.
     // Simulation may speed up if it is disabled.
     void Set_EnableStore(bool store=true);
+
+    // Draw a waveform by using the stored data in every OUTPUT modules.
     void Plot();
+
     // Set storage duration of OUTPUT modules. It means how long do every OUTPUT
     //  modules store a data.
     void Set_SampleTime(double time=-1);
@@ -235,6 +237,7 @@ private:
 
     // See public member function "Set_t" and "Get_t".
     double _t;
+    std::vector<double> _tvec;
 
     // See public member function "Set_WarningLevel".
     int _errlevel;

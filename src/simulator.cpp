@@ -16,8 +16,8 @@ Simulator::Simulator(double duration)
     _duration = duration;
     _cntM = 0;
     _t = 0;
-    _store = true;
     _errlevel = 0;
+    _store = true;
     DISCRETE_INITIALIZE(-1);
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
 }
@@ -230,10 +230,15 @@ int Simulator::Simulate_FinalStep()
     MODULE_INTEGRATOR_UPDATE();
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
+    _tvec.push_back(_t);
     return 0;
 }
 int Simulator::Simulate_OneStep()
 {
+    if ((_store) && (_t-_ltn >= _T-SIMUCPP_DBL_EPSILON)) {
+        _ltn += _T;
+        _tvec.push_back(_t);
+    }
     MODULE_UNITDELAY_UPDATE_OUTPUT();
     SET_DISCRETE_ENABLE(true);
     for(int i=0; i<_cntI; ++i){
@@ -354,9 +359,11 @@ Use data stored in OUTPUT modules to draw a waveform.
 void Simulator::Plot()
 {
 #ifdef USE_MPLT
-    vecdble t(_duration*_H/2);
-    vecdble y = _outputs[0]->_values;
-    matplotlibcpp::plot(t, y);
+    for (PMOutput m: _outputs) {
+        if (!m->_store) continue;
+        matplotlibcpp::plot(_tvec, m->_values);
+    }
+    matplotlibcpp::show();
 #else
     SIMUCPP_ASSERT_WARNING(false, "You didn't add matplotlib-cpp library.");
 #endif
@@ -365,9 +372,10 @@ void Simulator::Plot()
 
 /**********************
 **********************/
-void Simulator::Set_EnableStore(bool store) {
-    for (int i=0; i<_cntO; ++i) _outputs[i]->Set_EnableStore(store); }
-void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
+void Simulator::Set_EnableStore(bool store) { _store=store;
+    for (PMOutput m: _outputs) m->Set_EnableStore(store); }
+void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T;
+    for (PMOutput m: _outputs) m->Set_SampleTime(time); }
 void Simulator::Set_t(double t) { _t = t; }
 double Simulator::Get_t() { return _t; }
 void Simulator::Set_Duration(double t) { _duration=t; }
@@ -376,6 +384,6 @@ void Simulator::Set_SimStep(double step) { _H=0.5*step; }
 double Simulator::Get_SimStep() { return _H+_H; }
 void Simulator::VERSION() { std::cout << SIMUCPP_VERSION << std::endl; }
 void Simulator::Set_WarningLevel(int level) {
-    _errlevel=(level>0)?SIMUCPP_INFINITE1:((level<0)?-SIMUCPP_INFINITE1:0); }
+    _errlevel=(level>0)?(int)SIMUCPP_INFINITE1:((level<0)?-(int)SIMUCPP_INFINITE1:0); }
 
 NAMESPACE_SIMUCPP_R

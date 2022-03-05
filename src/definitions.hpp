@@ -80,8 +80,8 @@ simulator.cpp
 #define CHECK_CONVERGENCE(x, y) \
     for (x m: y) { \
         if (m->_outvalue > SIMUCPP_INFINITE1) return 1; \
-        if (m->_outvalue < -SIMUCPP_INFINITE1) return 1; \
-        if (std::isnan(m->_outvalue)) return 1; \
+        if (m->_outvalue < -SIMUCPP_INFINITE1) return 2; \
+        if (std::isnan(m->_outvalue)) return 3; \
     }
 
 #define STRING_DIRECT(x)    #x

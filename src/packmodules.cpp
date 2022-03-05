@@ -55,9 +55,9 @@ PUnitModule TransferFcn::Get_InputPort(int n) const { return n==0?sum1:nullptr; 
 PUnitModule TransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
 void TransferFcn::Set_InitialValue(vecdble value)
 {
-    SIMUCPP_ASSERT_WARNING(value.size()==_order,
+    SIMUCPP_ASSERT_WARNING((int)value.size()==_order,
         "State space module \""<<_name<<"\" accepted mismatched initial values.");
-    for (int i=SIMUCPP_MIN(value.size(), _order)-1; i>=0; --i)
+    for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
         integrators[i]->Set_InitialValue(value[i]);
 }
 vecdble TransferFcn::Get_OutValue()
@@ -110,9 +110,9 @@ PUnitModule DiscreteTransferFcn::Get_InputPort(int n) const { return n==0?sum1:n
 PUnitModule DiscreteTransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
 void DiscreteTransferFcn::Set_InitialValue(vecdble value)
 {
-    SIMUCPP_ASSERT_WARNING(value.size()==_order,
+    SIMUCPP_ASSERT_WARNING((int)value.size()==_order,
         "State space module \""<<_name<<"\" accepted mismatched initial values.");
-    for (int i=SIMUCPP_MIN(value.size(), _order)-1; i>=0; --i)
+    for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
         unitdelays[i]->Set_InitialValue(value[i]);
 }
 vecdble DiscreteTransferFcn::Get_OutValue()
@@ -232,9 +232,9 @@ void StateSpace::Set_SampleTime(double time)
 }
 void StateSpace::Set_InitialValue(vecdble value)
 {
-    SIMUCPP_ASSERT_WARNING(value.size()==_orderx,
+    SIMUCPP_ASSERT_WARNING((int)value.size()==_orderx,
         "State space module \""<<_name<<"\" accepted mismatched initial values.");
-    for (int i=SIMUCPP_MIN(value.size(), _orderx)-1; i>=0; --i)
+    for (int i=SIMUCPP_MIN((int)value.size(), _orderx)-1; i>=0; --i)
         integrators[i]->Set_InitialValue(value[i]);
 }
 vecdble StateSpace::Get_OutValue()

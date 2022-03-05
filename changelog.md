@@ -12,6 +12,6 @@ Fix some bugs in destructor of Simulator.
 Additional considerations are added to the convergence check
 Add version() function to Simulator.
 
-# V1.7.14
+# V1.7.4
 Add library matplotlib-cpp for waveform plot.
 Delete functions of saving waveform data to files.
