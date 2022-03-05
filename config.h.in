@@ -1,3 +1,5 @@
 #define simucpp_VERSION_MAJOR  @simucpp_VERSION_MAJOR@
 #define simucpp_VERSION_MINOR  @simucpp_VERSION_MINOR@
 #define simucpp_VERSION_PATCH  @simucpp_VERSION_PATCH@
+
+#define PYTHONHOME  L"${PYTHON_HOME}"
