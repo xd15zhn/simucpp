@@ -31,8 +31,17 @@ if(USE_ZHNMAT)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE ${ZHNMAT_DIR}/build/libzhnmat.a)
     target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${ZHNMAT_DIR})
 endif()
-if(USE_ZHNMAT)
+if(USE_MPLT)
     message(STATUS "matplotlib-cpp dir: ${MPLT_DIR}")
     add_definitions(-DUSE_MPLT)
-    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${MPLT_DIR})
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
+        D:/python/libs/_tkinter.lib
+        D:/python/libs/python3.lib
+        D:/python/libs/python39.lib
+    )
+    target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        ${MPLT_DIR}
+        D:/python/include
+        D:/python/Lib/site-packages/numpy/core/include
+    )
 endif()

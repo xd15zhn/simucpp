@@ -167,10 +167,14 @@ public:
     int Simulate_OneStep();
     int Simulate_FinalStep();
 
-    // Used to control whether simulation data is printed to file or stored to memory.
-    // Simulation may speed up if they are disabled.
-    void Set_EnableStore(bool store=false);
-    void Set_EnablePlot(bool print=true);
+    // Used to control whether simulation data is stored to every OUTPUT modules
+    //  and draw a waveform plot after simulation finished.
+    // Simulation may speed up if it is disabled.
+    void Set_EnableStore(bool store=true);
+    void Plot();
+    // Set storage duration of OUTPUT modules. It means how long do every OUTPUT
+    //  modules store a data.
+    void Set_SampleTime(double time=-1);
 
     // Get and set current simulation time.
     void Set_t(double t);
@@ -183,10 +187,13 @@ public:
     double Get_SimStep();
 
     // Change the warning level in self-check procedure.
+    // For example, if a module doesn't have a child module, simulator will give
+    //  an error and stop the program by default, but you can ignore this kind
+    //  of errors by setting the warning level to 1.
     // 0: Default;
     // 1: ignore all errors and only give warnings;
     // -1: any warning will be considered an error.
-    void Set_WarningLevel(uint8_t level=0);
+    void Set_WarningLevel(int level=0);
 
     // Print current Simucpp version.
     static void VERSION();
@@ -222,8 +229,9 @@ private:
     std::vector<std::vector<int>> _integIDs, _delayIDs, _outIDs;
     std::vector<int> _discIDs;
 
-    // See public member function "Set_EnableStore" and "Set_EnablePlot".
-    bool _store, _plot;
+    // See public member function "Set_EnableStore" and "Set_SampleTime".
+    bool _store;
+    DISCRETE_VARIABLES();
 
     // See public member function "Set_t" and "Get_t".
     double _t;

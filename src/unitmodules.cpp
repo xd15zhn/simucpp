@@ -175,8 +175,8 @@ INPUT module.
 MInput::~MInput() { _data.clear();_f=nullptr; }
 double MInput::Get_OutValue() const { return _outvalue; }
 void MInput::Set_Enable(bool enable) { _enable=enable; }
-void MInput::Set_InputFunction(double (*function)(double u)) { _f=function; }
-void MInput::Set_InputFunction(UserFunc *function) { _fu=function; }
+void MInput::Set_Function(double (*function)(double u)) { _f=function; }
+void MInput::Set_Function(UserFunc *function) { _fu=function; }
 void MInput::Set_InputData(const std::vector<double> &data) { _data=data; }
 void MInput::Set_Continuous(bool isContinuous) { _isc=isContinuous; }
 void MInput::Set_SampleTime(double time) { _T=time; }
@@ -299,7 +299,6 @@ void MOutput::connect(const PUnitModule m) { _next=m;_enable=true; }
 std::vector<double>& MOutput::Get_StoredData() { return _values; }
 void MOutput::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void MOutput::Set_EnableStore(bool store) { _store=store; }
-void MOutput::Set_EnablePlot(bool print) { _plot=print; }
 void MOutput::Set_InputGain(double inputgain) { _ingain=inputgain; }
 void MOutput::Set_MaxDataStorage(int n) { _maxstorage=n; }
 MOutput::MOutput(Simulator *sim, std::string name): UnitModule(name)
@@ -308,7 +307,7 @@ MOutput::MOutput(Simulator *sim, std::string name): UnitModule(name)
     _outvalue = 0;
     _ingain = 1;
     _maxstorage = -1;
-    _store = _plot = true;
+    _store = true;
     _next = nullptr;
     ADD_SIMULATOR();
 }

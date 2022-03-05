@@ -126,8 +126,8 @@ class MInput: public UnitModule
     UNITMODULE_VIRTUAL(MInput, in);
 public:
     // User should provide an input function when it's in continuous mode.
-    void Set_InputFunction(double(*function)(double u));
-    void Set_InputFunction(UserFunc *function);
+    void Set_Function(double(*function)(double u));
+    void Set_Function(UserFunc *function);
     // User should provide sample dataswhen it's in discrete mode.
     void Set_InputData(const std::vector<double>& data);
     // Set if this module is in continuous mode.
@@ -201,9 +201,8 @@ public:
     void Set_SampleTime(double time=-1);
 
     // Used to control whether simulation data is printed to file or stored to memory.
-    // Simulation may speed up if they are disabled.
+    // Simulation may speed up if it is disabled.
     void Set_EnableStore(bool store=false);
-    void Set_EnablePlot(bool print=true);
 
     // all input data will be multiplied by "inputgain" before stored.
     void Set_InputGain(double inputgain=1);
@@ -219,9 +218,9 @@ private:
     // Stored data.
     std::vector<double> _values;
 
-    // See public member function "Set_EnableStore" and "Set_EnablePlot".
+    // See public member function "Set_EnableStore".
     // @_maxstorage: How many samples will it store.
-    bool _store, _plot;
+    bool _store;
     int _maxstorage;
 
     // @_outvalue: value of its latest sample point.

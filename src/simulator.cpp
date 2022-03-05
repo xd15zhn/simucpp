@@ -2,6 +2,9 @@
 #include <cmath>
 #include "unitmodules.hpp"
 #include "definitions.hpp"
+#ifdef USE_MPLT
+#include "matplotlibcpp.h"
+#endif
 NAMESPACE_SIMUCPP_L
 
 /**********************
@@ -13,8 +16,9 @@ Simulator::Simulator(double duration)
     _duration = duration;
     _cntM = 0;
     _t = 0;
-    _store = _plot = true;
+    _store = true;
     _errlevel = 0;
+    DISCRETE_INITIALIZE(-1);
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
 }
 Simulator::~Simulator()
@@ -343,11 +347,27 @@ void Simulator::Simulation_Reset()
     }
 }
 
+
+/**********************
+Use data stored in OUTPUT modules to draw a waveform.
+**********************/
+void Simulator::Plot()
+{
+#ifdef USE_MPLT
+    vecdble t(_duration*_H/2);
+    vecdble y = _outputs[0]->_values;
+    matplotlibcpp::plot(t, y);
+#else
+    SIMUCPP_ASSERT_WARNING(false, "You didn't add matplotlib-cpp library.");
+#endif
+}
+
+
 /**********************
 **********************/
 void Simulator::Set_EnableStore(bool store) {
     for (int i=0; i<_cntO; ++i) _outputs[i]->Set_EnableStore(store); }
-void Simulator::Set_EnablePlot(bool print) { _plot=print; }
+void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void Simulator::Set_t(double t) { _t = t; }
 double Simulator::Get_t() { return _t; }
 void Simulator::Set_Duration(double t) { _duration=t; }
@@ -355,7 +375,7 @@ double Simulator::Get_Duration() { return _duration; }
 void Simulator::Set_SimStep(double step) { _H=0.5*step; }
 double Simulator::Get_SimStep() { return _H+_H; }
 void Simulator::VERSION() { std::cout << SIMUCPP_VERSION << std::endl; }
-void Simulator::Set_WarningLevel(uint8_t level) {
+void Simulator::Set_WarningLevel(int level) {
     _errlevel=(level>0)?SIMUCPP_INFINITE1:((level<0)?-SIMUCPP_INFINITE1:0); }
 
 NAMESPACE_SIMUCPP_R
