@@ -1,19 +1,23 @@
+# Set the directory of dependent libraries
+set(ZHNMAT_DIR D:/cppcode/zhnmat)  # directory of zhnmat
+set(MPLT_DIR D:/cppcode/matplotlibcpp)  # directory of matplotlib-cpp
+set(PYTHON_HOME D:/python)  # directory of mpython
+
+# If you don't wan't to use the cooresponding dependent libraries,
+#  change the following options to "OFF"
+option(USE_ZHNMAT "If you can use zhnmat." ON)
+option(USE_MPLT "If you can use matplotlib-cpp." ON)
+
 cmake_minimum_required(VERSION 3.12)
-project(simucpp VERSION 1.7.4)
+project(simucpp VERSION 1.7.5)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE release)
-set(ZHNMAT_DIR D:/cppcode/zhnmat)
-set(MPLT_DIR D:/cppcode/matplotlibcpp)
-set(PYTHON_HOME D:/python)
 configure_file(config.h.in config.h)
 
 message(STATUS "project name: ${CMAKE_PROJECT_NAME}")
 message(STATUS "project version: ${PROJECT_VERSION}")
 message(STATUS "project build type: ${CMAKE_BUILD_TYPE}")
-
-option(USE_ZHNMAT "If you can use zhnmat." ON)
-option(USE_MPLT "If you can use matplotlib-cpp." ON)
 
 set(SIMUCPP_SOURCES
     ${PROJECT_SOURCE_DIR}/src/unitmodules.cpp

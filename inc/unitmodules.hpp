@@ -200,9 +200,10 @@ public:
     // All samples will be collected by default.
     void Set_SampleTime(double time=-1);
 
-    // Used to control whether simulation data is printed to file or stored to memory.
-    // Simulation may speed up if it is disabled.
+    // Is simulation data stored to memory.
     void Set_EnableStore(bool store=false);
+    // Is simulation data printed to a file.
+    void Set_EnablePrint(bool print=true);
 
     // all input data will be multiplied by "inputgain" before stored.
     void Set_InputGain(double inputgain=1);
@@ -218,9 +219,9 @@ private:
     // Stored data.
     std::vector<double> _values;
 
-    // See public member function "Set_EnableStore".
+    // See public member function "Set_EnableStore" and "Set_EnablePrint".
     // @_maxstorage: How many samples will it store.
-    bool _store;
+    bool _store, _print;
     int _maxstorage;
 
     // @_outvalue: value of its latest sample point.

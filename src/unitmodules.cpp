@@ -299,6 +299,7 @@ void MOutput::connect(const PUnitModule m) { _next=m;_enable=true; }
 std::vector<double>& MOutput::Get_StoredData() { return _values; }
 void MOutput::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void MOutput::Set_EnableStore(bool store) { _store=store; }
+void MOutput::Set_EnablePrint(bool print) { _print=print; }
 void MOutput::Set_InputGain(double inputgain) { _ingain=inputgain; }
 void MOutput::Set_MaxDataStorage(int n) { _maxstorage=n; }
 MOutput::MOutput(Simulator *sim, std::string name): UnitModule(name)
@@ -308,6 +309,7 @@ MOutput::MOutput(Simulator *sim, std::string name): UnitModule(name)
     _ingain = 1;
     _maxstorage = -1;
     _store = true;
+    _print = false;
     _next = nullptr;
     ADD_SIMULATOR();
 }
@@ -563,7 +565,7 @@ void MZOH::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void MZOH::Module_Reset() { _outvalue=0;_ltn=-_T; }
 int MZOH::Get_childCnt() const { return 1; }
 PUnitModule MZOH::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
-void MZOH::connect(const PUnitModule m) { _next=m; }
+void MZOH::connect(const PUnitModule m) { _next=m;_enable=true; }
 MZOH::MZOH(Simulator *sim, std::string name): UnitModule(name)
 {
     DISCRETE_INITIALIZE(1);

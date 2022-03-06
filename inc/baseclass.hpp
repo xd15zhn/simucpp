@@ -167,9 +167,14 @@ public:
     int Simulate_OneStep();
     int Simulate_FinalStep();
 
-    // Used to control whether simulation data is stored to every OUTPUT modules
-    // Simulation may speed up if it is disabled.
+    // Is simulation data stored to memory.
+    // It will also set all the OUTPUT modules.
     void Set_EnableStore(bool store=true);
+    // Is simulation data printed to a file.
+    // It will also set all the OUTPUT modules.
+    void Set_EnablePrint(bool print=false);
+    // Set the precision of floating point data printed to a file.
+    void Set_PrintPrecision(unsigned int n=8);
 
     // Draw a waveform by using the stored data in every OUTPUT modules.
     void Plot();
@@ -231,8 +236,11 @@ private:
     std::vector<std::vector<int>> _integIDs, _delayIDs, _outIDs;
     std::vector<int> _discIDs;
 
-    // See public member function "Set_EnableStore" and "Set_SampleTime".
-    bool _store;
+    // See public member function "Set_EnableStore" and "Set_EnablePrint".
+    bool _store, _print;
+    int _precision;
+    std::fstream *_fp;
+    // See public member function and "Set_SampleTime".
     DISCRETE_VARIABLES();
 
     // See public member function "Set_t" and "Get_t".

@@ -15,3 +15,7 @@ Add version() function to Simulator.
 # V1.7.4
 Add library matplotlib-cpp for waveform plot.
 Delete functions of saving waveform data to files.
+
+# V1.7.5
+Add functions of saving waveform data to files again.
+Change ZOH module default state from disable to enable.
