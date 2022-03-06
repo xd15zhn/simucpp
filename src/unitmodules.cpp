@@ -1,3 +1,5 @@
+#include <iostream>
+#include <ctime>
 #include "unitmodules.hpp"
 #include "definitions.hpp"
 NAMESPACE_SIMUCPP_L
@@ -43,7 +45,7 @@ void MConstant::connect(const PUnitModule m) {}
 void MConstant::Set_OutValue(double v) { _outvalue=v; };
 MConstant::MConstant(Simulator *sim, std::string name): UnitModule(name)
 {
-    _outvalue = 0;
+    _outvalue = 1;
     ADD_SIMULATOR();
 }
 
@@ -177,7 +179,7 @@ double MInput::Get_OutValue() const { return _outvalue; }
 void MInput::Set_Enable(bool enable) { _enable=enable; }
 void MInput::Set_Function(double (*function)(double u)) { _f=function; }
 void MInput::Set_Function(UserFunc *function) { _fu=function; }
-void MInput::Set_InputData(const std::vector<double> &data) { _data=data; }
+void MInput::Set_InputData(const vecdble &data) { _data=data; }
 void MInput::Set_Continuous(bool isContinuous) { _isc=isContinuous; }
 void MInput::Set_SampleTime(double time) { _T=time; }
 int MInput::Get_childCnt() const { return 0; }
@@ -296,7 +298,7 @@ void MOutput::Module_Reset() { _values.clear(); }
 int MOutput::Get_childCnt() const { return 1; }
 PUnitModule MOutput::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
 void MOutput::connect(const PUnitModule m) { _next=m;_enable=true; }
-std::vector<double>& MOutput::Get_StoredData() { return _values; }
+vecdble& MOutput::Get_StoredData() { return _values; }
 void MOutput::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void MOutput::Set_EnableStore(bool store) { _store=store; }
 void MOutput::Set_EnablePrint(bool print) { _print=print; }
@@ -484,12 +486,12 @@ void MTransportDelay::Set_DelayTime(double time)
     SIMUCPP_ASSERT_WARNING(delayPoints>0,
         "TRANSPORTDELAY module was given an improper delay time.");
     if (delayPoints>0){
-        _lv = std::vector<double>(delayPoints);
+        _lv = vecdble(delayPoints);
         for (int i=_lv.size()-1; i>=0; --i)
             _lv[i] = _iv;
     }
     else {
-        _lv = std::vector<double>{};
+        _lv = vecdble{};
     }
 }
 int MTransportDelay::Self_Check() const

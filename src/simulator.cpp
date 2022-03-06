@@ -1,6 +1,6 @@
+#include <iostream>
 #include <fstream>
 #include <stack>
-#include <cmath>
 #include "unitmodules.hpp"
 #include "definitions.hpp"
 #ifdef USE_MPLT
@@ -115,7 +115,7 @@ void Simulator::connect(PPackModule m1, PPackModule m2, int n2)
 
 /**********************
 Simulation initialization procedure, which includes the following steps:
- - step 1: Let every unit modules run a self check procedure;
+ - step 1: Self check procedure of unit modules and simulators;
  - step 2: Delete CONNECTOR module;
  - step 3: Build sequence table.
  - step 4: Index for discrete modules.
@@ -134,9 +134,10 @@ void Simulator::Initialize()
     MProduct *prod;
     MFcnMISO *miso;
     
-    /* step 1: Let every unit modules run a self check procedure*/
+    /* step 1: Self check procedure of unit modules and simulators*/
     for(int i=0; i<4; ++i)
         _ode4K[i] = new double[_cntI];
+    SIMUCPP_ASSERT_ERROR(_H>0, "Simulation step must be greator than zero!")
     for(int i=0; i<_cntM; ++i) {
         errcode = _modules[i]->Self_Check();
         if ((errcode!=0) && (errcode>_errlevel)) {
@@ -233,7 +234,7 @@ int Simulator::Simulate()
 {
     int err = 0;
     _t = 0;
-    while (_t < _duration)
+    while (_t < _duration-SIMUCPP_DBL_EPSILON)
         err |= Simulate_OneStep();
     err |= Simulate_FinalStep();
     return err;
@@ -253,18 +254,18 @@ int Simulator::Simulate_OneStep()
         _ltn += _T;
         _tvec.push_back(_t);
     }
-    MODULE_UNITDELAY_UPDATE_OUTPUT();
     SET_DISCRETE_ENABLE(true);
+    MODULE_UNITDELAY_UPDATE_OUTPUT();
     for(int i=0; i<_cntI; ++i){
         _outref[i] = _integrators[i]->_outvalue;
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[0][i] = _integrators[i]->Get_child()->Get_OutValue();
     }
-    SET_DISCRETE_ENABLE(false);
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
     PRINT_OUTPUT();
+    SET_DISCRETE_ENABLE(false);
 
     _t += _H;
     for(int i=0; i<_cntI; ++i)
@@ -376,6 +377,8 @@ void Simulator::Plot()
 #ifdef USE_MPLT
     for (PMOutput m: _outputs) {
         if (!m->_store) continue;
+        SIMUCPP_ASSERT_ERROR(_tvec.size()==m->_values.size(),
+            "internal error: plot.");
         matplotlibcpp::plot(_tvec, m->_values);
     }
     matplotlibcpp::show();

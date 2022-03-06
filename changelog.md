@@ -18,4 +18,6 @@ Delete functions of saving waveform data to files.
 
 # V1.7.5
 Add functions of saving waveform data to files again.
-Change ZOH module default state from disable to enable.
+Change default state of ZOH module from disable to enable.
+Change default output value of CONSTANT module from 0 to 1.
+Fix a bug which has a slight effect on simulation accuracy.

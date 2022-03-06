@@ -1,3 +1,4 @@
+#include <iostream>
 #include "packmodules.hpp"
 #include "definitions.hpp"
 NAMESPACE_SIMUCPP_L
@@ -21,8 +22,8 @@ TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator,
         "The order of the denominator must be equal to or higher than the order of the numerator!");
     SIMUCPP_ASSERT_ERROR(denominator[0]!=0,
         "The highest order of the denominator must not be 0!");
-    std::vector<double> num = numerator;
-    std::vector<double> den = denominator;
+    vecdble num = numerator;
+    vecdble den = denominator;
     _order = den.size()-1;
     if (den[0]!=1){
         for (int i=num.size()-1; i>=0; --i)
@@ -30,7 +31,6 @@ TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator,
         for (int i=den.size()-1; i>=0; --i)
             den[i] /= den[0];
     }
-    //std::vector<double> numtemp(den.size());
     for (int i=0; i<(int)(denominator.size()-numerator.size()); ++i){
         num.insert(num.begin(), 0);
     }
