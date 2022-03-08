@@ -52,7 +52,7 @@ simulator.cpp
 **********************/
 #define MODULE_INTEGRATOR_UPDATE() \
     for(int i=0; i<_cntI; ++i) \
-        for (int j=_integIDs[i].size()-1; j>=0; --j) \
+        for (int j=_integIDs[i].size()-1; j>0; --j) \
             _modules[_integIDs[i][j]]->Module_Update(_t)
 #define MODULE_OUTPUT_UPDATE() \
     for(int i=0; i<_cntO; ++i) \

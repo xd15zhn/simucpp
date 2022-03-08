@@ -9,5 +9,6 @@ ddeleting CONNECTOR modules, so it is not recommand for users to define a new Un
 module with multiple input ports.
 
 # todo lists
-- It should be carefully examined for developers that whether discrete modules should
-update only once or not in each simulation step.
+- Add a statistic for all errors and warnings and give each of them a serial number.
+- Add a discrete solver.
+- Add a code generator for faster simulations.

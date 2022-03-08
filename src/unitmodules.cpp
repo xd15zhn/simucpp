@@ -86,7 +86,6 @@ void MFcn::Module_Update(double time)
 
 /**********************
 FCNMISO module.
-This module is used for customization.
 **********************/
 MFcnMISO::~MFcnMISO() { _f=nullptr;_next.clear(); }
 double MFcnMISO::Get_OutValue() const { return _outvalue; }

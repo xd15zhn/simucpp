@@ -45,7 +45,7 @@ private:
 /**********************
 CONSTANT module.(cnst)
 User can use INPUT module instead, and this module is added for convenience.
-It generate a constant value.
+It outputs a constant value.
 **********************/
 class MConstant: public UnitModule
 {
@@ -231,7 +231,7 @@ private:
 
 
 /**********************
-PRODUCT module.(pord)
+PRODUCT module.(prod)
 See SUM module for details.
 **********************/
 class MProduct: public UnitModule

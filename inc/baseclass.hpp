@@ -164,6 +164,7 @@ public:
     // Run a simulation once or step by step.
     // They return 0 for everything is normal and others for some errors.
     int Simulate();
+    int Simulate_FirstStep();
     int Simulate_OneStep();
     int Simulate_FinalStep();
 
@@ -231,8 +232,9 @@ private:
 
     // IDs of every Endpoint modules according to the their updating orders.
     // First ID of every vector is an Endpoint module.
-    // @_discIDs: Make sure that every modules will update once in every simulation step,
-    //  and it will be reused as discrete ids.
+    // @_discIDs: Its name is "_allIDs" in previous version. Itis used to make
+    //  sure that every modules will update only once in every simulation step,
+    //  and it will be reused as discrete ids after building sequence table.
     std::vector<std::vector<int>> _integIDs, _delayIDs, _outIDs;
     std::vector<int> _discIDs;
 

@@ -21,3 +21,8 @@ Add functions of saving waveform data to files again.
 Change default state of ZOH module from disable to enable.
 Change default output value of CONSTANT module from 0 to 1.
 Fix a bug which has a slight effect on simulation accuracy.
+
+# V1.7.6
+Fix some bugs for DiscreteTransferFcn.
+Add Simulate_FirstStep() function again.
+Fix some little spell errors.

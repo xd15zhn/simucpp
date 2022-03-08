@@ -239,8 +239,18 @@ int Simulator::Simulate()
     err |= Simulate_FinalStep();
     return err;
 }
+int Simulator::Simulate_FirstStep()
+{
+    MODULE_INTEGRATOR_UPDATE();
+    MODULE_UNITDELAY_UPDATE();
+    MODULE_OUTPUT_UPDATE();
+    PRINT_OUTPUT();
+    _tvec.push_back(_t);
+    return 0;
+}
 int Simulator::Simulate_FinalStep()
 {
+    MODULE_UNITDELAY_UPDATE_OUTPUT();
     MODULE_INTEGRATOR_UPDATE();
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
@@ -254,7 +264,6 @@ int Simulator::Simulate_OneStep()
         _ltn += _T;
         _tvec.push_back(_t);
     }
-    SET_DISCRETE_ENABLE(true);
     MODULE_UNITDELAY_UPDATE_OUTPUT();
     for(int i=0; i<_cntI; ++i){
         _outref[i] = _integrators[i]->_outvalue;
@@ -265,9 +274,9 @@ int Simulator::Simulate_OneStep()
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
     PRINT_OUTPUT();
-    SET_DISCRETE_ENABLE(false);
 
     _t += _H;
+    SET_DISCRETE_ENABLE(false);
     for(int i=0; i<_cntI; ++i)
         _integrators[i]->_outvalue = _outref[i] + _H*_ode4K[0][i];
     for(int i=0; i<_cntI; ++i){
@@ -294,6 +303,7 @@ int Simulator::Simulate_OneStep()
     for(int i=0; i<_cntI; ++i)
         _integrators[i]->_outvalue = _outref[i] +
             _H/3*(_ode4K[0][i] + _ode4K[1][i] + _ode4K[1][i] + _ode4K[2][i] + _ode4K[2][i] + _ode4K[3][i]);
+    SET_DISCRETE_ENABLE(true);
 
     // Convergence and divergence check
     CHECK_CONVERGENCE(PMIntegrator, _integrators);
@@ -378,7 +388,7 @@ void Simulator::Plot()
     for (PMOutput m: _outputs) {
         if (!m->_store) continue;
         SIMUCPP_ASSERT_ERROR(_tvec.size()==m->_values.size(),
-            "internal error: plot.");
+            "Module " << m->_name << " has a wrong data amount for plot!");
         matplotlibcpp::plot(_tvec, m->_values);
     }
     matplotlibcpp::show();
