@@ -72,8 +72,8 @@ State space module.
 class StateSpace: public PackModule
 {
 public:
-    StateSpace(Simulator *sim, const zhnmat::Mat& A, const zhnmat::Mat& B,
-        const zhnmat::Mat& C, const zhnmat::Mat& D, bool isc, std::string name="sts");
+    StateSpace(Simulator *sim, const zhnmat::Mat& A, const zhnmat::Mat& B, const zhnmat::Mat& C,
+        const zhnmat::Mat& D=zhnmat::Mat(), bool isc=true, std::string name="sts");
     virtual PUnitModule Get_InputPort(int n=0) const;
     virtual PUnitModule Get_OutputPort(int n=0) const;
     void Set_SampleTime(double time);

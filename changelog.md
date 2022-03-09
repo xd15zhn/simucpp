@@ -26,3 +26,4 @@ Fix a bug which has a slight effect on simulation accuracy.
 Fix some bugs for DiscreteTransferFcn.
 Add Simulate_FirstStep() function again.
 Fix some little spell errors.
+Add some default values.

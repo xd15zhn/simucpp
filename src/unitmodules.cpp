@@ -263,19 +263,21 @@ MNoise::~MNoise() {}
 double MNoise::Get_OutValue() const { return _outvalue; }
 void MNoise::Set_Enable(bool enable) { _enable=enable; }
 int MNoise::Self_Check() const { return 0; }
-void MNoise::Set_Mean(double mean) { _mean=mean; }
-void MNoise::Set_Variance(double var) { _var=var; }
-void MNoise::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void MNoise::Module_Reset() {}
 int MNoise::Get_childCnt() const { return 0; }
 PUnitModule MNoise::Get_child(unsigned int n) const { return nullptr; }
 void MNoise::connect(const PUnitModule m) {}
+void MNoise::Set_Mean(double mean) { _mean=mean; }
+void MNoise::Set_Variance(double var) { _var=var; }
+void MNoise::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 MNoise::MNoise(Simulator *sim, std::string name): UnitModule(name)
 {
     DISCRETE_INITIALIZE(-1);
     _outvalue = 0;
     ADD_SIMULATOR();
     _enable = true;
+    _mean = 0;
+    _var = 1;
     gen = std::default_random_engine((unsigned int)time(0));
     NormDis = std::normal_distribution<double>(0, 1);
 }
@@ -526,11 +528,11 @@ MUnitDelay::~MUnitDelay() { _next=nullptr; }
 double MUnitDelay::Get_OutValue() const { return _outvalue; }
 void MUnitDelay::Set_Enable(bool enable) { _enable=enable; }
 void MUnitDelay::Set_InitialValue(double value) { _outvalue=_lv=_iv=value; }
-void MUnitDelay::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void MUnitDelay::Module_Reset() { _outvalue=_lv=_iv; }
 int MUnitDelay::Get_childCnt() const { return 1; }
 PUnitModule MUnitDelay::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
 void MUnitDelay::connect(const PUnitModule m) { _next=m;_enable=true; }
+void MUnitDelay::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 MUnitDelay::MUnitDelay(Simulator *sim, std::string name): UnitModule(name)
 {
     DISCRETE_INITIALIZE(1);
@@ -562,11 +564,11 @@ ZOH module.
 MZOH::~MZOH() { _next=nullptr; }
 double MZOH::Get_OutValue() const { return _outvalue; }
 void MZOH::Set_Enable(bool enable) { _enable=enable; }
-void MZOH::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void MZOH::Module_Reset() { _outvalue=0;_ltn=-_T; }
 int MZOH::Get_childCnt() const { return 1; }
 PUnitModule MZOH::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
 void MZOH::connect(const PUnitModule m) { _next=m;_enable=true; }
+void MZOH::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 MZOH::MZOH(Simulator *sim, std::string name): UnitModule(name)
 {
     DISCRETE_INITIALIZE(1);
