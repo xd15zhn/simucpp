@@ -67,7 +67,9 @@ private:
 
 #ifdef USE_ZHNMAT
 /*********************
-State space module.
+STATESPACE module.
+Generate a state space module with matrix A,B,C,D.
+You should specify that this module is working in continuous mode or discrete mode.
 **********************/
 class StateSpace: public PackModule
 {
@@ -88,6 +90,22 @@ private:
     int _orderx, _orderu, _ordery;  // Order of states, inputs, outputs.
     bool _isc;  // True if in continuous mode.
     double _T;
+};
+
+
+/*********************
+STATEGAIN module.
+**********************/
+class StateGain: public PackModule
+{
+public:
+    StateGain(Simulator *sim, const zhnmat::Mat& G, std::string name="sgn");
+    virtual PUnitModule Get_InputPort(int n=0) const;
+    virtual PUnitModule Get_OutputPort(int n=0) const;
+private:
+    MSum **sumy = nullptr;
+    MConnector **inu = nullptr;
+    int _orderu, _ordery;  // Order of inputs, outputs.
 };
 
 #endif

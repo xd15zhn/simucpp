@@ -245,5 +245,41 @@ vecdble StateSpace::Get_OutValue()
     return ans;
 }
 
+
+/*********************
+STATEGAIN module.
+**********************/
+StateGain::StateGain(Simulator *sim, const zhnmat::Mat& G, std::string name)
+    :PackModule(name)
+{
+    _orderu = G.col(); _ordery = G.row();
+    SIMUCPP_ASSERT_ERROR(_orderu>=2, "Order too few!");
+    SIMUCPP_ASSERT_ERROR(_ordery>=2, "Order too few!");
+    sumy = new MSum*[_ordery];
+    inu = new MConnector*[_orderu];
+    for (int i=0; i<_orderu; ++i)
+        inu[i] = new MConnector(sim, name+"_inu"+std::to_string(i));
+    for (int i=0; i<_ordery; ++i) {
+        sumy[i] = new MSum(sim, name+"_sumy"+std::to_string(i));
+        for (int j=0; j<_orderu; ++j) {
+            sim->connect(inu[j], sumy[i]);
+            sumy[i]->Set_InputGain(G.at(i, j));
+        }
+    }
+}
+PUnitModule StateGain::Get_InputPort(int n) const
+{
+        if (n<0) return nullptr;
+        if (n<_orderu) return inu[n];
+        return nullptr;
+}
+PUnitModule StateGain::Get_OutputPort(int n) const
+{
+        if (n<0) return nullptr;
+        if (n<_ordery) return sumy[n];
+        return nullptr;
+}
+
+
 #endif
 NAMESPACE_SIMUCPP_R

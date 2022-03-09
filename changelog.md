@@ -27,3 +27,6 @@ Fix some bugs for DiscreteTransferFcn.
 Add Simulate_FirstStep() function again.
 Fix some little spell errors.
 Add some default values.
+
+# V1.7.7
+Add pack module StateGain.
