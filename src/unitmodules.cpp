@@ -176,14 +176,14 @@ INPUT module.
 MInput::~MInput() { _data.clear();_f=nullptr; }
 double MInput::Get_OutValue() const { return _outvalue; }
 void MInput::Set_Enable(bool enable) { _enable=enable; }
+int MInput::Get_childCnt() const { return 0; }
+PUnitModule MInput::Get_child(unsigned int n) const { return nullptr; }
+void MInput::connect(const PUnitModule m) {}
 void MInput::Set_Function(double (*function)(double u)) { _f=function; }
 void MInput::Set_Function(UserFunc *function) { _fu=function; }
 void MInput::Set_InputData(const vecdble &data) { _data=data; }
 void MInput::Set_Continuous(bool isContinuous) { _isc=isContinuous; }
 void MInput::Set_SampleTime(double time) { _T=time; }
-int MInput::Get_childCnt() const { return 0; }
-PUnitModule MInput::Get_child(unsigned int n) const { return nullptr; }
-void MInput::connect(const PUnitModule m) {}
 MInput::MInput(Simulator *sim, std::string name): UnitModule(name)
 {
     _outvalue = 0;
@@ -263,7 +263,7 @@ MNoise::~MNoise() {}
 double MNoise::Get_OutValue() const { return _outvalue; }
 void MNoise::Set_Enable(bool enable) { _enable=enable; }
 int MNoise::Self_Check() const { return 0; }
-void MNoise::Module_Reset() {}
+void MNoise::Module_Reset() { _outvalue=0;_ltn=-_T; }
 int MNoise::Get_childCnt() const { return 0; }
 PUnitModule MNoise::Get_child(unsigned int n) const { return nullptr; }
 void MNoise::connect(const PUnitModule m) {}
@@ -295,7 +295,7 @@ OUTPUT module.
 MOutput::~MOutput() { _values.clear(); }
 double MOutput::Get_OutValue() const { return _outvalue; }
 void MOutput::Set_Enable(bool enable) { _enable=enable; }
-void MOutput::Module_Reset() { _values.clear(); }
+void MOutput::Module_Reset() { _values.clear();_outvalue=0;_ltn=-_T; }
 int MOutput::Get_childCnt() const { return 1; }
 PUnitModule MOutput::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
 void MOutput::connect(const PUnitModule m) { _next=m;_enable=true; }

@@ -34,7 +34,11 @@ typedef MOutput* PMOutput;
 typedef MUnitDelay* PMUnitDelay;
 typedef std::vector<double> vecdble;
 
-
+enum DIVERGENCE_MODE {
+    DIVERGENCE_ABORT,
+    DIVERGENCE_PRINT,
+    DIVERGENCE_NONE,
+};
 
 /**********************
 Used to provide another method to replace the pointer to a function.
@@ -203,6 +207,13 @@ public:
     // -1: any warning will be considered an error.
     void Set_WarningLevel(int level=0);
 
+    // Set how the simulator works when the simulation diverged.
+    // 0: Default, Print a message and stop.
+    // 1: print a message and keep going on, and return a none-zero value after simulation.
+    // 2: keep going on and return a none-zero value after simulation.
+    // other: the same as 2.
+    void Set_DivergenceCheckMode(int mode=0);
+
     // Print current Simucpp version.
     static void VERSION();
 
@@ -249,8 +260,9 @@ private:
     double _t;
     std::vector<double> _tvec;
 
-    // See public member function "Set_WarningLevel".
-    int _errlevel;
+    // See public member function "Set_WarningLevel" and "Set_DivergenceCheckMode".
+    int _errlevel, _divmode;
+    bool _diverge;
 };
 
 NAMESPACE_SIMUCPP_R

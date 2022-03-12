@@ -17,13 +17,15 @@ Simulator::Simulator(double duration)
     _duration = duration;
     _cntM = 0;
     _t = 0;
-    _errlevel = 0;
     _store = true;
     _print = false;
     _precision = 8;
     DISCRETE_INITIALIZE(-1);
     _fp = nullptr;
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
+    _errlevel = 0;
+    _divmode = 0;
+    _diverge = false;
 }
 Simulator::~Simulator()
 {
@@ -176,7 +178,9 @@ void Simulator::Initialize()
                     if(curm) miso->connect(bm->Get_child());
                 }
                 else {
-                    SIMUCPP_ASSERT_ERROR(false, "Multiple input modules undefined!");
+                    SIMUCPP_ASSERT_ERROR(curm->Get_childCnt()<=1,
+                        "Multiple input modules undefined!");
+                    curm->connect(bm->Get_child());
                 }
                 _cntM--;
                 connectorids.push_back(bm->_id);
@@ -227,6 +231,7 @@ void Simulator::Initialize()
 
 /**********************
 Simulate();
+Simulate_FirstStep();
 Simulate_FinalStep();
 Simulate_OneStep();
 **********************/
@@ -234,8 +239,21 @@ int Simulator::Simulate()
 {
     int err = 0;
     _t = 0;
-    while (_t < _duration-SIMUCPP_DBL_EPSILON)
+    while (_t < _duration-SIMUCPP_DBL_EPSILON) {
         err |= Simulate_OneStep();
+        if (!err) continue;
+        switch (_divmode) {
+        case DIVERGENCE_ABORT: std::cout << "Simulation diverged." << std::endl; abort();
+        case DIVERGENCE_PRINT:
+            if (!_diverge) {
+                _diverge = true;
+                std::cout << "Simulation diverged." << std::endl;
+            }
+            break;
+        case DIVERGENCE_NONE: break;
+        default: break;
+        }
+    }
     err |= Simulate_FinalStep();
     return err;
 }
@@ -371,7 +389,8 @@ Reset all modules of this simulation to their initial state.
 **********************/
 void Simulator::Simulation_Reset()
 {
-     _t = 0;
+     _t = 0; _tvec.clear();
+     _ltn = -_T;
     for(PUnitModule m:_modules) {
         if (m==nullptr) continue;
         m->Module_Reset();
@@ -417,5 +436,6 @@ double Simulator::Get_SimStep() { return _H+_H; }
 void Simulator::VERSION() { std::cout << SIMUCPP_VERSION << std::endl; }
 void Simulator::Set_WarningLevel(int level) {
     _errlevel=(level>0)?(int)SIMUCPP_INFINITE1:((level<0)?-(int)SIMUCPP_INFINITE1:0); }
+void Simulator::Set_DivergenceCheckMode(int mode) { _divmode=mode; };
 
 NAMESPACE_SIMUCPP_R

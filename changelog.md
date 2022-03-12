@@ -30,3 +30,8 @@ Add some default values.
 
 # V1.7.7
 Add pack module StateGain.
+
+# V1.7.8
+Fix some bugs of Simulation_Reset().
+Fix a bug of deleting CONNECTOR module.
+Add Set_DivergenceCheckMode() function.
