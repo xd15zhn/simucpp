@@ -240,21 +240,18 @@ int Simulator::Simulate()
     int err = 0;
     _t = 0;
     while (_t < _duration-SIMUCPP_DBL_EPSILON) {
-        err |= Simulate_OneStep();
+        err = Simulate_OneStep();
         if (!err) continue;
-        switch (_divmode) {
-        case DIVERGENCE_ABORT: std::cout << "Simulation diverged." << std::endl; abort();
-        case DIVERGENCE_PRINT:
-            if (!_diverge) {
-                _diverge = true;
-                std::cout << "Simulation diverged." << std::endl;
-            }
-            break;
-        case DIVERGENCE_NONE: break;
-        default: break;
+        if (_divmode == DIVERGENCE_ABORT) {
+            PRINT_CONVERGENCE(err);
+            abort();
+        }
+        else if ((_divmode == DIVERGENCE_PRINT) && !_diverge) {
+            _diverge = true;
+            PRINT_CONVERGENCE(err);
         }
     }
-    err |= Simulate_FinalStep();
+    err = Simulate_FinalStep();
     return err;
 }
 int Simulator::Simulate_FirstStep()
@@ -395,6 +392,7 @@ void Simulator::Simulation_Reset()
         if (m==nullptr) continue;
         m->Module_Reset();
     }
+    _diverge = false;
 }
 
 

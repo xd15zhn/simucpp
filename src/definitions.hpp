@@ -8,8 +8,8 @@ global
 #define SIMUCPP_ASSERT_ERROR(e, s)           if(!(e)){std::cout<<"Simucpp Error: "<<s<<std::endl;abort();}
 #define SIMUCPP_ASSERT_WARNING(e, s)         if(!(e)){std::cout<<"Simucpp Warning: "<<s<<std::endl;}
 #define SIMUCPP_PRINT(s)                     std::cout<<s<<std::endl;
-#define SIMUCPP_INFINITE1                    1e12
-#define SIMUCPP_INFINITE2                    9e11
+#define SIMUCPP_INFINITE1                    1e16
+#define SIMUCPP_INFINITE2                    9e15
 #define SIMUCPP_DBL_EPSILON                  1e-6
 
 
@@ -92,6 +92,14 @@ simulator.cpp
         if (m->_outvalue > SIMUCPP_INFINITE1) return 1; \
         if (m->_outvalue < -SIMUCPP_INFINITE1) return 2; \
         if (std::isnan(m->_outvalue)) return 3; \
+    }
+#define PRINT_CONVERGENCE(x) \
+    std::cout << "Simulation diverged. Type: "; \
+    switch (x) { \
+    case 1: std::cout<< "Positive infinity." << std::endl; break; \
+    case 2: std::cout<< "Negative infinity." << std::endl; break; \
+    case 3: std::cout<< "Not a number." << std::endl; break; \
+    default: break; \
     }
 
 #define STRING_DIRECT(x)    #x
