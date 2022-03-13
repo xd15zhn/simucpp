@@ -208,9 +208,11 @@ public:
     void Set_WarningLevel(int level=0);
 
     // Set how the simulator works when the simulation diverged.
-    // 0: Default, Print a message and stop.
-    // 1: print a message and keep going on, and return a none-zero value after simulation.
-    // 2: keep going on and return a none-zero value after simulation.
+    // 0: Default, Print a message and stop the program.
+    // 1: Print a message and keep going on, and return a none-zero value after simulation.
+    // 2: Keep going on and return a none-zero value after simulation.
+    // 3: Print a message and stop the simulation, return a none-zero value.
+    // 4: Stop the simulation, return a none-zero value.
     // other: the same as 2.
     void Set_DivergenceCheckMode(int mode=0);
 

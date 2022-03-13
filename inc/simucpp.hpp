@@ -1,5 +1,5 @@
-#ifndef MISCELLANEOUS_H
-#define MISCELLANEOUS_H
+#ifndef SIMUCPP_HEADER_H
+#define SIMUCPP_HEADER_H
 #include "packmodules.hpp"
 
 #define SIMUCPP_CONTINUOUS                        true
@@ -47,4 +47,4 @@ public: \
     virtual double Function(double *u)const{ funccontent; } \
 };
 
-#endif
+#endif  // SIMUCPP_HEADER_H

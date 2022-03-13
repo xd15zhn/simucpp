@@ -1,12 +1,19 @@
 #include <iostream>
 #include <fstream>
 #include <stack>
+#include <algorithm>
 #include "unitmodules.hpp"
 #include "definitions.hpp"
 #ifdef USE_MPLT
 #include "matplotlibcpp.h"
 #endif
 NAMESPACE_SIMUCPP_L
+
+bool Find_vector(std::vector<int>& data, int x)
+{
+    std::vector<int>::iterator iter = std::find(data.begin(), data.end(), x);
+    return iter != data.end();
+}
 
 /**********************
 **********************/
@@ -242,14 +249,16 @@ int Simulator::Simulate()
     while (_t < _duration-SIMUCPP_DBL_EPSILON) {
         err = Simulate_OneStep();
         if (!err) continue;
-        if (_divmode == DIVERGENCE_ABORT) {
-            PRINT_CONVERGENCE(err);
-            abort();
-        }
-        else if ((_divmode == DIVERGENCE_PRINT) && !_diverge) {
+        if (_divmode == 0) {
+            PRINT_CONVERGENCE(err); abort(); }
+        else if ((_divmode == 1) && !_diverge) {
             _diverge = true;
+            PRINT_CONVERGENCE(err); }
+        else if (_divmode == 3) {
             PRINT_CONVERGENCE(err);
-        }
+            return err; }
+        else if (_divmode == 4) {
+            return err; }
     }
     err = Simulate_FinalStep();
     return err;
@@ -337,13 +346,14 @@ The input is a sequence table and has only one element, and this function
 void Simulator::Build_Connection(std::vector<int> &ids)
 {
     std::stack<int> idq;  // ids in stack
+    std::vector<int> idqv;  // compare in idq
     int id;  // id of child module
     int curid;  // id of module in top of stack
     bool equal = false;  // if repetitive id detected
     PUnitModule bm;  // pointer to child module
-    idq.push(ids[0]);
+    idq.push(ids[0]); idqv.push_back(ids[0]);
     while (!idq.empty()){
-        curid = idq.top(); idq.pop();
+        curid = idq.top(); idq.pop(); idqv.pop_back();
         for (int i=0; i<_modules[curid]->Get_childCnt(); ++i){
             bm = _modules[curid]->Get_child(i);
             if (bm==nullptr) continue;
@@ -367,15 +377,19 @@ void Simulator::Build_Connection(std::vector<int> &ids)
                         agq.push(agid);
                     }
                 }
-                equal = true;
+                if (Find_vector(ids, id)) {
+                    std::remove(std::begin(ids), std::end(ids), id);
+                    ids.pop_back(); }
+                else {
+                    equal = true; }
                 break;
             }
             if (equal) {
-                equal=false; continue;
-            }
+                equal=false; continue; }
             ids.push_back(id);
             _discIDs.push_back(id);
-            idq.push(id);
+            if (!Find_vector(idqv, id)) {
+                idq.push(id);idqv.push_back(id); }
         }
     }
 }

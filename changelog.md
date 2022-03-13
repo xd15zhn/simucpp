@@ -35,3 +35,7 @@ Add pack module StateGain.
 Fix some bugs of Simulation_Reset().
 Fix a bug of deleting CONNECTOR module.
 Add Set_DivergenceCheckMode() function.
+
+# V1.7.9
+Fix a bug of building Sequence Table.
+Add some conditions for Set_DivergenceCheckMode() function.
