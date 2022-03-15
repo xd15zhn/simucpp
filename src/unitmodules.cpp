@@ -133,10 +133,16 @@ void MFcnMISO::connect(const PUnitModule m)
     _next.push_back(m);
     _enable = true;
 }
-void MFcnMISO::disconnect(int n)
+void MFcnMISO::connect2(const PUnitModule m, unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect");
-    _next.erase(_next.begin()+n);
+    SIMUCPP_ASSERT_ERROR(n<_next.size(), "internal error: reconnect.");
+    SIMUCPP_ASSERT_ERROR(_next[n]==nullptr, "internal error: reconnect.");
+    _next[n] = m;
+}
+void MFcnMISO::disconnect(unsigned int n)
+{
+    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect.");
+    _next[n] = nullptr;
 }
 
 
@@ -388,13 +394,16 @@ void MProduct::connect(const PUnitModule m)
     _ingain.push_back(1);
     _enable = true;
 }
-double MProduct::disconnect(int n)
+void MProduct::connect2(const PUnitModule m, unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect");
-    double ingaintemp = _ingain[n];
-    _next.erase(_next.begin()+n);
-    _ingain.erase(_ingain.begin()+n);
-    return ingaintemp;
+    SIMUCPP_ASSERT_ERROR(n<_next.size(), "internal error: reconnect.");
+    SIMUCPP_ASSERT_ERROR(_next[n]==nullptr, "internal error: reconnect.");
+    _next[n] = m;
+}
+void MProduct::disconnect(unsigned int n)
+{
+    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect.");
+    _next[n] = nullptr;
 }
 
 
@@ -453,13 +462,17 @@ void MSum::connect(const PUnitModule m)
     _ingain.push_back(1);
     _enable = true;
 }
-double MSum::disconnect(int n)
+void MSum::connect2(const PUnitModule m, unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect");
-    double ingaintemp = _ingain[n];
-    _next.erase(_next.begin()+n);
-    _ingain.erase(_ingain.begin()+n);
-    return ingaintemp;
+    SIMUCPP_ASSERT_ERROR(n>=0, "internal error: reconnect.");
+    SIMUCPP_ASSERT_ERROR(n<_next.size(), "internal error: reconnect.");
+    SIMUCPP_ASSERT_ERROR(_next[n]==nullptr, "internal error: reconnect.");
+    _next[n] = m;
+}
+void MSum::disconnect(unsigned int n)
+{
+    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect.");
+    _next[n] = nullptr;
 }
 
 

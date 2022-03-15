@@ -87,7 +87,8 @@ public:
     void Set_Function(double(*function)(double* inparam));
     void Set_Function(UserFunc *function);
 private:
-    void disconnect(int n=0);
+    void connect2(const PUnitModule m, unsigned int n=0);
+    void disconnect(unsigned int n=0);
     double _outvalue;
     double(*_f)(double* inparam);
     UserFunc *_fu;
@@ -241,7 +242,8 @@ public:
     // Set the input gain of current connection, or the connection specified by param "port".
     void Set_InputGain(double inputgain, int port=-1);
 private:
-    double disconnect(int n=0);
+    void connect2(const PUnitModule m, unsigned int n=0);
+    void disconnect(unsigned int n=0);
     double _outvalue;
     std::vector<PUnitModule> _next;
     std::vector<double> _ingain;
@@ -261,7 +263,8 @@ public:
     // Set the input gain of current connection, or the connection specified by param "port".
     void Set_InputGain(double inputgain, int port=-1);
 private:
-    double disconnect(int n=0);
+    void connect2(const PUnitModule m, unsigned int n=0);
+    void disconnect(unsigned int n=0);
     double _outvalue;
     std::vector<PUnitModule> _next;
     std::vector<double> _ingain;

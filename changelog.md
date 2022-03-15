@@ -39,3 +39,6 @@ Add Set_DivergenceCheckMode() function.
 # V1.7.9
 Fix a bug of building Sequence Table.
 Add some conditions for Set_DivergenceCheckMode() function.
+
+# V1.7.10
+Change the logic for disconnect() of MISO modules.

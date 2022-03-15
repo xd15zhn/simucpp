@@ -135,7 +135,6 @@ void Simulator::Initialize()
     _cntI = _integIDs.size();
     _cntO = _outIDs.size();
     _cntD = _delayIDs.size();
-    double ingaintemp;
     int errcode;
     PUnitModule bm, curm;
     std::vector<int> connectorids;
@@ -166,23 +165,21 @@ void Simulator::Initialize()
                 curm = _modules[i];
                 if (typeid(*curm) == typeid(MSum)){
                     sum = (MSum*)curm;
-                    ingaintemp = sum->disconnect(j);
+                    sum->disconnect(j);
                     curm = bm->Get_child();
-                    if(curm) sum->connect(curm);
-                    sum->Set_InputGain(ingaintemp);
+                    if(curm) sum->connect2(curm, j);
                 }
                 else if (typeid(*curm) == typeid(MProduct)){
                     prod = (MProduct*)curm;
-                    ingaintemp = prod->disconnect(j);
+                    prod->disconnect(j);
                     curm = bm->Get_child();
-                    if(curm) prod->connect(bm->Get_child());
-                    prod->Set_InputGain(ingaintemp);
+                    if(curm) prod->connect2(bm->Get_child(), j);
                 }
                 else if (typeid(*curm) == typeid(MFcnMISO)){
                     miso = (MFcnMISO*)curm;
                     miso->disconnect(j);
                     curm = bm->Get_child();
-                    if(curm) miso->connect(bm->Get_child());
+                    if(curm) miso->connect2(bm->Get_child(), j);
                 }
                 else {
                     SIMUCPP_ASSERT_ERROR(curm->Get_childCnt()<=1,
