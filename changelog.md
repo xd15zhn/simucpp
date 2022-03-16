@@ -34,7 +34,7 @@ Add pack module StateGain.
 # V1.7.8
 Fix some bugs of Simulation_Reset().
 Fix a bug of deleting CONNECTOR module.
-Add Set_DivergenceCheckMode() function.
+Add Set_DivergenceCheckMode() function of simulator.
 
 # V1.7.9
 Fix a bug of building Sequence Table.
@@ -42,3 +42,7 @@ Add some conditions for Set_DivergenceCheckMode() function.
 
 # V1.7.10
 Change the logic for disconnect() of MISO modules.
+
+# V1.7.11
+Add DBG_Set_NaNOutput() function of simulator.
+

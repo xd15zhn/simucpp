@@ -405,8 +405,6 @@ void Simulator::Simulation_Reset()
     }
     _diverge = false;
 }
-
-
 /**********************
 Use data stored in OUTPUT modules to draw a waveform.
 **********************/
@@ -424,7 +422,35 @@ void Simulator::Plot()
     SIMUCPP_ASSERT_WARNING(false, "You didn't add matplotlib-cpp library.");
 #endif
 }
-
+/**********************
+Use data stored in OUTPUT modules to draw a waveform.
+**********************/
+void Simulator::Set_DivergenceCheckMode()
+{
+    PUnitModule bm = nullptr;
+    for(int i=_cntM-1; i>=0; --i){
+        if (_modules[i]==nullptr) continue;
+        bm = _modules[i];
+        if (typeid(*bm) == typeid(MInput)) {
+           MInput *mdl = (MInput*)bm;
+           mdl->_outvalue = nan(""); }
+        else if (typeid(*bm) == typeid(MFcn)) {
+           MFcn *mdl = (MFcn*)bm;
+           mdl->_outvalue = nan(""); }
+        else if (typeid(*bm) == typeid(MFcnMISO)) {
+           MFcnMISO *mdl = (MFcnMISO*)bm;
+           mdl->_outvalue = nan(""); }
+        else if (typeid(*bm) == typeid(MProduct)) {
+           MProduct *mdl = (MProduct*)bm;
+           mdl->_outvalue = nan(""); }
+        else if (typeid(*bm) == typeid(MSum)) {
+           MSum *mdl = (MSum*)bm;
+           mdl->_outvalue = nan(""); }
+        else if (typeid(*bm) == typeid(MZOH)) {
+           MZOH *mdl = (MZOH*)bm;
+           mdl->_outvalue = nan(""); }
+    }
+}
 
 /**********************
 **********************/

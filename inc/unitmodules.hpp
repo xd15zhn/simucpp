@@ -8,7 +8,7 @@ The first line in code annotations of each unitmodule gives its name and abbrevi
 #ifndef BASEMODULES_H
 #define BASEMODULES_H
 #include <random>
-#include "baseclass.hpp"
+#include "simulator.hpp"
 NAMESPACE_SIMUCPP_L
 #define UNITMODULE_VIRTUAL(classname, abbrname) \
     friend class Simulator; \
