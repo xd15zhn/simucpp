@@ -262,12 +262,14 @@ class MSum: public UnitModule
 public:
     // Set the input gain of current connection, or the connection specified by param "port".
     void Set_InputGain(double inputgain, int port=-1);
+    void Set_Redundant(bool rdnt=true);
 private:
     void connect2(const PUnitModule m, unsigned int n=0);
     void disconnect(unsigned int n=0);
     double _outvalue;
     std::vector<PUnitModule> _next;
     std::vector<double> _ingain;
+    bool _rdnt;
 };
 
 

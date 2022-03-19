@@ -9,7 +9,7 @@ option(USE_ZHNMAT "If you can use zhnmat." ON)
 option(USE_MPLT "If you can use matplotlib-cpp." ON)
 
 cmake_minimum_required(VERSION 3.12)
-project(simucpp VERSION 1.7.11)
+project(simucpp VERSION 1.7.12)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE release)

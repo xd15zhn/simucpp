@@ -125,10 +125,11 @@ void Simulator::connect(PPackModule m1, PPackModule m2, int n2)
 /**********************
 Simulation initialization procedure, which includes the following steps:
  - step 1: Self check procedure of unit modules and simulators;
- - step 2: Delete CONNECTOR module;
- - step 3: Build sequence table.
- - step 4: Index for discrete modules.
- - step 5: Initialize a data file for storage.
+ - step 2: Delete CONNECTOR module.
+ - step 3: Delete redundant connection of SUM module.
+ - step 4: Build sequence table.
+ - step 5: Index for discrete modules.
+ - step 6: Initialize a data file for storage.
 **********************/
 void Simulator::Initialize()
 {
@@ -138,9 +139,6 @@ void Simulator::Initialize()
     int errcode;
     PUnitModule bm, curm;
     std::vector<int> connectorids;
-    MSum *sum;
-    MProduct *prod;
-    MFcnMISO *miso;
     
     /* step 1: Self check procedure of unit modules and simulators*/
     for(int i=0; i<4; ++i)
@@ -164,22 +162,22 @@ void Simulator::Initialize()
             if (typeid(*bm) == typeid(MConnector)){
                 curm = _modules[i];
                 if (typeid(*curm) == typeid(MSum)){
-                    sum = (MSum*)curm;
-                    sum->disconnect(j);
+                    MSum* mdl = (MSum*)curm;
+                    mdl->disconnect(j);
                     curm = bm->Get_child();
-                    if(curm) sum->connect2(curm, j);
+                    if(curm) mdl->connect2(curm, j);
                 }
                 else if (typeid(*curm) == typeid(MProduct)){
-                    prod = (MProduct*)curm;
-                    prod->disconnect(j);
+                    MProduct* mdl = (MProduct*)curm;
+                    mdl->disconnect(j);
                     curm = bm->Get_child();
-                    if(curm) prod->connect2(bm->Get_child(), j);
+                    if(curm) mdl->connect2(bm->Get_child(), j);
                 }
                 else if (typeid(*curm) == typeid(MFcnMISO)){
-                    miso = (MFcnMISO*)curm;
-                    miso->disconnect(j);
+                    MFcnMISO* mdl = (MFcnMISO*)curm;
+                    mdl->disconnect(j);
                     curm = bm->Get_child();
-                    if(curm) miso->connect2(bm->Get_child(), j);
+                    if(curm) mdl->connect2(bm->Get_child(), j);
                 }
                 else {
                     SIMUCPP_ASSERT_ERROR(curm->Get_childCnt()<=1,
@@ -196,7 +194,21 @@ void Simulator::Initialize()
         _modules[id] = nullptr;
     }
 
-    /*step 3: Build sequence table*/
+    /*step 3: Delete redundant connection of SUM module*/
+    for(int i=_cntM-1; i>=0; --i){
+        if (_modules[i]==nullptr) continue;
+        bm = _modules[i];
+        if (typeid(*bm) != typeid(MSum)) continue;
+        MSum *mdl = (MSum*)bm;
+        if (mdl->_rdnt) continue;
+        for (int i=mdl->_next.size()-1; i>=0; --i) {
+            if (mdl->_ingain[i]!=0) continue;
+            mdl->_ingain.erase(mdl->_ingain.begin() + i);
+            mdl->_next.erase(mdl->_next.begin() + i);
+        }
+    }
+
+    /*step 4: Build sequence table*/
     for(int i=0; i<_cntI; ++i)
         Build_Connection(_integIDs[i]);
     for(int i=0; i<_cntD; ++i)
@@ -204,7 +216,7 @@ void Simulator::Initialize()
     for(int i=0; i<_cntO; ++i)
         Build_Connection(_outIDs[i]);
 
-    /*step 4: Index for discrete modules*/
+    /*step 5: Index for discrete modules*/
     _discIDs.clear();
     for (PUnitModule m: _modules) {
         if (m==nullptr) continue;
@@ -224,7 +236,7 @@ void Simulator::Initialize()
     }
     SIMUCPP_ASSERT_WARNING(_cntO>0, "You haven't add any OUTPUT modules.");
 
-    /*step 5: Initialize a data file for storage.*/
+    /*step 6: Initialize a data file for storage.*/
     if (!_print) return;
     _fp = new std::fstream;
     _fp->open("data.csv", std::ios::out);
@@ -242,7 +254,6 @@ Simulate_OneStep();
 int Simulator::Simulate()
 {
     int err = 0;
-    _t = 0;
     while (_t < _duration-SIMUCPP_DBL_EPSILON) {
         err = Simulate_OneStep();
         if (!err) continue;
@@ -423,7 +434,7 @@ void Simulator::Plot()
 #endif
 }
 /**********************
-Use data stored in OUTPUT modules to draw a waveform.
+Set the output values of every pass-through modules to NaN.
 **********************/
 void Simulator::Set_DivergenceCheckMode()
 {

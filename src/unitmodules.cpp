@@ -415,9 +415,11 @@ double MSum::Get_OutValue() const { return _outvalue; }
 void MSum::Set_Enable(bool enable) { _enable=enable; }
 void MSum::Module_Reset() {}
 int MSum::Get_childCnt() const { return _next.size(); }
+void MSum::Set_Redundant(bool rdnt) { _rdnt=rdnt; };
 MSum::MSum(Simulator *sim, std::string name): UnitModule(name)
 {
     _outvalue = 0;
+    _rdnt = true;
     ADD_SIMULATOR();
 }
 void MSum::Set_InputGain(double inputgain, int port)
