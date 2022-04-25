@@ -426,8 +426,9 @@ void Simulator::Plot()
         if (!m->_store) continue;
         SIMUCPP_ASSERT_ERROR(_tvec.size()==m->_values.size(),
             "Module " << m->_name << " has a wrong data amount for plot!");
-        matplotlibcpp::plot(_tvec, m->_values);
+        matplotlibcpp::named_plot(m->_name, _tvec, m->_values);
     }
+    matplotlibcpp::legend();
     matplotlibcpp::show();
 #else
     SIMUCPP_ASSERT_WARNING(false, "You didn't add matplotlib-cpp library.");

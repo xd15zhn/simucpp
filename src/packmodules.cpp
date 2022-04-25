@@ -180,7 +180,7 @@ StateSpace::StateSpace(Simulator *sim, const zhnmat::Mat& A, const zhnmat::Mat& 
     inus = new MConnector*[_orderu];
     for (int i=0; i<_orderx; ++i) {
         if (_isc) integrators[i] = new MIntegrator(sim, name+"_int"+std::to_string(i));
-        else      unitdelays[i] = new MUnitDelay(sim, name+"_int"+std::to_string(i));
+        else      unitdelays[i] = new MUnitDelay(sim, name+"_ud"+std::to_string(i));
     }
     for (int i=0; i<_orderu; ++i)
         inus[i] = new MConnector(sim, name+"_inu"+std::to_string(i));

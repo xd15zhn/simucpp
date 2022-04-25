@@ -68,8 +68,12 @@ private:
 #ifdef USE_ZHNMAT
 /*********************
 STATESPACE module.
-Generate a state space module with matrix A,B,C,D.
-You should specify that this module is working in continuous mode or discrete mode.
+Generate a state space module with matrix A,B,C,D as below:
+x'=Ax+Bu
+y=Cx+Du
+You should specify that this module is working in continuous mode
+ or discrete mode, default continuous.
+Matrix D has an empty value by default.
 **********************/
 class StateSpace: public PackModule
 {
