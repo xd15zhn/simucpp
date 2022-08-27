@@ -1,0 +1,8 @@
+*.a
+*.bat
+*.user
+.vscode
+/.vscode/
+/build/
+/out/
+/.vs/
