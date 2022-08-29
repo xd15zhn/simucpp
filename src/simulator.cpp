@@ -17,7 +17,6 @@ bool Find_vector(std::vector<int>& data, int x) {
 /**********************
 **********************/
 Simulator::Simulator(double duration) {
-    SIMUCPP_ASSERT_ERROR(duration!=0, "Simulation duration must not be equal to zero!");
     Set_SimStep();
     _duration = duration;
     _cntM = 0;
@@ -101,23 +100,22 @@ void Simulator::Initialize() {
             isInit &= m->Initialize();
         if (isInit) break;
     }
-    SIMUCPP_ASSERT_ERROR(cntdown>0, "Matrix modules initialization failed!")
+    if (cntdown<0) TraceLog(LOG_FATAL, "Matrix modules initialization failed!");
     _matmodules.clear();
+    TraceLog(LOG_DEBUG, "Matrix modules initialization completed.");
 
-    /* Self check procedure of unit modules and simulators*/
-    for(int i=0; i<4; ++i)
-        _ode4K[i] = new double[_cntI];
-    SIMUCPP_ASSERT_ERROR(_H>0, "Simulation step must be greator than zero!")
+    /* Self check procedure of unit modules and simulators */
+    for(int i=0; i<4; ++i) _ode4K[i] = new double[_cntI];
+    if (_H<=0) TraceLog(LOG_FATAL, "Simulation step must be greator than zero!");
     for(int i=0; i<_cntM; ++i) {
         errcode = _modules[i]->Self_Check();
         if ((errcode!=0) && (errcode>_errlevel)) {
-            std::cout << "Simucpp Error: "
-            << "Self check of module \"" << _modules[i]->_name << "\" failed!"
-            << std::endl; abort();
+            TraceLog(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!", _modules[i]->_name);
         }
     }
+    TraceLog(LOG_DEBUG, "Module self check completed.");
 
-    /* Delete redundant connection of SUM module*/
+    /* Delete redundant connections of SUM module */
     for(int i=_cntM-1; i>=0; --i){
         if (_modules[i]==nullptr) continue;
         bm = _modules[i];
@@ -130,14 +128,17 @@ void Simulator::Initialize() {
             mdl->_next.erase(mdl->_next.begin() + i);
         }
     }
+    TraceLog(LOG_DEBUG, "Delete redundant connections completed.");
 
-    /* Build sequence table*/
+    /* Build sequence table */
     for(int i=0; i<_cntI; ++i)
         Build_Connection(_integIDs[i]);
     for(int i=0; i<_cntD; ++i)
         Build_Connection(_delayIDs[i]);
     for(int i=0; i<_cntO; ++i)
         Build_Connection(_outIDs[i]);
+    if (_cntO==0) TraceLog(LOG_WARNING, "You haven't add any OUTPUT modules.");
+    TraceLog(LOG_DEBUG, "Build sequence table completed.");
 
     /* Index for discrete modules*/
     _discIDs.clear();
@@ -157,14 +158,17 @@ void Simulator::Initialize() {
             _discIDs.push_back(m->_id);
         }
     }
-    SIMUCPP_ASSERT_WARNING(_cntO>0, "You haven't add any OUTPUT modules.");
+    TraceLog(LOG_DEBUG, "Discrete modules indexing completed.");
 
     /* Initialize a data file for storage.*/
-    if (!_print) return;
-    _fp = new std::fstream;
-    _fp->open("data.csv", std::ios::out);
-    SIMUCPP_ASSERT_ERROR(_fp->is_open(), "Failed to open data file!");
-    _fp->precision(_precision);
+    if (_print) {
+        _fp = new std::fstream;
+        _fp->open("data.csv", std::ios::out);
+        if (!_fp->is_open())  TraceLog(LOG_FATAL, "Failed to open data file!");
+        _fp->precision(_precision);
+        TraceLog(LOG_DEBUG, "Data file initialization completed.");
+    }
+    TraceLog(LOG_INFO, "Simulator initialization completed.");
 }
 
 
@@ -284,7 +288,7 @@ void Simulator::Build_Connection(std::vector<int> &ids) {
             bm = _modules[curid]->Get_child(i);
             if (bm==nullptr) continue;
             id = bm->_id;
-            SIMUCPP_ASSERT_ERROR(id>=0, "internal error: connection.");
+            if (id<0) TraceLog(LOG_FATAL, "internal error: connection.");
             if (typeid(*bm) == typeid(UIntegrator)) continue;
             if (typeid(*bm) == typeid(UUnitDelay)) continue;
             for (int j=0; j<(int)_discIDs.size(); ++j){
@@ -299,7 +303,7 @@ void Simulator::Build_Connection(std::vector<int> &ids) {
                         if (typeid(*bm) == typeid(UIntegrator)) continue;
                         if (typeid(*bm) == typeid(UUnitDelay)) continue;
                         int agid = bm->_id;
-                        SIMUCPP_ASSERT_ERROR(agid!=curid, "Algebraic loop detected!");
+                        if (agid==curid) TraceLog(LOG_FATAL, "Algebraic loop detected!");
                         agq.push(agid);
                     }
                 }
@@ -340,8 +344,9 @@ void Simulator::Plot() {
 #ifdef USE_MPLT
     for (PUOutput m: _outputs) {
         if (!m->_store) continue;
-        SIMUCPP_ASSERT_ERROR(_tvec.size()==m->_values.size(),
-            "Module " << m->_name << " has a wrong data amount for plot!");
+        if (_tvec.size()!=m->_values.size())
+            TraceLog(LOG_FATAL, "Module \"%s\" has a wrong data amount for plot!"
+            "Time points num is %d; data points num is %d.", m->_name, _tvec.size(), m->_values.size());
         matplotlibcpp::named_plot(m->_name, _tvec, m->_values);
     }
     matplotlibcpp::legend();

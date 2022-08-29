@@ -1,13 +1,10 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
-// #include "config.h"
+#include "tracelog.h"
 
 /**********************
 global
 **********************/
-#define SIMUCPP_ASSERT_ERROR(e, s)           if(!(e)){std::cout<<"Simucpp Error: "<<s<<std::endl;abort();}
-#define SIMUCPP_ASSERT_WARNING(e, s)         if(!(e)){std::cout<<"Simucpp Warning: "<<s<<std::endl;}
-#define SIMUCPP_PRINT(s)                     std::cout<<s<<std::endl;
 #define SIMUCPP_INFINITE1                    1e16
 #define SIMUCPP_INFINITE2                    9e15
 #define SIMUCPP_DBL_EPSILON                  1e-6
@@ -26,11 +23,11 @@ enum SIMUCPP_ERROR_CODE{
 
 #define CHECK_CHILD(module) \
     if(_next==nullptr) { \
-        std::cout<<"Simucpp Warning: "<<#module " module \"" << _name << "\" doesn't have a child module."<<std::endl; \
+        TraceLog(LOG_WARNING, "Simucpp: "#module" module \"%s\" doesn't have a child module.", _name.c_str()); \
         return SIMUCPP_NO_ID; }
 #define CHECK_FUNCTION(module) \
     if((_f==nullptr)&&(_fu==nullptr)) { \
-        std::cout<<"Simucpp Warning: "<<#module " module \"" << _name << "\" doesn't have a function."<<std::endl; \
+        TraceLog(LOG_WARNING, "Simucpp: "#module" module \"%s\" doesn't have a function.", _name.c_str()); \
         return SIMUCPP_NO_FUNCTION; }
 
 #define UNITMODULE_INIT() \
@@ -51,29 +48,22 @@ enum SIMUCPP_ERROR_CODE{
 simulator.cpp
 **********************/
 #define MODULE_INTEGRATOR_UPDATE() \
-    for(int i=0; i<_cntI; ++i) \
-        for (int j=_integIDs[i].size()-1; j>0; --j) \
-            _modules[_integIDs[i][j]]->Module_Update(_t)
+    for(int i=0; i<_cntI; ++i)  for (int j=_integIDs[i].size()-1; j>0; --j) \
+        _modules[_integIDs[i][j]]->Module_Update(_t)
 #define MODULE_OUTPUT_UPDATE() \
-    for(int i=0; i<_cntO; ++i) \
-        for (int j=_outIDs[i].size()-1; j>=0; --j) \
-            _modules[_outIDs[i][j]]->Module_Update(_t)
+    for(int i=0; i<_cntO; ++i)  for (int j=_outIDs[i].size()-1; j>=0; --j) \
+        _modules[_outIDs[i][j]]->Module_Update(_t)
 #define MODULE_UNITDELAY_UPDATE() \
-    for(int i=0; i<_cntD; ++i) \
-        for (int j=_delayIDs[i].size()-1; j>=0; --j) \
-            _modules[_delayIDs[i][j]]->Module_Update(_t)
+    for(int i=0; i<_cntD; ++i)  for (int j=_delayIDs[i].size()-1; j>=0; --j) \
+        _modules[_delayIDs[i][j]]->Module_Update(_t)
 #define MODULE_UNITDELAY_UPDATE_OUTPUT() \
-    for(int i=0; i<_cntD; ++i) \
-        _unitdelays[i]->Output_Update(_t)
+    for(int i=0; i<_cntD; ++i) _unitdelays[i]->Output_Update(_t)
 #define CHECK_NULLPTR(x) \
-    SIMUCPP_ASSERT_ERROR(x!=nullptr, \
-        "Module "<<#x<<" is a null pointer!")
+    if (x!=nullptr) TraceLog(LOG_FATAL, "Simucpp: Module "#x" is a null pointer!")
 #define CHECK_NULLID(x) \
-    SIMUCPP_ASSERT_ERROR(x->_id!=-1, \
-        "Module \"" << x->_name << "\" wasn't added to a simulator!")
+    if (x->_id==-1) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is not added to a simulator!", x->_name)
 #define CHECK_SIMULATOR(x) \
-    SIMUCPP_ASSERT_ERROR(x->_sim==this, \
-        "Module \"" << x->_name << "\" was added to a wrong simulator!")
+    if (x->_sim!=this) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is added to a wrong simulator!", x->_name)
 #define PRINT_OUTPUT() \
     if ((_print) && (_t-_ltn>=_T-SIMUCPP_DBL_EPSILON)) { \
         _ltn += _T; \

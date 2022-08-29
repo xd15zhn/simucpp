@@ -83,8 +83,7 @@ UFcnMISO::UFcnMISO(Simulator *sim, std::string name): UnitModule(sim, name)
 }
 int UFcnMISO::Self_Check() const
 {
-    SIMUCPP_ASSERT_WARNING(_next.size()>0,
-        "FCNMISO module \"" << _name << "\" doesn't have enough child module.");
+    if (_next.size() <= 0) TraceLog(LOG_WARNING, "Simucpp: FCNMISO module \"%s\" doesn't have enough child module.", _name);
     CHECK_FUNCTION(FCNMISO);
     if (_next.size()==0) return SIMUCPP_NO_CHILD;
     if ((_f==nullptr)&&(_fu==nullptr)) return SIMUCPP_NO_FUNCTION;
@@ -115,13 +114,13 @@ void UFcnMISO::connect(const PUnitModule m)
 }
 void UFcnMISO::connect2(const PUnitModule m, unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n<_next.size(), "internal error: reconnect.");
-    SIMUCPP_ASSERT_ERROR(_next[n]==nullptr, "internal error: reconnect.");
+    if (n>=_next.size()) TraceLog(LOG_FATAL, "Simucpp internal error: reconnect.");
+    if (_next[n]!=nullptr) TraceLog(LOG_FATAL, "Simucpp internal error: reconnect.");
     _next[n] = m;
 }
 void UFcnMISO::disconnect(unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect.");
+    if (n>=(int)_next.size()) TraceLog(LOG_FATAL, "Simucpp internal error: disconnect.");
     _next[n] = nullptr;
 }
 
@@ -183,15 +182,15 @@ UInput::UInput(Simulator *sim, std::string name): UnitModule(sim, name)
 int UInput::Self_Check() const
 {
     if (_isc){
-        SIMUCPP_ASSERT_WARNING(_f!=nullptr,
-            "INPUT module \"" << _name << "\" is in continuous mode but doesn't have an input function.");
+        if (_f == nullptr) TraceLog(LOG_WARNING, 
+            "Simucpp: INPUT module \"%s\" is in continuous mode but doesn't have an input function.", _name);
         if ((_f==nullptr)&&(_fu==nullptr)) return SIMUCPP_NO_FUNCTION;
     }
     else{
-        SIMUCPP_ASSERT_WARNING(_data.size()>0,
-            "INPUT module \"" << _name << "\" is in discrete mode but doesn't have input data.");
-        SIMUCPP_ASSERT_WARNING(_T>0,
-            "INPUT module \"" << _name << "\" is in discrete mode with a non-positive sample time.");
+        if (_data.size() <= 0) TraceLog(LOG_WARNING, 
+            "Simucpp: INPUT module \"%s\" is in discrete mode but doesn't have input data.", _name);
+        if (_T <= 0) TraceLog(LOG_WARNING, 
+            "Simucpp: INPUT module \"%s\" is in discrete mode with a non-positive sample time.", _name);
         if (_data.size()==0) return SIMUCPP_NO_DATA;
     }
     return 0;
@@ -335,20 +334,20 @@ UProduct::UProduct(Simulator *sim, std::string name): UnitModule(sim, name)
 void UProduct::Set_InputGain(double inputgain, int port)
 {
     if (port==-1){
-        SIMUCPP_ASSERT_ERROR(_next.size()>0,
-            "PRODUCT module \"" << _name << "\" doesn't have input port!");
+        if (_next.size() <= 0) TraceLog(LOG_WARNING, 
+            "Simucpp: PRODUCT module \"%s\" doesn't have input port!", _name);
         _ingain[_next.size()-1] = inputgain;
     }
     else{
-        SIMUCPP_ASSERT_ERROR(port>=0 && port<(int)_next.size(),
-            "PRODUCT module \"" << _name << "\" doesn't have input port!");
+        if(port<0 || port>=(int)_next.size()) TraceLog(LOG_WARNING,
+            "Simucpp: PRODUCT module \"%s\" doesn't have input port!", _name);
         _ingain[port] = inputgain;
     }
 }
 int UProduct::Self_Check() const
 {
-    SIMUCPP_ASSERT_WARNING(_next.size()>1,
-        "PRODUCT module \"" << _name << "\" doesn't have enough child module.");
+    if (_next.size() <= 1) TraceLog(LOG_WARNING,
+        "PRODUCT module \"%s\" doesn't have enough child module.", _name);
     if (_next.size()==0) return SIMUCPP_NO_CHILD;
     for (int i=0; i<(int)_next.size(); ++i)
         if (_next[i]==nullptr) return SIMUCPP_NULLPTR;
@@ -376,13 +375,13 @@ void UProduct::connect(const PUnitModule m)
 }
 void UProduct::connect2(const PUnitModule m, unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n<_next.size(), "internal error: reconnect.");
-    SIMUCPP_ASSERT_ERROR(_next[n]==nullptr, "internal error: reconnect.");
+    if (n>=_next.size()) TraceLog(LOG_FATAL, "Simucpp: internal error: reconnect.");
+    if (_next[n]!=nullptr) TraceLog(LOG_FATAL, "Simucpp: internal error: reconnect.");
     _next[n] = m;
 }
 void UProduct::disconnect(unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect.");
+    if (n>=(int)_next.size()) TraceLog(LOG_FATAL, "Simucpp: internal error: disconnect.");
     _next[n] = nullptr;
 }
 
@@ -405,20 +404,17 @@ USum::USum(Simulator *sim, std::string name): UnitModule(sim, name)
 void USum::Set_InputGain(double inputgain, int port)
 {
     if (port==-1){
-        SIMUCPP_ASSERT_ERROR(_next.size()>0,
-            "SUM module \"" << _name << "\" doesn't have enough child module.");
+        if (_next.size()<=0) TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name);            
         _ingain[_next.size()-1] = inputgain;
     }
     else{
-        SIMUCPP_ASSERT_ERROR(port>=0 && port<(int)_next.size(),
-            "SUM module \"" << _name << "\" doesn't have enough child module.");
+        if (port<0 || port>=(int)_next.size()) TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name);            
         _ingain[port] = inputgain;
     }
 }
 int USum::Self_Check() const
 {
-    SIMUCPP_ASSERT_WARNING(_next.size()>0,
-        "SUM module \"" << _name << "\" doesn't have enough child module.");
+    if (_next.size()==0) TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name);
     if (_next.size()==0) return SIMUCPP_NO_CHILD;
     for (int i=0; i<(int)_next.size(); ++i)
         if (_next[i]==nullptr) return SIMUCPP_NULLPTR;
@@ -446,14 +442,14 @@ void USum::connect(const PUnitModule m)
 }
 void USum::connect2(const PUnitModule m, unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n>=0, "internal error: reconnect.");
-    SIMUCPP_ASSERT_ERROR(n<_next.size(), "internal error: reconnect.");
-    SIMUCPP_ASSERT_ERROR(_next[n]==nullptr, "internal error: reconnect.");
+    if (n<0) TraceLog(LOG_FATAL, "internal error: reconnect.");
+    if (n>=0) TraceLog(LOG_FATAL, "internal error: reconnect.");
+    if (_next[n]!=nullptr) TraceLog(LOG_FATAL, "internal error: reconnect.");
     _next[n] = m;
 }
 void USum::disconnect(unsigned int n)
 {
-    SIMUCPP_ASSERT_ERROR(n<(int)_next.size(), "internal error: disconnect.");
+    if (n>=(int)_next.size()) TraceLog(LOG_FATAL, "internal error: disconnect.");
     _next[n] = nullptr;
 }
 
@@ -479,8 +475,7 @@ UTransportDelay::UTransportDelay(Simulator *sim, std::string name): UnitModule(s
 void UTransportDelay::Set_DelayTime(double time)
 {
     int delayPoints = time/_simstep + 0.5;
-    SIMUCPP_ASSERT_WARNING(delayPoints>0,
-        "TRANSPORTDELAY module was given an improper delay time.");
+    if (delayPoints<=0) TraceLog(LOG_WARNING, "TRANSPORTDELAY module was given an improper delay time.");        
     if (delayPoints>0){
         _lv = vecdble(delayPoints);
         for (int i=_lv.size()-1; i>=0; --i)

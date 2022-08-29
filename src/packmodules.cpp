@@ -13,18 +13,13 @@ PMatModule PackModule::Get_OutputBus(int n) const { return nullptr; }
 /**********************
 Continuous transfer function module.
 **********************/
-TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator,
-    const vecdble denominator, std::string name) {
-    SIMUCPP_ASSERT_ERROR(denominator.size()>=2,
-        "Length of the denominator must be equal to or higher than 2!");
-    SIMUCPP_ASSERT_ERROR(numerator.size()>=1,
-        "Length of the numerator must be equal to or higher than 1!");
-    SIMUCPP_ASSERT_ERROR(denominator.size()>=numerator.size(),
-        "The order of the denominator must be equal to or higher than the order of the numerator!");
-    SIMUCPP_ASSERT_ERROR(denominator[0]!=0,
-        "The highest order of the denominator must not be 0!");
-    vecdble num = numerator;
-    vecdble den = denominator;
+TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator, const vecdble denominator, std::string name) {
+    if (denominator.size()<2) TraceLog(LOG_FATAL, "Length of the denominator must be equal to or higher than 2!");
+    if (numerator.size()<1) TraceLog(LOG_FATAL, "Length of the numerator must be equal to or higher than 1!");
+    if (denominator.size()<numerator.size())
+        TraceLog(LOG_FATAL, "The order of the denominator must be equal to or higher than the order of the numerator!");
+    if (denominator[0]==0) TraceLog(LOG_FATAL, "The highest order of the denominator must not be 0!");
+    vecdble num = numerator, den = denominator;
     _order = den.size()-1;
     if (den[0]!=1){
         for (int i=num.size()-1; i>=0; --i)
@@ -55,8 +50,7 @@ TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator,
 PUnitModule TransferFcn::Get_InputPort(int n) const { return n==0?sum1:nullptr; }
 PUnitModule TransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
 void TransferFcn::Set_InitialValue(vecdble value) {
-    SIMUCPP_ASSERT_WARNING((int)value.size()==_order,
-        "TransferFcn module \""<<_name<<"\" accepted mismatched initial values.");
+    if ((int)value.size()!=_order) TraceLog(LOG_WARNING, "TransferFcn module \"%s\" accepted mismatched initial values.", _name);
     for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
         integrators[i]->Set_InitialValue(value[i]);
 }
@@ -71,12 +65,9 @@ vecdble TransferFcn::Get_OutValue() {
 /**********************
 Discrete transfer function module.
 **********************/
-DiscreteTransferFcn::DiscreteTransferFcn(Simulator *sim, const vecdble numerator,
-    const vecdble denominator, std::string name) {
-    SIMUCPP_ASSERT_ERROR(denominator.size()>=1,
-        "Length of the denominator must be equal to or higher than 1!");
-    SIMUCPP_ASSERT_ERROR(numerator.size()>=1,
-        "Length of the numerator must be equal to or higher than 1!");
+DiscreteTransferFcn::DiscreteTransferFcn(Simulator *sim, const vecdble numerator, const vecdble denominator, std::string name) {
+    if ((int)denominator.size()<1) TraceLog(LOG_FATAL, "Length of the denominator must be equal to or higher than 1!");
+    if ((int)numerator.size()<1) TraceLog(LOG_FATAL, "Length of the numerator must be equal to or higher than 1!");
     _order = SIMUCPP_MAX(numerator.size()-1, denominator.size());
     sum1 = new USum(sim, _name+"_sumi");
     sum2 = new USum(sim, _name+"_sumo");
@@ -106,8 +97,7 @@ void DiscreteTransferFcn::Set_SampleTime(double time) {
 PUnitModule DiscreteTransferFcn::Get_InputPort(int n) const { return n==0?sum1:nullptr; }
 PUnitModule DiscreteTransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
 void DiscreteTransferFcn::Set_InitialValue(vecdble value) {
-    SIMUCPP_ASSERT_WARNING((int)value.size()==_order,
-        "DiscreteTransferFcn module \""<<_name<<"\" accepted mismatched initial values.");
+    if ((int)value.size()!=_order) TraceLog(LOG_WARNING, "DiscreteTransferFcn module \"%s\" accepted mismatched initial values.", _name);
     for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
         unitdelays[i]->Set_InitialValue(value[i]);
 }
