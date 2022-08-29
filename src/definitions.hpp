@@ -59,7 +59,7 @@ simulator.cpp
 #define MODULE_UNITDELAY_UPDATE_OUTPUT() \
     for(int i=0; i<_cntD; ++i) _unitdelays[i]->Output_Update(_t)
 #define CHECK_NULLPTR(x) \
-    if (x!=nullptr) TraceLog(LOG_FATAL, "Simucpp: Module "#x" is a null pointer!")
+    if (x==nullptr) TraceLog(LOG_FATAL, "Simucpp: Module "#x" is a null pointer!")
 #define CHECK_NULLID(x) \
     if (x->_id==-1) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is not added to a simulator!", x->_name)
 #define CHECK_SIMULATOR(x) \
