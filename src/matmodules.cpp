@@ -16,9 +16,9 @@ BusSize::BusSize(uint row, uint col): r(row),c(col) {};
 BusSize::BusSize(const BusSize& size): r(size.r),c(size.c) {};
 BusSize& BusSize::operator=(const BusSize &size) { r=size.r, c=size.c; return *this; }
 bool BusSize::operator==(const BusSize &size) const { return ((r==size.r)&&(c==size.c))?true:false; }
-bool BusSize::operator>=(const BusSize &size) const {
-    if (r<size.r) return false;
-    if (c<size.c) return false;
+bool BusSize::operator<(const BusSize &size) const {
+    if (r>=size.r) return false;
+    if (c>=size.c) return false;
     return true;
 }
 
@@ -30,21 +30,19 @@ Mux::~Mux() { delete[] _next; }
 u8 Mux::Get_State() const { return _state; }
 BusSize Mux::Get_OutputBusSize() const { return _size; }
 bool Mux::Initialize() { return true; }
-void Mux::connect(const PMatModule m) { SIMUCPP_ASSERT_ERROR(false, "internal error: Mux.") }
+void Mux::connect(const PMatModule m) { TraceLog(LOG_FATAL, "Simucpp: internal error: Mux."); }
 void Mux::connect(const PUnitModule m, BusSize size) { _next[size.r*_size.c+size.c] = m; }
 Mux::Mux(Simulator *sim, BusSize size, std::string name)
     :MatModule(sim, name), _size(size) {
     _state = BUS_INITIALIZED;
-    SIMUCPP_ASSERT_ERROR(_size>=BusSize(1, 1),
-        "Size of multiplex module \"" <<_name<< "\" is too small!");
+    if (_size<BusSize(1, 1)) TraceLog(LOG_FATAL, "Size of multiplex module \"%s\" is too small!", _name);
     _next = new PUnitModule[_size.c*_size.r];
     for (int i=_size.c*_size.r-1; i>=0; --i) _next[i] = nullptr;
     MATMODULE_INIT();
 }
 PUnitModule Mux::Get_OutputPort(BusSize size) const {
-    SIMUCPP_ASSERT_ERROR(_next!=nullptr,
-        "Multiplex module \"" <<_name<< "\" doesn't have a child module!");
-    if (size>=_size) return nullptr;
+    if (_next==nullptr) TraceLog(LOG_FATAL, "Multiplex module \"%s\" doesn't have a child module!", _name);
+    if (_size<size) return nullptr;
     return _next[size.r*_size.c+size.c];
 }
 
@@ -62,15 +60,14 @@ void DeMux::connect(const PUnitModule m, BusSize size) {
 DeMux::DeMux(Simulator *sim, BusSize size, std::string name)
     : MatModule(sim, name), _size(size) {
     _state = BUS_SIZED;
-    SIMUCPP_ASSERT_ERROR(_size>=BusSize(1, 1),
-        "Size of demultiplex module \"" <<_name<< "\" is too small!");
+    if (_size<BusSize(1, 1)) TraceLog(LOG_FATAL, "Size of multiplex module \"%s\" is too small!", _name);
     _gains = new PUGain[_size.c*_size.r];
     for (int i=_size.c*_size.r-1; i>=0; --i)
         _gains[i] = new UGain(sim, name+"connector"+std::to_string(i));
     MATMODULE_INIT();
 }
 PUnitModule DeMux::Get_OutputPort(BusSize size) const {
-    if (size>=_size) return nullptr;
+    if (_size<size) return nullptr;
     return _gains[size.r*_size.c+size.c];
 }
 bool DeMux::Initialize() {
@@ -87,8 +84,7 @@ bool DeMux::Initialize() {
             _sim->connectU(_next->Get_OutputPort(BusSize(i, j)), _gains[i*_size.c+j]);
         }
     }
-    SIMUCPP_ASSERT_WARNING(full,
-        "Demultiplex module \"" <<_name<< "\" was not fully connected.");
+    if (!full) TraceLog(LOG_WARNING, "Demultiplex module \"%s\" was not fully connected.", _name);
     _state = BUS_INITIALIZED; return true;
 }
 
@@ -117,16 +113,15 @@ MStateSpace::MStateSpace(Simulator *sim, BusSize size, bool isc, std::string nam
     }
 }
 PUnitModule MStateSpace::Get_OutputPort(BusSize size) const {
-    if (size>=_size) return nullptr;
+    if (_size<size) return nullptr;
     if (_isc) return _intx[size.r*_size.c+size.c];
     else return _udx[size.r*_size.c+size.c];
 }
 bool MStateSpace::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
-    SIMUCPP_ASSERT_ERROR(_next!=nullptr, "State module \""<<_name<<"\" doesn't have a child module!");
+    if (_next==nullptr) TraceLog(LOG_FATAL, "State module \"%s\" doesn't have a child module!", _name);
     if (!_next->Get_State()) return false;
-    SIMUCPP_ASSERT_ERROR(_next->Get_OutputBusSize() == _size,
-        "Bus size between state module \""<<_name<<"\" and its child module are mismatch!");
+    if (!(_next->Get_OutputBusSize()==_size)) TraceLog(LOG_FATAL, "Bus size between state module \"%s\" and its child module are mismatch!", _name);
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
             if (_isc) _sim->connectU(_next->Get_OutputPort(BusSize(i, j)), _intx[i*_size.c+j]);
@@ -144,8 +139,8 @@ void MStateSpace::Set_SampleTime(double time) {
     }
 }
 void MStateSpace::Set_InitialValue(const zhnmat::Mat& value) {
-    SIMUCPP_ASSERT_ERROR((value.row()==_size.r) && (value.col()==_size.c),
-        "Matrix module \""<<_name<<"\" accepted mismatched initial values!");
+    if ((value.row()!=_size.r) || (value.col()!=_size.c))
+        TraceLog(LOG_FATAL, "Matrix module \"%s\" accepted mismatched initial values!", _name);
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
             if (_isc) _intx[i*_size.c+j]->Set_InitialValue(value.at(i, j));
@@ -178,17 +173,17 @@ MGain::MGain(Simulator *sim, const zhnmat::Mat& G, bool isleft, std::string name
     MATMODULE_INIT();
 }
 PUnitModule MGain::Get_OutputPort(BusSize size) const {
-    SIMUCPP_ASSERT_ERROR(_sumy!=nullptr, "internal error: MGain.")
-    if (size>=_sizeout) return nullptr;
+    if (_sumy==nullptr) TraceLog(LOG_FATAL, "internal error: MGain.");
+    if (_sizeout<size) return nullptr;
     return _sumy[size.r*_sizeout.c+size.c];
 }
 bool MGain::Initialize() {
     if (_state == BUS_INITIALIZED) return true;  // This matrix module has been initialized.
-    SIMUCPP_ASSERT_ERROR(_next!=nullptr, "State module \""<<_name<<"\" doesn't have a child module!");
+    if (_next==nullptr) TraceLog(LOG_FATAL, "State module \"%s\" doesn't have a child module!", _name);
     if (!_next->Get_State()) return false;
     _sizein = _next->Get_OutputBusSize();
-    SIMUCPP_ASSERT_ERROR((_isleft && (_sizein.r==_G.col())) || (!_isleft && (_sizein.c==_G.row())),
-        "Bus size between state module \""<<_name<<"\" and its child module are mismatch!");
+    if ((!_isleft || (_sizein.r!=_G.col())) && (_isleft || (_sizein.c!=_G.row())))
+        TraceLog(LOG_FATAL, "Bus size between state module \"%s\" and its child module are mismatch!", _name);
     _sizeout = _isleft ? BusSize(_G.row(), _sizein.c) : BusSize(_sizein.r, _G.col());
     _sumy = new USum*[_sizeout.r*_sizeout.c];
     for (uint i=0; i<_sizeout.r; ++i) {
@@ -224,22 +219,21 @@ MSum::MSum(Simulator *sim, std::string name): MatModule(sim, name) {
     MATMODULE_INIT();
 }
 PUnitModule MSum::Get_OutputPort(BusSize size) const {
-    SIMUCPP_ASSERT_ERROR(_sumy!=nullptr, "internal error: MSum.")
-    if (size>=_size) return nullptr;
+    if (_sumy==nullptr) TraceLog(LOG_FATAL, "internal error: MSum.");
+    if (_size<size) return nullptr;
     return _sumy[size.r*_size.c+size.c];
 }
 bool MSum::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
-    SIMUCPP_ASSERT_ERROR(_nexts.size()>0, 
-        "Matrix module \""<<_name<<"\" doesn't have a child module!");
+    if (_nexts.size()==0) TraceLog(LOG_FATAL, "Matrix module \"%s\" doesn't have a child module!", _name);
     BusSize childBusSize;
     PUnitModule childBusPort;
     for (int b=_nexts.size()-1; b>=0; --b) {
         if (!_nexts[b]->Get_State()) continue;  // Bus size of child module is not determined
         childBusSize = _nexts[b]->Get_OutputBusSize();
         if (_state & BUS_SIZED) {  // Bus size of this module is determined
-            SIMUCPP_ASSERT_ERROR(childBusSize == _size,
-                "Bus size mismatch between child modules of matrix module \""<<_name<<"\"!");
+            if (!(childBusSize==_size))
+                TraceLog(LOG_FATAL, "Bus size mismatch between child modules of matrix module \"%s\"!", _name);
         }
         else {  // Bus size of this module is not determined
             _size = childBusSize; _state |= BUS_SIZED;

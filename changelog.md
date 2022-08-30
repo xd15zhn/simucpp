@@ -1,2 +1,3 @@
 # V2.0.1
-添加`tracelog`日志库。
+- 添加`tracelog`日志库。
+- 删除`SIMUCPP_ASSERT_ERROR`和`SIMUCPP_ASSERT_WARNING`。

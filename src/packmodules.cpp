@@ -141,16 +141,16 @@ State transfer function module.
 StateTransFcn::StateTransFcn(Simulator *sim, const zhnmat::Mat& A, const zhnmat::Mat& B, const zhnmat::Mat& C,
     const zhnmat::Mat& D, bool isc, std::string name): _isc(isc) {
     _orderx = A.row(); _orderu = B.col(); _ordery = C.row();
-    SIMUCPP_ASSERT_ERROR(_orderx>=2, "Order too few!");
-    SIMUCPP_ASSERT_ERROR(A.col()==_orderx, "Shape of matrix A error!");
-    SIMUCPP_ASSERT_ERROR(B.row()==_orderx, "Shape of matrix B error!");
-    SIMUCPP_ASSERT_ERROR(C.col()==_orderx, "Shape of matrix C error!");
+    if (_orderx<2) TraceLog(LOG_FATAL, "Order too few!");
+    if (A.col()!=_orderx) TraceLog(LOG_FATAL, "Shape of matrix A error!");
+    if (B.row()!=_orderx) TraceLog(LOG_FATAL, "Shape of matrix B error!");
+    if (C.col()!=_orderx) TraceLog(LOG_FATAL, "Shape of matrix C error!");
     zhnmat::Mat tD;
     if ((D.col()==0) && (D.row()==0))
         tD = zhnmat::Mat(_ordery, _orderu);
     else {
-        SIMUCPP_ASSERT_ERROR(D.row()==_orderu, "Shape of matrix D error!");
-        SIMUCPP_ASSERT_ERROR(D.col()==_ordery, "Shape of matrix D error!");
+        if (D.row()!=_orderu) TraceLog(LOG_FATAL, "Shape of matrix D error!");
+        if (D.col()!=_ordery) TraceLog(LOG_FATAL, "Shape of matrix D error!");
         tD = D;
     }
     _statex = new MStateSpace(sim, BusSize(_orderx, 1), true, name+"_msx");

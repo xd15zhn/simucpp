@@ -8,7 +8,12 @@ C++重写simulink.
 有两个分支，master是频繁修改更新的分支，不一定可用；release是经过测试可以使用的稳定版。  
 当前release发布版本：V2.0.0
 
-## 博客目录
+# 依赖库
+- <https://gitee.com/xd15zhn/tracelog>(必装)
+- <https://gitee.com/xd15zhn/matplotlibcpp> (选装)
+- <https://gitee.com/xd15zhn/zhnmat> (选装)
+
+# 博客目录
 [simucpp：C++搭建微分方程求解器框架(重写simulink)](https://blog.csdn.net/qq_34288751/article/details/117740605)  
 [simucpp系列教程(1)安装教程](https://blog.csdn.net/qq_34288751/article/details/121111051)  
 [simucpp系列教程(2)例程解析(第一部分)](https://blog.csdn.net/qq_34288751/article/details/121112003)  
@@ -20,7 +25,7 @@ C++重写simulink.
 [番外篇(2)连续离散混合仿真中的若干问题](https://blog.csdn.net/qq_34288751/article/details/122708048)  
 [番外篇(3)矩阵模块与复用模块的设计细节](https://blog.csdn.net/qq_34288751/article/details/126324078)  
 
-## 一个简单的例子
+# 一个简单的例子
 ```cpp
 // main.cpp
 /*一阶系统阶跃响应*/

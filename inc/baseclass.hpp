@@ -72,7 +72,7 @@ public:
     // Here are some examples:
     //  (2,3)>=(1,1),(2,3)>=(1,3): true
     //  (2,3)>=(3,1),(2,3)>=(2,4): false
-    bool operator>=(const BusSize &size) const;
+    bool operator<(const BusSize &size) const;
     uint r, c;
 };
 
