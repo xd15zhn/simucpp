@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(simucpp VERSION 2.0.1)
+project(simucpp VERSION 2.0.2)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -44,6 +44,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ${tracelog_LIBS})
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${tracelog_INCLUDE_DIRS}>)
 if(USE_ZHNMAT)
     message(STATUS "Use dependent lirary zhnmat.")
+    find_package(zhnmat REQUIRED)
     message(STATUS "zhnmat_VERSION: ${zhnmat_VERSION}")
     message(STATUS "zhnmat_DIR: ${zhnmat_DIR}")
     message(STATUS "zhnmat_LIBS: ${zhnmat_LIBS}")
@@ -66,7 +67,6 @@ endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/inc>
-    $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
 )
 
 include(CMakePackageConfigHelpers)

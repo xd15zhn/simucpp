@@ -5,8 +5,9 @@
 /**********************
 global
 **********************/
+// Required for: CHECK_CONVERGENCE
 #define SIMUCPP_INFINITE1                    1e16
-#define SIMUCPP_INFINITE2                    9e15
+// Used to solve the problem of imprecision of floating-point numbers
 #define SIMUCPP_DBL_EPSILON                  1e-6
 
 

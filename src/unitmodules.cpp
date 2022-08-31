@@ -200,8 +200,7 @@ void UInput::Module_Update(double time)
     if (_isc) {
         if (_fu) _outvalue = _fu->Function(time);
         else _outvalue = _f(time);
-    }
-    else {
+    } else {
         if (time - _cnt*_T < _T-SIMUCPP_DBL_EPSILON) return;
         _cnt++;
         if (_cnt >= (int)_data.size()) return;

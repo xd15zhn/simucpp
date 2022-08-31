@@ -7,9 +7,6 @@ This file contains some base class definitions.
 #include <string>
 #define NAMESPACE_SIMUCPP_L                  namespace simucpp {
 #define NAMESPACE_SIMUCPP_R                  }
-#define SIMUCPP_LIMIT(x, min, max)           (((x)<=(min) ? (min) : ((x)>=(max) ? (max) : (x))))
-#define SIMUCPP_MIN(a, b)                    ((a) < (b) ? (a) : (b))
-#define SIMUCPP_MAX(a, b)                    ((a) > (b) ? (a) : (b))
 #define DISCRETE_VARIABLES() \
     double _T, _ltn
 NAMESPACE_SIMUCPP_L

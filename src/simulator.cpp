@@ -7,6 +7,11 @@
 #ifdef USE_MPLT
 #include "matplotlibcpp.h"
 #endif
+
+#define SIMUCPP_LIMIT(x, min, max)           (((x)<=(min) ? (min) : ((x)>=(max) ? (max) : (x))))
+#define SIMUCPP_MIN(a, b)                    ((a) < (b) ? (a) : (b))
+#define SIMUCPP_MAX(a, b)                    ((a) > (b) ? (a) : (b))
+
 NAMESPACE_SIMUCPP_L
 
 bool Find_vector(std::vector<int>& data, int x) {

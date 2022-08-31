@@ -1,7 +1,10 @@
 set(PACKAGE_NAME @PROJECT_NAME@)
 set(simucpp_VERSION @simucpp_VERSION_MAJOR@.@simucpp_VERSION_MINOR@.@simucpp_VERSION_PATCH@)
 
-set(simucpp_LIBS @CMAKE_INSTALL_PREFIX@/lib/libsimucpp.a)
+set(simucpp_LIBS
+    @CMAKE_INSTALL_PREFIX@/lib/libsimucpp.a
+    @CMAKE_INSTALL_PREFIX@/lib/libtracelog.a
+)
 set(simucpp_INCLUDE_DIRS @CMAKE_INSTALL_PREFIX@/include)
 set(USE_ZHNMAT @USE_ZHNMAT@)
 set(USE_MPLT @USE_MPLT@)
