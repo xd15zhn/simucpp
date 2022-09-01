@@ -65,9 +65,9 @@ simulator.cpp
 #define CHECK_NULLPTR(x) \
     if (x==nullptr) TraceLog(LOG_FATAL, "Simucpp: Module "#x" is a null pointer!")
 #define CHECK_NULLID(x) \
-    if (x->_id==-1) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is not added to a simulator!", x->_name)
+    if (x->_id==-1) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is not added to a simulator!", x->_name.c_str())
 #define CHECK_SIMULATOR(x) \
-    if (x->_sim!=this) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is added to a wrong simulator!", x->_name)
+    if (x->_sim!=this) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is added to a wrong simulator!", x->_name.c_str())
 #define PRINT_OUTPUT() \
     if ((_print) && (_t-_ltn>=_T-SIMUCPP_DBL_EPSILON)) { \
         _ltn += _T; \
@@ -117,14 +117,5 @@ matmodules.cpp
 #define BIT_01              (BIT0+BIT1)
 #define BUS_SIZED           BIT0
 #define BUS_INITIALIZED     BIT_01
-
-/**********************
-config.h
-**********************/
-#define STRING_DIRECT(x)    #x
-#define STRING(x)           STRING_DIRECT(x)
-#define SIMUCPP_VERSION     "V" STRING(simucpp_VERSION_MAJOR) \
-                            "." STRING(simucpp_VERSION_MINOR) \
-                            "." STRING(simucpp_VERSION_PATCH)
 
 #endif // DEFINITIONS_H

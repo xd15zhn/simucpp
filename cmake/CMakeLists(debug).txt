@@ -8,9 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE debug)
 message(STATUS "PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}")
 if (WIN32)
+    message(STATUS "System is Windows.")
     set(SIMUCPP_DIR E:/cppcode/simucpp_master/)
+    set(CMAKE_INSTALL_PREFIX E:/cpplibraries/)
 elseif (UNIX)
-    set(SIMUCPP_DIR /home/hangning/Desktop/myfile/cppcode/simucpp_master/)
+    MESSAGE(STATUS "System is UNIX.")
+    add_compile_options(-Wno-psabi)
+    set(SIMUCPP_DIR /home/pi/Desktop/myfile/cppcode/simucpp/)
 endif ()
 
 set(SIMUCPP_SOURCES
@@ -21,39 +25,19 @@ set(SIMUCPP_SOURCES
     ${SIMUCPP_DIR}/src/simulator.cpp
     ${SIMUCPP_DIR}/src/connector.cpp
 )
-
-add_executable(simucpptest_exe ${SIMUCPP_SOURCES})
-
-if (WIN32)
-    MESSAGE(STATUS "System is Windows.")
-    set(SIMUCPP_DIR E:/cppcode/simucpp_master/)
-    set(ZHNMAT_DIR E:/cppcode/zhnmat)
-    set(MPLT_DIR E:/cppcode/matplotlibcpp)
-    set(PYTHON_HOME D:/python)
-    message(STATUS "zhnmat dir: ${ZHNMAT_DIR}")
-    message(STATUS "matplotlib-cpp dir: ${MPLT_DIR}")
-    message(STATUS "python dir: ${PYTHON_HOME}")
-    target_include_directories(simucpptest_exe PUBLIC
-        "${SIMUCPP_DIR}/inc"
-        "${SIMUCPP_DIR}/build"
-        ${ZHNMAT_DIR}
-        ${MPLT_DIR}
-        ${PYTHON_HOME}/include
-        ${PYTHON_HOME}/Lib/site-packages/numpy/core/include
-    )
-    target_link_libraries(simucpptest_exe PUBLIC
-        ${ZHNMAT_DIR}/build/libzhnmat.a
-        ${PYTHON_HOME}/libs/_tkinter.lib
-        ${PYTHON_HOME}/libs/python3.lib
-        ${PYTHON_HOME}/libs/python39.lib
-    )
-elseif (UNIX)
-    MESSAGE(STATUS "System is UNIX.")
-    set(SIMUCPP_DIR /home/hangning/Desktop/myfile/cppcode/simucpp_master/)
-    find_package(zhnmat REQUIRED)
-    find_package(matplotlibcpp REQUIRED)
-    target_link_libraries(simucpptest_exe PRIVATE zhnmat)
-    target_link_libraries(simucpptest_exe PUBLIC ${matplotlibcpp_LIBS})
-    target_include_directories(simucpptest_exe PUBLIC ${matplotlibcpp_INCLUDE_DIRS})
-    target_include_directories(simucpptest_exe PUBLIC ${SIMUCPP_DIR}/inc)
-endif ()
+add_executable(${CMAKE_PROJECT_NAME} ${SIMUCPP_SOURCES})
+find_package(tracelog REQUIRED)
+find_package(zhnmat REQUIRED)
+find_package(matplotlibcpp REQUIRED)
+add_definitions(-DUSE_ZHNMAT)
+add_definitions(-DUSE_MPLT)
+target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC
+    ${tracelog_LIBS}
+    ${zhnmat_LIBS}
+    ${matplotlibcpp_LIBS}
+)
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+    ${SIMUCPP_DIR}/inc
+    ${zhnmat_INCLUDE_DIRS}>
+    ${matplotlibcpp_INCLUDE_DIRS}>
+)

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(simucpp VERSION 2.0.3)
+project(simucpp VERSION 2.0.4)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,7 +26,6 @@ elseif (UNIX)
     add_compile_options(-Wno-psabi)
     include(GNUInstallDirs)
 endif ()
-add_library(${CMAKE_PROJECT_NAME} STATIC ${SIMUCPP_SOURCES})
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 message(STATUS "CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "INSTALL_CONFIGDIR: ${INSTALL_CONFIGDIR}")
@@ -35,6 +34,10 @@ message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR}")
 option(USE_ZHNMAT "Dependent lirary zhnmat, used for matrix modules." ON)
 option(USE_MPLT "Dependent lirary matplotlibcpp, used to plot waves." ON)
 
+add_library(${CMAKE_PROJECT_NAME} STATIC ${SIMUCPP_SOURCES})
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/inc>
+)
 find_package(tracelog REQUIRED)
 message(STATUS "tracelog_VERSION: ${tracelog_VERSION}")
 message(STATUS "tracelog_DIR: ${tracelog_DIR}")
@@ -64,10 +67,6 @@ if(USE_MPLT)
     target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ${matplotlibcpp_LIBS})
     target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${matplotlibcpp_INCLUDE_DIRS}>)
 endif()
-
-target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/inc>
-)
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(

@@ -10,3 +10,8 @@
 - [simulator.cpp/hpp] RENAME: duration -> endtime.
 - [packmodules.cpp] BUGFIXED.
 - 添加一些日志打印。
+
+# V2.0.4
+- [CMakeLists.txt] BUGFIXED: `target_include_directories`.
+- [CMakeLists(linux).txt] DELETED.
+- [definitions.hpp] BUGFIXED: `c_str`.
