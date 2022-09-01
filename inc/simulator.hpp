@@ -31,8 +31,8 @@ class Simulator
     friend class MGain;
     friend class MSum;
 public:
-    // Init a simulator with a duration.
-    Simulator(double duration=10);
+    // Init a simulator with end time.
+    Simulator(double endtime=10);
     ~Simulator();
 
     /**********************
@@ -123,9 +123,9 @@ public:
     // Get and set current simulation time.
     void Set_t(double t);
     double Get_t();
-    // Get and set simulation duration.
-    void Set_Duration(double t);
-    double Get_Duration();
+    // Get and set simulation end time.
+    void Set_Endtime(double t);
+    double Get_Endtime();
     // Get and set simulation step.
     void Set_SimStep(double step=0.001);
     double Get_SimStep();
@@ -163,8 +163,8 @@ private:
     // Build connection of Endpoint modules.
     void Build_Connection(std::vector<int> &ids);
 
-    // Simulation step and duration.
-    double _H, _duration;
+    // Simulation step and end time.
+    double _H, _endtime;
 
     // Number of total modules, INTEGRATOR/UNITDELAY/OUTPUT modules.
     int _cntM, _cntI, _cntD, _cntO;

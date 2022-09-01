@@ -8,10 +8,6 @@
 #include "matplotlibcpp.h"
 #endif
 
-#define SIMUCPP_LIMIT(x, min, max)           (((x)<=(min) ? (min) : ((x)>=(max) ? (max) : (x))))
-#define SIMUCPP_MIN(a, b)                    ((a) < (b) ? (a) : (b))
-#define SIMUCPP_MAX(a, b)                    ((a) > (b) ? (a) : (b))
-
 NAMESPACE_SIMUCPP_L
 
 bool Find_vector(std::vector<int>& data, int x) {
@@ -21,9 +17,9 @@ bool Find_vector(std::vector<int>& data, int x) {
 
 /**********************
 **********************/
-Simulator::Simulator(double duration) {
+Simulator::Simulator(double endtime) {
     Set_SimStep();
-    _duration = duration;
+    _endtime = endtime;
     _cntM = 0;
     _t = 0;
     _store = true;
@@ -105,20 +101,20 @@ void Simulator::Initialize() {
             isInit &= m->Initialize();
         if (isInit) break;
     }
-    if (cntdown<0) TraceLog(LOG_FATAL, "Matrix modules initialization failed!");
+    if (cntdown<0) TraceLog(LOG_FATAL, "Simucpp: Matrix modules initialization failed!");
     _matmodules.clear();
-    TraceLog(LOG_DEBUG, "Matrix modules initialization completed.");
+    TraceLog(LOG_DEBUG, "Simucpp: Matrix modules initialization completed.");
 
     /* Self check procedure of unit modules and simulators */
     for(int i=0; i<4; ++i) _ode4K[i] = new double[_cntI];
-    if (_H<=0) TraceLog(LOG_FATAL, "Simulation step must be greator than zero!");
+    if (_H<=0) TraceLog(LOG_FATAL, "Simucpp: Simulation step must be greator than zero!");
     for(int i=0; i<_cntM; ++i) {
         errcode = _modules[i]->Self_Check();
         if ((errcode!=0) && (errcode>_errlevel)) {
             TraceLog(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!", _modules[i]->_name);
         }
     }
-    TraceLog(LOG_DEBUG, "Module self check completed.");
+    TraceLog(LOG_DEBUG, "Simucpp: Module self check completed.");
 
     /* Delete redundant connections of SUM module */
     for(int i=_cntM-1; i>=0; --i){
@@ -133,7 +129,7 @@ void Simulator::Initialize() {
             mdl->_next.erase(mdl->_next.begin() + i);
         }
     }
-    TraceLog(LOG_DEBUG, "Delete redundant connections completed.");
+    TraceLog(LOG_DEBUG, "Simucpp: Delete redundant connections completed.");
 
     /* Build sequence table */
     for(int i=0; i<_cntI; ++i)
@@ -142,8 +138,8 @@ void Simulator::Initialize() {
         Build_Connection(_delayIDs[i]);
     for(int i=0; i<_cntO; ++i)
         Build_Connection(_outIDs[i]);
-    if (_cntO==0) TraceLog(LOG_WARNING, "You haven't add any OUTPUT modules.");
-    TraceLog(LOG_DEBUG, "Build sequence table completed.");
+    if (_cntO==0) TraceLog(LOG_WARNING, "Simucpp: You haven't add any OUTPUT modules.");
+    TraceLog(LOG_DEBUG, "Simucpp: Build sequence table completed.");
 
     /* Index for discrete modules*/
     _discIDs.clear();
@@ -163,17 +159,17 @@ void Simulator::Initialize() {
             _discIDs.push_back(m->_id);
         }
     }
-    TraceLog(LOG_DEBUG, "Discrete modules indexing completed.");
+    TraceLog(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
 
     /* Initialize a data file for storage.*/
     if (_print) {
         _fp = new std::fstream;
         _fp->open("data.csv", std::ios::out);
-        if (!_fp->is_open())  TraceLog(LOG_FATAL, "Failed to open data file!");
+        if (!_fp->is_open())  TraceLog(LOG_FATAL, "Simucpp: Failed to open data file!");
         _fp->precision(_precision);
-        TraceLog(LOG_DEBUG, "Data file initialization completed.");
+        TraceLog(LOG_DEBUG, "Simucpp: Data file initialization completed.");
     }
-    TraceLog(LOG_INFO, "Simulator initialization completed.");
+    TraceLog(LOG_INFO, "Simucpp: Simulator initialization completed.");
 }
 
 
@@ -185,7 +181,7 @@ Simulate_OneStep();
 **********************/
 int Simulator::Simulate() {
     int err = 0;
-    while (_t < _duration-SIMUCPP_DBL_EPSILON) {
+    while (_t < _endtime-SIMUCPP_DBL_EPSILON) {
         err = Simulate_OneStep();
         if (!err) continue;
         if (_divmode == 0) {
@@ -293,7 +289,7 @@ void Simulator::Build_Connection(std::vector<int> &ids) {
             bm = _modules[curid]->Get_child(i);
             if (bm==nullptr) continue;
             id = bm->_id;
-            if (id<0) TraceLog(LOG_FATAL, "internal error: connection.");
+            if (id<0) TraceLog(LOG_FATAL, "Simucpp: internal error: connection.");
             if (typeid(*bm) == typeid(UIntegrator)) continue;
             if (typeid(*bm) == typeid(UUnitDelay)) continue;
             for (int j=0; j<(int)_discIDs.size(); ++j){
@@ -308,7 +304,7 @@ void Simulator::Build_Connection(std::vector<int> &ids) {
                         if (typeid(*bm) == typeid(UIntegrator)) continue;
                         if (typeid(*bm) == typeid(UUnitDelay)) continue;
                         int agid = bm->_id;
-                        if (agid==curid) TraceLog(LOG_FATAL, "Algebraic loop detected!");
+                        if (agid==curid) TraceLog(LOG_FATAL, "Simucpp: Algebraic loop detected!");
                         agq.push(agid);
                     }
                 }
@@ -347,15 +343,19 @@ Use data stored in OUTPUT modules to draw a waveform.
 **********************/
 void Simulator::Plot() {
 #ifdef USE_MPLT
+    TraceLog(LOG_INFO, "Simucpp: Wait for ploting......");
     for (PUOutput m: _outputs) {
         if (!m->_store) continue;
         if (_tvec.size()!=m->_values.size())
-            TraceLog(LOG_FATAL, "Module \"%s\" has a wrong data amount for plot!"
+            TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" has a wrong data amount for plot!"
             "Time points num is %d; data points num is %d.", m->_name, _tvec.size(), m->_values.size());
         matplotlibcpp::named_plot(m->_name, _tvec, m->_values);
     }
     matplotlibcpp::legend();
     matplotlibcpp::show();
+    TraceLog(LOG_INFO, "Simucpp: Plot completed.");
+#else
+    TraceLog(LOG_WARNING, "Simucpp: You didn't add library \"matplotlibcpp\" for plot.");
 #endif
 }
 /**********************
@@ -399,8 +399,8 @@ void Simulator::Set_PrintPrecision(unsigned int n) {
     _precision = SIMUCPP_LIMIT(n, 2, 20); }
 void Simulator::Set_t(double t) { _t = t; }
 double Simulator::Get_t() { return _t; }
-void Simulator::Set_Duration(double t) { _duration=t; }
-double Simulator::Get_Duration() { return _duration; }
+void Simulator::Set_Endtime(double t) { _endtime=t; }
+double Simulator::Get_Endtime() { return _endtime; }
 void Simulator::Set_SimStep(double step) { _H=0.5*step; }
 double Simulator::Get_SimStep() { return _H+_H; }
 void Simulator::VERSION() { std::cout << SIMUCPP_VERSION << std::endl; }

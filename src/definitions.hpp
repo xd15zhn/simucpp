@@ -5,6 +5,9 @@
 /**********************
 global
 **********************/
+#define SIMUCPP_LIMIT(x, min, max)           (((x)<=(min) ? (min) : ((x)>=(max) ? (max) : (x))))
+#define SIMUCPP_MIN(a, b)                    ((a) < (b) ? (a) : (b))
+#define SIMUCPP_MAX(a, b)                    ((a) > (b) ? (a) : (b))
 // Required for: CHECK_CONVERGENCE
 #define SIMUCPP_INFINITE1                    1e16
 // Used to solve the problem of imprecision of floating-point numbers
