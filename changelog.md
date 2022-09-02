@@ -15,3 +15,7 @@
 - [CMakeLists.txt] BUGFIXED: `target_include_directories`.
 - [CMakeLists(linux).txt] DELETED.
 - [definitions.hpp] BUGFIXED: `c_str`.
+
+# V2.0.5
+- [simulator.cpp/hpp] DELETED: `Set_WarningLevel`.
+- [simulator.cpp/hpp] DELETED: `VERSION`.

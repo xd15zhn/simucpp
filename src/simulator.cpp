@@ -167,7 +167,7 @@ void Simulator::Initialize() {
         _fp->open("data.csv", std::ios::out);
         if (!_fp->is_open())  TraceLog(LOG_FATAL, "Simucpp: Failed to open data file!");
         _fp->precision(_precision);
-        TraceLog(LOG_DEBUG, "Simucpp: Data file initialization completed.");
+        TraceLog(LOG_INFO, "Simucpp: Data file initialization completed.");
     }
     TraceLog(LOG_INFO, "Simucpp: Simulator initialization completed.");
 }
@@ -403,9 +403,6 @@ void Simulator::Set_Endtime(double t) { _endtime=t; }
 double Simulator::Get_Endtime() { return _endtime; }
 void Simulator::Set_SimStep(double step) { _H=0.5*step; }
 double Simulator::Get_SimStep() { return _H+_H; }
-void Simulator::VERSION() { std::cout << SIMUCPP_VERSION << std::endl; }
-void Simulator::Set_WarningLevel(int level) {
-    _errlevel=(level>0)?(int)SIMUCPP_INFINITE1:((level<0)?-(int)SIMUCPP_INFINITE1:0); }
 void Simulator::Set_DivergenceCheckMode(int mode) { _divmode=mode; };
 
 NAMESPACE_SIMUCPP_R

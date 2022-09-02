@@ -130,15 +130,6 @@ public:
     void Set_SimStep(double step=0.001);
     double Get_SimStep();
 
-    // Change the warning level in self-check procedure.
-    // For example, if a module doesn't have a child module, simulator will give
-    //  an error and stop the program by default, but you can ignore this kind
-    //  of errors by setting the warning level to 1.
-    // 0: Default;
-    // 1: ignore all errors and only give warnings;
-    // -1: any warning will be considered an error.
-    void Set_WarningLevel(int level=0);
-
     // Set how the simulator works when the simulation diverged.
     // 0: Default, Print a message and stop the program.
     // 1: Print a message and keep going on, and return a none-zero value after simulation.
@@ -151,9 +142,6 @@ public:
     // Set the output values of every pass-through modules to NaN, so that if there exists
     //  possible connection errors, they can be figured out immediately.
     void Set_DivergenceCheckMode();
-
-    // Print current Simucpp version.
-    static void VERSION();
 
 private:
     // Add a module to this simulator.
