@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ctime>
+#include <cmath>
 #include "simulator.hpp"
 #include "definitions.hpp"
 NAMESPACE_SIMUCPP_L
@@ -262,14 +262,15 @@ UNoise::UNoise(Simulator *sim, std::string name): UnitModule(sim, name)
     _enable = true;
     _mean = 0;
     _var = 1;
-    gen = std::default_random_engine((unsigned int)time(0));
-    NormDis = std::normal_distribution<double>(0, 1);
 }
 void UNoise::Module_Update(double time)
 {
     if (!_enable) return;
     DISCRETE_UPDATE();
-    _outvalue = _var * NormDis(gen) + _mean;
+    double U = (rand()+1.0) / (RAND_MAX+1.0);
+    double V = (rand()+1.0) / (RAND_MAX+1.0);
+    double ans = sqrt(-2.0 * log(U))* cos(6.283185307179586477 * V);
+    _outvalue = _var * ans + _mean;
 }
 
 

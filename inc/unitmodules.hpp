@@ -7,7 +7,6 @@ The first line in code annotations of each unitmodule gives its name and abbrevi
 **********************/
 #ifndef BASEMODULES_H
 #define BASEMODULES_H
-#include <random>
 #include "baseclass.hpp"
 NAMESPACE_SIMUCPP_L
 #define UNITMODULE_VIRTUAL(classname, abbrname) \
@@ -155,8 +154,6 @@ private:
     DISCRETE_VARIABLES();
     double _outvalue;
     double _mean, _var;
-    std::default_random_engine gen;
-    std::normal_distribution<double> NormDis;
 };
 
 

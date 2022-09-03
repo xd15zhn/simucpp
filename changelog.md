@@ -19,3 +19,4 @@
 # V2.0.5
 - [simulator.cpp/hpp] DELETED: `Set_WarningLevel`.
 - [simulator.cpp/hpp] DELETED: `VERSION`.
+- [UNoise] CHANGED: 重写正态分布随机变量生成函数。
