@@ -7,6 +7,7 @@ The first line in code annotations of each unitmodule gives its name and abbrevi
 **********************/
 #ifndef BASEMODULES_H
 #define BASEMODULES_H
+#include <vector>
 #include "baseclass.hpp"
 NAMESPACE_SIMUCPP_L
 #define UNITMODULE_VIRTUAL(classname, abbrname) \

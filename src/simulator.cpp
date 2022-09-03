@@ -167,7 +167,7 @@ void Simulator::Initialize() {
         _fp->open("data.csv", std::ios::out);
         if (!_fp->is_open())  TraceLog(LOG_FATAL, "Simucpp: Failed to open data file!");
         _fp->precision(_precision);
-        TraceLog(LOG_INFO, "Simucpp: Data file initialization completed.");
+        TraceLog(LOG_INFO, "Simucpp: Data file is ready for writing.");
     }
     TraceLog(LOG_INFO, "Simucpp: Simulator initialization completed.");
 }
@@ -343,11 +343,12 @@ Use data stored in OUTPUT modules to draw a waveform.
 **********************/
 void Simulator::Plot() {
 #ifdef USE_MPLT
+    if (!_store) { TraceLog(LOG_WARNING, "Simucpp: There is no data for plotting."); return; }
     TraceLog(LOG_INFO, "Simucpp: Wait for ploting......");
     for (PUOutput m: _outputs) {
         if (!m->_store) continue;
         if (_tvec.size()!=m->_values.size())
-            TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" has a wrong data amount for plot!"
+            TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" has a wrong data amount for plotting!"
             "Time points num is %d; data points num is %d.", m->_name, _tvec.size(), m->_values.size());
         matplotlibcpp::named_plot(m->_name, _tvec, m->_values);
     }
@@ -355,7 +356,7 @@ void Simulator::Plot() {
     matplotlibcpp::show();
     TraceLog(LOG_INFO, "Simucpp: Plot completed.");
 #else
-    TraceLog(LOG_WARNING, "Simucpp: You didn't add library \"matplotlibcpp\" for plot.");
+    TraceLog(LOG_WARNING, "Simucpp: You didn't add library \"matplotlibcpp\" for plotting.");
 #endif
 }
 /**********************

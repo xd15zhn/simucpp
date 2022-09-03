@@ -105,6 +105,7 @@ public:
     int Simulate_FinalStep();
 
     // Is simulation data stored to memory.
+    // If set false, then function "Simulator::Plot()" won't be executed.
     // It will also set all the OUTPUT modules.
     void Set_EnableStore(bool store=true);
     // Is simulation data printed to a file.
