@@ -113,13 +113,13 @@ public:
     void Set_EnablePrint(bool print=false);
     // Set the precision of floating point data printed to a file.
     void Set_PrintPrecision(unsigned int n=8);
+    // Set storage interval of all OUTPUT modules.
+    // It means how long do every OUTPUT modules store a data.
+    // Notice: It changes only OUTPUT modules, not others.
+    void Set_SampleTime(double time=-1);
 
     // Draw a waveform by using the stored data in every OUTPUT modules.
     void Plot();
-
-    // Set storage duration of OUTPUT modules. It means how long do every OUTPUT
-    //  modules store a data.
-    void Set_SampleTime(double time=-1);
 
     // Get and set current simulation time.
     void Set_t(double t);

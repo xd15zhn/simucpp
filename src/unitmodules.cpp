@@ -20,7 +20,7 @@ int UConstant::Self_Check() const { return 0; }
 void UConstant::Module_Update(double time) {}
 void UConstant::Module_Reset() {}
 int UConstant::Get_childCnt() const { return 0; }
-PUnitModule UConstant::Get_child(unsigned int n) const { return 0; }
+PUnitModule UConstant::Get_child(unsigned int n) const { return nullptr; }
 void UConstant::connect(const PUnitModule m) {}
 void UConstant::Set_OutValue(double v) { _outvalue=v; };
 UConstant::UConstant(Simulator *sim, std::string name): UnitModule(sim, name)
@@ -83,7 +83,7 @@ UFcnMISO::UFcnMISO(Simulator *sim, std::string name): UnitModule(sim, name)
 }
 int UFcnMISO::Self_Check() const
 {
-    if (_next.size() <= 0) TraceLog(LOG_WARNING, "Simucpp: FCNMISO module \"%s\" doesn't have enough child module.", _name);
+    if (_next.size() <= 0) TraceLog(LOG_WARNING, "Simucpp: FCNMISO module \"%s\" doesn't have enough child module.", _name.c_str());
     CHECK_FUNCTION(FCNMISO);
     if (_next.size()==0) return SIMUCPP_NO_CHILD;
     if ((_f==nullptr)&&(_fu==nullptr)) return SIMUCPP_NO_FUNCTION;
@@ -183,14 +183,14 @@ int UInput::Self_Check() const
 {
     if (_isc){
         if (_f == nullptr) TraceLog(LOG_WARNING, 
-            "Simucpp: INPUT module \"%s\" is in continuous mode but doesn't have an input function.", _name);
+            "Simucpp: INPUT module \"%s\" is in continuous mode but doesn't have an input function.", _name.c_str());
         if ((_f==nullptr)&&(_fu==nullptr)) return SIMUCPP_NO_FUNCTION;
     }
     else{
         if (_data.size() <= 0) TraceLog(LOG_WARNING, 
-            "Simucpp: INPUT module \"%s\" is in discrete mode but doesn't have input data.", _name);
+            "Simucpp: INPUT module \"%s\" is in discrete mode but doesn't have input data.", _name.c_str());
         if (_T <= 0) TraceLog(LOG_WARNING, 
-            "Simucpp: INPUT module \"%s\" is in discrete mode with a non-positive sample time.", _name);
+            "Simucpp: INPUT module \"%s\" is in discrete mode with a non-positive sample time.", _name.c_str());
         if (_data.size()==0) return SIMUCPP_NO_DATA;
     }
     return 0;
@@ -335,19 +335,19 @@ void UProduct::Set_InputGain(double inputgain, int port)
 {
     if (port==-1){
         if (_next.size() <= 0) TraceLog(LOG_WARNING, 
-            "Simucpp: PRODUCT module \"%s\" doesn't have input port!", _name);
+            "Simucpp: PRODUCT module \"%s\" doesn't have input port!", _name.c_str());
         _ingain[_next.size()-1] = inputgain;
     }
     else{
         if(port<0 || port>=(int)_next.size()) TraceLog(LOG_WARNING,
-            "Simucpp: PRODUCT module \"%s\" doesn't have input port!", _name);
+            "Simucpp: PRODUCT module \"%s\" doesn't have input port!", _name.c_str());
         _ingain[port] = inputgain;
     }
 }
 int UProduct::Self_Check() const
 {
     if (_next.size() <= 1) TraceLog(LOG_WARNING,
-        "PRODUCT module \"%s\" doesn't have enough child module.", _name);
+        "PRODUCT module \"%s\" doesn't have enough child module.", _name.c_str());
     if (_next.size()==0) return SIMUCPP_NO_CHILD;
     for (int i=0; i<(int)_next.size(); ++i)
         if (_next[i]==nullptr) return SIMUCPP_NULLPTR;
@@ -404,18 +404,22 @@ USum::USum(Simulator *sim, std::string name): UnitModule(sim, name)
 void USum::Set_InputGain(double inputgain, int port)
 {
     if (port==-1){
-        if (_next.size()<=0) TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name);            
+        if (_next.size()<=0)
+            TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name.c_str());
         _ingain[_next.size()-1] = inputgain;
     }
     else{
-        if (port<0 || port>=(int)_next.size()) TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name);            
+        if (port<0 || port>=(int)_next.size())
+            TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name.c_str());
         _ingain[port] = inputgain;
     }
 }
 int USum::Self_Check() const
 {
-    if (_next.size()==0) TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name);
-    if (_next.size()==0) return SIMUCPP_NO_CHILD;
+    if (_next.size()==0) {
+        TraceLog(LOG_WARNING, "SUM module \"%s\" doesn't have enough child module.", _name.c_str());
+        return SIMUCPP_NO_CHILD;
+    }
     for (int i=0; i<(int)_next.size(); ++i)
         if (_next[i]==nullptr) return SIMUCPP_NULLPTR;
     return 0;

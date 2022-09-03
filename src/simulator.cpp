@@ -111,7 +111,7 @@ void Simulator::Initialize() {
     for(int i=0; i<_cntM; ++i) {
         errcode = _modules[i]->Self_Check();
         if ((errcode!=0) && (errcode>_errlevel)) {
-            TraceLog(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!", _modules[i]->_name);
+            TraceLog(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!", _modules[i]->_name.c_str());
         }
     }
     TraceLog(LOG_DEBUG, "Simucpp: Module self check completed.");
@@ -349,7 +349,7 @@ void Simulator::Plot() {
         if (!m->_store) continue;
         if (_tvec.size()!=m->_values.size())
             TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" has a wrong data amount for plotting!"
-            "Time points num is %d; data points num is %d.", m->_name, _tvec.size(), m->_values.size());
+            "Time points num is %d; data points num is %d.", m->_name.c_str(), _tvec.size(), m->_values.size());
         matplotlibcpp::named_plot(m->_name, _tvec, m->_values);
     }
     matplotlibcpp::legend();
