@@ -7,7 +7,7 @@
 - 添加一些注释，优化代码格式等。
 
 # V2.0.3
-- [simulator.cpp/hpp] RENAME: duration -> endtime.
+- [simulator.cpp/hpp] RENAME: `duration` -> `endtime`.
 - [packmodules.cpp] BUGFIXED.
 - 添加一些日志打印。
 
@@ -20,3 +20,7 @@
 - [simulator.cpp/hpp] DELETED: `Set_WarningLevel`.
 - [simulator.cpp/hpp] DELETED: `VERSION`.
 - [UNoise] CHANGED: 重写正态分布随机变量生成函数。
+
+# V2.0.6
+- [unitmodules.cpp/simulator.cpp] BUGFIXED: `c_str`.
+- [simulator.hpp] DELETED: `Set_DivergenceCheckMode` 

@@ -28,7 +28,6 @@ Simulator::Simulator(double endtime) {
     DISCRETE_INITIALIZE(-1);
     _fp = nullptr;
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
-    _errlevel = 0;
     _divmode = 0;
     _diverge = false;
 }
@@ -110,9 +109,8 @@ void Simulator::Initialize() {
     if (_H<=0) TraceLog(LOG_FATAL, "Simucpp: Simulation step must be greator than zero!");
     for(int i=0; i<_cntM; ++i) {
         errcode = _modules[i]->Self_Check();
-        if ((errcode!=0) && (errcode>_errlevel)) {
-            TraceLog(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!", _modules[i]->_name.c_str());
-        }
+        if (errcode!=0) TraceLog(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!"
+            "Errcode: %d", _modules[i]->_name.c_str(), errcode);
     }
     TraceLog(LOG_DEBUG, "Simucpp: Module self check completed.");
 
@@ -362,7 +360,7 @@ void Simulator::Plot() {
 /**********************
 Set the output values of every pass-through modules to NaN.
 **********************/
-void Simulator::Set_DivergenceCheckMode() {
+void Simulator::Set_PassNaN() {
     PUnitModule bm = nullptr;
     for(int i=_cntM-1; i>=0; --i){
         if (_modules[i]==nullptr) continue;
