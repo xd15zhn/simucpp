@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cmath>
 #include "simulator.hpp"
 #include "definitions.hpp"
@@ -44,7 +43,7 @@ PUnitModule UFcn::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
 void UFcn::connect(const PUnitModule m) { _next=m;_enable=true; }
 UFcn::UFcn(Simulator *sim, std::string name): UnitModule(sim, name)
 {
-    _outvalue = 0;
+    _outvalue = nan("");
     _f = [](double u){return u;};
     _fu = nullptr;
     _next = nullptr;
@@ -76,7 +75,7 @@ void UFcnMISO::Module_Reset() {}
 int UFcnMISO::Get_childCnt() const { return _next.size(); }
 UFcnMISO::UFcnMISO(Simulator *sim, std::string name): UnitModule(sim, name)
 {
-    _outvalue = 0;
+    _outvalue = nan("");
     _f = [](double *u){return u[0];};
     _fu = nullptr;
     UNITMODULE_INIT();
@@ -139,7 +138,7 @@ void UGain::connect(const PUnitModule m) { _next=m;_enable=true; }
 UGain::UGain(Simulator *sim, std::string name): UnitModule(sim, name)
 {
     _gain = 1;
-    _outvalue = 0;
+    _outvalue = nan("");
     _next = nullptr;
     UNITMODULE_INIT();
 }
@@ -171,7 +170,7 @@ void UInput::Set_Continuous(bool isContinuous) { _isc=isContinuous; }
 void UInput::Set_SampleTime(double time) { _T=time; }
 UInput::UInput(Simulator *sim, std::string name): UnitModule(sim, name)
 {
-    _outvalue = 0;
+    _outvalue = nan("");
     _cnt = -1;
     _isc = true;
     _f = [](double t){return 1.0;};
@@ -210,7 +209,7 @@ void UInput::Module_Update(double time)
 void UInput::Module_Reset()
 {
     _cnt = -1;
-    _outvalue = 0;
+    _outvalue = nan("");
 }
 
 
@@ -257,7 +256,7 @@ void UNoise::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 UNoise::UNoise(Simulator *sim, std::string name): UnitModule(sim, name)
 {
     DISCRETE_INITIALIZE(-1);
-    _outvalue = 0;
+    _outvalue = nan("");
     UNITMODULE_INIT();
     _enable = true;
     _mean = 0;
@@ -328,7 +327,7 @@ void UProduct::Module_Reset() {}
 int UProduct::Get_childCnt() const { return _next.size(); }
 UProduct::UProduct(Simulator *sim, std::string name): UnitModule(sim, name)
 {
-    _outvalue = 0;
+    _outvalue = nan("");
     UNITMODULE_INIT();
 }
 void UProduct::Set_InputGain(double inputgain, int port)
@@ -397,7 +396,7 @@ int USum::Get_childCnt() const { return _next.size(); }
 void USum::Set_Redundant(bool rdnt) { _rdnt=rdnt; };
 USum::USum(Simulator *sim, std::string name): UnitModule(sim, name)
 {
-    _outvalue = 0;
+    _outvalue = nan("");
     _rdnt = true;
     UNITMODULE_INIT();
 }
@@ -470,7 +469,8 @@ PUnitModule UTransportDelay::Get_child(unsigned int n) const { return n==0?_next
 void UTransportDelay::connect(const PUnitModule m) { _next=m;_enable=true; }
 UTransportDelay::UTransportDelay(Simulator *sim, std::string name): UnitModule(sim, name)
 {
-    _iv = _outvalue = 0;
+    _outvalue = nan("");
+    _iv = 0;
     _lv.push_back(0);
     _next = nullptr;
     UNITMODULE_INIT();
@@ -566,7 +566,7 @@ void UZOH::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 UZOH::UZOH(Simulator *sim, std::string name): UnitModule(sim, name)
 {
     DISCRETE_INITIALIZE(1);
-    _outvalue = 0;
+    _outvalue = nan("");
     _next = nullptr;
     UNITMODULE_INIT();
 }

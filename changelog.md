@@ -23,4 +23,6 @@
 
 # V2.0.6
 - [unitmodules.cpp/simulator.cpp] BUGFIXED: `c_str`.
-- [simulator.hpp] DELETED: `Set_DivergenceCheckMode` 
+- [simulator.hpp] RENAMED: `Set_DivergenceCheckMode` -> `Set_PassNaN`.
+- [simulator.hpp] DELETED: `Set_PassNaN`.
+- [unitmodules.cpp] CHANGED: 将所有直通模块的初始输出值设为`NaN`。

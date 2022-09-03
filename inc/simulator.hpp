@@ -143,14 +143,10 @@ public:
 private:
     // Add a module to this simulator.
     void Add_Module(const PUnitModule m);
-
     void Add_Module(const PMatModule m);
+
     // Build connection of Endpoint modules.
     void Build_Connection(std::vector<int> &ids);
-
-    // Set the output values of every pass-through modules to NaN, so that if there exists
-    //  possible connection errors, they can be figured out immediately.
-    void Set_PassNaN();
 
     // Simulation step and end time.
     double _H, _endtime;
@@ -190,7 +186,7 @@ private:
     double _t;
     std::vector<double> _tvec;
 
-    // See public member function "Set_WarningLevel" and "Set_DivergenceCheckMode".
+    // See public member function "Set_DivergenceCheckMode".
     int _divmode;
     bool _diverge;
 };

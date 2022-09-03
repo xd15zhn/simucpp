@@ -1,4 +1,3 @@
-#include <iostream>
 #include "packmodules.hpp"
 #include "definitions.hpp"
 NAMESPACE_SIMUCPP_L

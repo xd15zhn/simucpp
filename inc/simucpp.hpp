@@ -4,12 +4,7 @@
 
 #define SIMUCPP_CONTINUOUS                        true
 #define SIMUCPP_DISCRETE                          false
-#ifndef PRINT_VALUE
-#define PRINT_VALUE(x)                            std::cout << x << std::endl
-#endif
-#ifndef PRINT_NAME_VALUE
-#define PRINT_NAME_VALUE(x)                       std::cout<<#x<<": "<<x<<std::endl;
-#endif
+
 
 #define SUConstant(x, sim)                        x=new UConstant(sim, #x)
 #define SUFcn(x, sim)                             x=new UFcn(sim, #x)

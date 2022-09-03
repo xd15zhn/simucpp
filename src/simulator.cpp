@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 #include <stack>
 #include <algorithm>
@@ -357,34 +356,7 @@ void Simulator::Plot() {
     TraceLog(LOG_WARNING, "Simucpp: You didn't add library \"matplotlibcpp\" for plotting.");
 #endif
 }
-/**********************
-Set the output values of every pass-through modules to NaN.
-**********************/
-void Simulator::Set_PassNaN() {
-    PUnitModule bm = nullptr;
-    for(int i=_cntM-1; i>=0; --i){
-        if (_modules[i]==nullptr) continue;
-        bm = _modules[i];
-        if (typeid(*bm) == typeid(UInput)) {
-           UInput *mdl = (UInput*)bm;
-           mdl->_outvalue = nan(""); }
-        else if (typeid(*bm) == typeid(UFcn)) {
-           UFcn *mdl = (UFcn*)bm;
-           mdl->_outvalue = nan(""); }
-        else if (typeid(*bm) == typeid(UFcnMISO)) {
-           UFcnMISO *mdl = (UFcnMISO*)bm;
-           mdl->_outvalue = nan(""); }
-        else if (typeid(*bm) == typeid(UProduct)) {
-           UProduct *mdl = (UProduct*)bm;
-           mdl->_outvalue = nan(""); }
-        else if (typeid(*bm) == typeid(USum)) {
-           USum *mdl = (USum*)bm;
-           mdl->_outvalue = nan(""); }
-        else if (typeid(*bm) == typeid(UZOH)) {
-           UZOH *mdl = (UZOH*)bm;
-           mdl->_outvalue = nan(""); }
-    }
-}
+
 
 /**********************
 **********************/

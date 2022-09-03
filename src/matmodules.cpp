@@ -1,4 +1,3 @@
-#include <iostream>
 #include "simulator.hpp"
 #include "definitions.hpp"
 #ifdef USE_ZHNMAT
