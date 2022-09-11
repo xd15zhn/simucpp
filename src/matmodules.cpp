@@ -41,7 +41,7 @@ Mux::Mux(Simulator *sim, BusSize size, std::string name)
 }
 PUnitModule Mux::Get_OutputPort(BusSize size) const {
     if (_next==nullptr) TraceLog(LOG_FATAL, "Multiplex module \"%s\" doesn't have a child module!", _name);
-    if (_size<size) return nullptr;
+    if (!(size<_size)) return nullptr;
     return _next[size.r*_size.c+size.c];
 }
 
@@ -66,7 +66,7 @@ DeMux::DeMux(Simulator *sim, BusSize size, std::string name)
     MATMODULE_INIT();
 }
 PUnitModule DeMux::Get_OutputPort(BusSize size) const {
-    if (_size<size) return nullptr;
+    if (!(size<_size)) return nullptr;
     return _gains[size.r*_size.c+size.c];
 }
 bool DeMux::Initialize() {
@@ -112,7 +112,7 @@ MStateSpace::MStateSpace(Simulator *sim, BusSize size, bool isc, std::string nam
     }
 }
 PUnitModule MStateSpace::Get_OutputPort(BusSize size) const {
-    if (_size<size) return nullptr;
+    if (!(size<_size)) return nullptr;
     if (_isc) return _intx[size.r*_size.c+size.c];
     else return _udx[size.r*_size.c+size.c];
 }
@@ -120,7 +120,8 @@ bool MStateSpace::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
     if (_next==nullptr) TraceLog(LOG_FATAL, "State module \"%s\" doesn't have a child module!", _name);
     if (!_next->Get_State()) return false;
-    if (!(_next->Get_OutputBusSize()==_size)) TraceLog(LOG_FATAL, "Bus size between state module \"%s\" and its child module are mismatch!", _name);
+    if (!(_next->Get_OutputBusSize()==_size))
+        TraceLog(LOG_FATAL, "Bus size between state module \"%s\" and its child module are mismatch!", _name);
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
             if (_isc) _sim->connectU(_next->Get_OutputPort(BusSize(i, j)), _intx[i*_size.c+j]);
@@ -173,7 +174,7 @@ MGain::MGain(Simulator *sim, const zhnmat::Mat& G, bool isleft, std::string name
 }
 PUnitModule MGain::Get_OutputPort(BusSize size) const {
     if (_sumy==nullptr) TraceLog(LOG_FATAL, "internal error: MGain.");
-    if (_sizeout<size) return nullptr;
+    if (!(size<_sizeout)) return nullptr;
     return _sumy[size.r*_sizeout.c+size.c];
 }
 bool MGain::Initialize() {
@@ -193,8 +194,7 @@ bool MGain::Initialize() {
                     _sim->connectU(_next->Get_OutputPort(BusSize(k, j)), _sumy[i*_sizeout.c+j]);
                     _sumy[i*_sizeout.c+j]->Set_InputGain(_G.at(i, k));
                 }
-            }
-            else {
+            } else {
                 for (uint k=0; k<_sizein.c; ++k) {
                     _sim->connectU(_next->Get_OutputPort(BusSize(i, k)), _sumy[i*_sizeout.c+j]);
                     _sumy[i*_sizeout.c+j]->Set_InputGain(_G.at(k, j));
@@ -202,6 +202,34 @@ bool MGain::Initialize() {
             }
         }
     }
+    _state = BUS_INITIALIZED; return true;
+}
+
+
+/*********************
+matrix Product module.
+**********************/
+MProduct::~MProduct() {}
+BusSize MProduct::Get_OutputBusSize() const { return _sizeout; }
+u8 MProduct::Get_State() const { return _state; }
+void MProduct::connect(const PMatModule m) { _nexts.push_back(m); }
+MProduct::MProduct(Simulator *sim, std::string name): MatModule(sim, name) {
+    _state = 0;
+    MATMODULE_INIT();
+}
+PUnitModule MProduct::Get_OutputPort(BusSize size) const {
+    if (_sumy==nullptr) TraceLog(LOG_FATAL, "internal error: MProduct.");
+    if (!(size<_sizeout)) return nullptr;
+    return _sumy[size.r*_sizeout.c+size.c];
+}
+bool MProduct::Initialize() {
+    if (_state == BUS_INITIALIZED) return true;
+    if (_nexts.size()==0) TraceLog(LOG_FATAL, "Matrix module \"%s\" doesn't have a child module!", _name);
+    BusSize childBusSize;
+    PUnitModule childBusPort;
+    for (int b=_nexts.size()-1; b>=0; --b) {
+    }
+    if (!(_state & BUS_SIZED)) return false;
     _state = BUS_INITIALIZED; return true;
 }
 
@@ -219,7 +247,7 @@ MSum::MSum(Simulator *sim, std::string name): MatModule(sim, name) {
 }
 PUnitModule MSum::Get_OutputPort(BusSize size) const {
     if (_sumy==nullptr) TraceLog(LOG_FATAL, "internal error: MSum.");
-    if (_size<size) return nullptr;
+    if (!(size<_size)) return nullptr;
     return _sumy[size.r*_size.c+size.c];
 }
 bool MSum::Initialize() {

@@ -68,7 +68,7 @@ private:
 /*********************
 matrix Gain module.
 "isleft" refers to the side of matrix multiplication.
-Iif "isleft=true" then y=Gx, else y=xG
+If "isleft=true" then y=Gx, else y=xG
 **********************/
 class MGain: public MatModule {
     MATMODULE_VIRTUAL(MGain);
@@ -80,6 +80,20 @@ private:
     zhnmat::Mat _G;
     bool _isleft;
     PMatModule _next;
+};
+
+
+/*********************
+matrix Product module.
+**********************/
+class MProduct: public MatModule {
+    MATMODULE_VIRTUAL(MProduct);
+public:
+    MProduct(Simulator *sim, std::string name="mprd");
+private:
+    PUSum *_sumy = nullptr;  // Output port
+    BusSize *_sizein, _sizeout;  // Bus size of input and output
+    std::vector<PMatModule> _nexts;  // input pointers
 };
 
 

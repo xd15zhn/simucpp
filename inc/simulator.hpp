@@ -29,21 +29,23 @@ class Simulator
     friend class DeMux;
     friend class MStateSpace;
     friend class MGain;
+    friend class MProduct;
     friend class MSum;
 public:
     // Init a simulator with end time.
     Simulator(double endtime=10);
     ~Simulator();
 
-    /**********************
-    The following 3 groups of functions are uesd to build connections
-     between modules. Each function accepts 2 parameters of modules "m1"
-     and "m2", and usually 2 parameters of orders "n1" and "n2", means to
-     connect "n1"th output port of "m1" to "n2"th input port of "m2".
-    Unit modules and matrix modules don't need to be specified which port
-     of them should be connected.
-    As for PackModule, default zero if port is not specified.
-    **********************/
+/**********************
+The following 3 groups of functions are uesd to build connections
+    between modules. Each function accepts 2 parameters of modules "m1"
+    and "m2", and usually 2 parameters of orders "n1" and "n2", means to
+    connect "n1"th output port of "m1" to "n2"th input port of "m2".
+Unit modules and matrix modules don't need to be specified which port
+    of them should be connected.
+As for PackModule, default zero if port is not specified.
+**********************/
+#pragma region connect
     // The following functions are used to build a single line connection between:
     //  unit module and unit module
     //  unit module and pack module
@@ -83,9 +85,7 @@ public:
     void connectU(PPackModule m1, PMux m2, BusSize n2=BusSize());  // pack to mux
     // void connectM(PPackModule m1, int n1, PDeMux m2, BusSize n2=BusSize());  // pack to demux
     // void connectM(PPackModule m1, PDeMux m2, BusSize n2=BusSize());  // pack to demux
-    /**********************
-    Connect functions ended.
-    **********************/
+#pragma endregion connect
 
     // Update the connection between modules which belongs to THIS simulator.
     // It must be called before first simulation and has no need to be called afterward.

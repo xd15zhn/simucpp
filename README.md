@@ -26,6 +26,13 @@ master:最新修改版本：V2.0.2
 [番外篇(2)连续离散混合仿真中的若干问题](https://blog.csdn.net/qq_34288751/article/details/122708048)  
 [番外篇(3)矩阵模块与复用模块的设计细节](https://blog.csdn.net/qq_34288751/article/details/126324078)  
 
+# 目前用该库解决的实用问题
+- [倒立摆控制与仿真动画展示](https://blog.csdn.net/qq_34288751/article/details/122640930)
+- [卫星轨道3D仿真程序](https://gitee.com/xd15zhn/satellitesim)
+- [降维状态观测器的直观理解与仿真](https://blog.csdn.net/qq_34288751/article/details/123061451)
+- [导弹追踪问题](https://blog.csdn.net/qq_34288751/article/details/122725421)
+- [水流冲重物问题](https://blog.csdn.net/qq_34288751/article/details/123159543)
+
 # 一个简单的例子
 ```cpp
 // main.cpp

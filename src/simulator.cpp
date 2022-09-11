@@ -200,7 +200,7 @@ int Simulator::Simulate_FirstStep() {
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
     PRINT_OUTPUT();
-    _tvec.push_back(_t);
+    if (_store) _tvec.push_back(_t);
     return 0;
 }
 int Simulator::Simulate_FinalStep() {
@@ -209,7 +209,7 @@ int Simulator::Simulate_FinalStep() {
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
     PRINT_OUTPUT();
-    _tvec.push_back(_t);
+    if (_store) _tvec.push_back(_t);
     return 0;
 }
 int Simulator::Simulate_OneStep() {

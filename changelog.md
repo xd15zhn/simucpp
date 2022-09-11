@@ -26,3 +26,8 @@
 - [simulator.hpp] RENAMED: `Set_DivergenceCheckMode` -> `Set_PassNaN`.
 - [simulator.hpp] DELETED: `Set_PassNaN`.
 - [unitmodules.cpp] CHANGED: 将所有直通模块的初始输出值设为`NaN`。
+
+# V2.0.7
+- [matmodules.cpp/simulator.cpp] ADDED: `MProduct`.
+- [matmodules.cpp] BUGFIXED: if (!(size<_size)).
+- [matmodules.cpp] DELETED: 仿真器的`connectU`和`connectM`函数删除默认连接端口.
