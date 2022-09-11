@@ -1,5 +1,5 @@
-#include <fstream>
 #include <stack>
+#include <cmath>
 #include <algorithm>
 #include "simulator.hpp"
 #include "definitions.hpp"
@@ -22,10 +22,7 @@ Simulator::Simulator(double endtime) {
     _cntM = 0;
     _t = 0;
     _store = true;
-    _print = false;
-    _precision = 8;
     DISCRETE_INITIALIZE(-1);
-    _fp = nullptr;
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
     _divmode = 0;
     _diverge = false;
@@ -35,11 +32,6 @@ Simulator::~Simulator() {
         if (!_ode4K[i]) continue;
         delete _ode4K[i]; _ode4K[i] = nullptr;
     }
-    if (!_print) return;
-    if (!_fp) return;
-    if (!_fp->is_open()) return;
-    _fp->close();
-    delete _fp; _fp = nullptr;
 }
 
 
@@ -157,15 +149,6 @@ void Simulator::Initialize() {
         }
     }
     TraceLog(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
-
-    /* Initialize a data file for storage.*/
-    if (_print) {
-        _fp = new std::fstream;
-        _fp->open("data.csv", std::ios::out);
-        if (!_fp->is_open())  TraceLog(LOG_FATAL, "Simucpp: Failed to open data file!");
-        _fp->precision(_precision);
-        TraceLog(LOG_INFO, "Simucpp: Data file is ready for writing.");
-    }
     TraceLog(LOG_INFO, "Simucpp: Simulator initialization completed.");
 }
 
@@ -199,7 +182,6 @@ int Simulator::Simulate_FirstStep() {
     MODULE_INTEGRATOR_UPDATE();
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
-    PRINT_OUTPUT();
     if (_store) _tvec.push_back(_t);
     return 0;
 }
@@ -208,7 +190,6 @@ int Simulator::Simulate_FinalStep() {
     MODULE_INTEGRATOR_UPDATE();
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
-    PRINT_OUTPUT();
     if (_store) _tvec.push_back(_t);
     return 0;
 }
@@ -226,7 +207,6 @@ int Simulator::Simulate_OneStep() {
     }
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
-    PRINT_OUTPUT();
 
     _t += _H;
     SET_DISCRETE_ENABLE(false);
@@ -362,12 +342,8 @@ void Simulator::Plot() {
 **********************/
 void Simulator::Set_EnableStore(bool store) { _store=store;
     for (PUOutput m: _outputs) m->Set_EnableStore(store); }
-void Simulator::Set_EnablePrint(bool print) { _print=print;
-    for (PUOutput m: _outputs) m->Set_EnablePrint(print); }
 void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T;
     for (PUOutput m: _outputs) m->Set_SampleTime(time); }
-void Simulator::Set_PrintPrecision(unsigned int n) {
-    _precision = SIMUCPP_LIMIT(n, 2, 20); }
 void Simulator::Set_t(double t) { _t = t; }
 double Simulator::Get_t() { return _t; }
 void Simulator::Set_Endtime(double t) { _endtime=t; }

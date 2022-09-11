@@ -286,7 +286,6 @@ void UOutput::connect(const PUnitModule m) { _next=m;_enable=true; }
 vecdble& UOutput::Get_StoredData() { return _values; }
 void UOutput::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 void UOutput::Set_EnableStore(bool store) { _store=store; }
-void UOutput::Set_EnablePrint(bool print) { _print=print; }
 void UOutput::Set_InputGain(double inputgain) { _ingain=inputgain; }
 void UOutput::Set_MaxDataStorage(int n) { _maxstorage=n; }
 UOutput::UOutput(Simulator *sim, std::string name): UnitModule(sim, name)
@@ -296,7 +295,6 @@ UOutput::UOutput(Simulator *sim, std::string name): UnitModule(sim, name)
     _ingain = 1;
     _maxstorage = -1;
     _store = true;
-    _print = false;
     _next = nullptr;
     UNITMODULE_INIT();
 }

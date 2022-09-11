@@ -98,11 +98,6 @@ As for PackModule, default zero if port is not specified.
     // If set false, then function "Simulator::Plot()" won't be executed.
     // It will also set all the OUTPUT modules.
     void Set_EnableStore(bool store=true);
-    // Is simulation data printed to a file.
-    // It will also set all the OUTPUT modules.
-    void Set_EnablePrint(bool print=false);
-    // Set the precision of floating point data printed to a file.
-    void Set_PrintPrecision(unsigned int n=8);
     // Set storage interval of all OUTPUT modules.
     // It means how long do every OUTPUT modules store a data.
     // Notice: It changes only OUTPUT modules, not others.
@@ -129,6 +124,9 @@ As for PackModule, default zero if port is not specified.
     // 4: Stop the simulation, return a none-zero value.
     // other: the same as 2.
     void Set_DivergenceCheckMode(int mode=0);
+
+    // Print all modules and their connections.
+    void Print_Modules();
 
 private:
     // Add a module to this simulator.
@@ -165,10 +163,8 @@ private:
     std::vector<std::vector<int>> _integIDs, _delayIDs, _outIDs;
     std::vector<int> _discIDs;
 
-    // See public member function "Set_EnableStore" and "Set_EnablePrint".
-    bool _store, _print;
-    int _precision;
-    std::fstream *_fp;
+    // See public member function "Set_EnableStore".
+    bool _store;
     // See public member function "Set_SampleTime".
     DISCRETE_VARIABLES();
 

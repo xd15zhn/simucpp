@@ -62,7 +62,7 @@ DeMux::DeMux(Simulator *sim, BusSize size, std::string name)
     if (_size<BusSize(1, 1)) TraceLog(LOG_FATAL, "Size of multiplex module \"%s\" is too small!", _name);
     _gains = new PUGain[_size.c*_size.r];
     for (int i=_size.c*_size.r-1; i>=0; --i)
-        _gains[i] = new UGain(sim, name+"connector"+std::to_string(i));
+        _gains[i] = new UGain(sim, name+"_connector_"+std::to_string(i));
     MATMODULE_INIT();
 }
 PUnitModule DeMux::Get_OutputPort(BusSize size) const {

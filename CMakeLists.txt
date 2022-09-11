@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(simucpp VERSION 2.0.7)
+project(simucpp VERSION 2.0.8)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,6 +15,7 @@ set(SIMUCPP_SOURCES
     ${PROJECT_SOURCE_DIR}/src/matmodules.cpp
     ${PROJECT_SOURCE_DIR}/src/simulator.cpp
     ${PROJECT_SOURCE_DIR}/src/connector.cpp
+    ${PROJECT_SOURCE_DIR}/src/debugs.cpp
 )
 
 if (WIN32)
@@ -33,6 +34,7 @@ message(STATUS "CMAKE_INSTALL_INCLUDEDIR: ${CMAKE_INSTALL_INCLUDEDIR}")
 
 option(USE_ZHNMAT "Dependent lirary zhnmat, used for matrix modules." ON)
 option(USE_MPLT "Dependent lirary matplotlibcpp, used to plot waves." ON)
+option(SUPPORT_DEBUG "Print more informations about simulators and modules." OFF)
 
 add_library(${CMAKE_PROJECT_NAME} STATIC ${SIMUCPP_SOURCES})
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC
@@ -67,6 +69,10 @@ if(USE_MPLT)
     target_link_libraries(${CMAKE_PROJECT_NAME} PUBLIC ${matplotlibcpp_LIBS})
     target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${matplotlibcpp_INCLUDE_DIRS}>)
 endif()
+if (SUPPORT_DEBUG)
+    MESSAGE(STATUS "Support simulator debug functions.")
+    add_definitions(-DSUPPORT_DEBUG)
+endif ()
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(

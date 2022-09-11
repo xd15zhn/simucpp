@@ -68,16 +68,6 @@ simulator.cpp
     if (x->_id==-1) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is not added to a simulator!", x->_name.c_str())
 #define CHECK_SIMULATOR(x) \
     if (x->_sim!=this) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is added to a wrong simulator!", x->_name.c_str())
-#define PRINT_OUTPUT() \
-    if ((_print) && (_t-_ltn>=_T-SIMUCPP_DBL_EPSILON)) { \
-        _ltn += _T; \
-        *_fp << _t; \
-        for (int i=0; i<_cntO; ++i){ \
-            if (!_outputs[i]->_print) continue; \
-            *_fp << ',' << _outputs[i]->_outvalue; \
-        } \
-        *_fp << '\n'; \
-    }
 #define SET_DISCRETE_ENABLE(x) \
     for (int i: _discIDs) \
         _modules[i]->Set_Enable(x)
@@ -88,11 +78,11 @@ simulator.cpp
         if (std::isnan(m->_outvalue)) return 3; \
     }
 #define PRINT_CONVERGENCE(x) \
-    std::cout << "Simulation diverged. Type: "; \
+    TraceLog(LOG_WARNING, "Simulation diverged. Type: "); \
     switch (x) { \
-    case 1: std::cout<< "Positive infinity." << std::endl; break; \
-    case 2: std::cout<< "Negative infinity." << std::endl; break; \
-    case 3: std::cout<< "Not a number." << std::endl; break; \
+    case 1: TraceLog(LOG_WARNING, "    Positive infinity."); break; \
+    case 2: TraceLog(LOG_WARNING, "    Negative infinity."); break; \
+    case 3: TraceLog(LOG_WARNING, "    Not a number."); break; \
     default: break; \
     }
 
