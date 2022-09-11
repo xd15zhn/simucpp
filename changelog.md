@@ -30,4 +30,6 @@
 # V2.0.7
 - [matmodules.cpp/simulator.cpp] ADDED: `MProduct`.
 - [matmodules.cpp] BUGFIXED: if (!(size<_size)).
-- [matmodules.cpp] DELETED: 仿真器的`connectU`和`connectM`函数删除默认连接端口.
+- [matmodules.cpp] DELETED: 实际使用中发现很多不应该使用默认参数的连接误使用了默认参数，
+代码虽然整齐但更容易出错，因此将仿真器的`connectU`和`connectM`函数删除了默认连接端口.
+- [matmodules.cpp] BUGFIXED: `zhnmat::Mat MStateSpace::Get_OutValue`.

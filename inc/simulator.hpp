@@ -50,23 +50,19 @@ As for PackModule, default zero if port is not specified.
     //  unit module and unit module
     //  unit module and pack module
     //  pack module and pack module
-    void connectU(PUnitModule m1, PUnitModule m2);
-    void connectU(PUnitModule m1, PPackModule m2, int n2=0);
-    void connectU(PPackModule m1, int n1, PUnitModule m2);
-    void connectU(PPackModule m1, PUnitModule m2);
-    void connectU(PPackModule m1, int n1, PPackModule m2, int n2=0);
-    void connectU(PPackModule m1, PPackModule m2, int n2=0);
+    void connectU(PUnitModule m1, PUnitModule m2);  // unit to unit
+    void connectU(PUnitModule m1, PPackModule m2, int n2);  // unit to pack
+    void connectU(PPackModule m1, int n1, PUnitModule m2);  // pack to unit
+    void connectU(PPackModule m1, int n1, PPackModule m2, int n2);  // pack to pack
 
     // The following functions are used to build a bus connection between:
     //  matrix module and matrix module
     //  matrix module and pack module
     //  pack module and pack module
-    void connectM(PMatModule m1, PMatModule m2);
-    void connectM(PMatModule m1, PPackModule m2, int n2=0);
-    void connectM(PPackModule m1, int n1, PMatModule m2);
-    void connectM(PPackModule m1, PMatModule m2);
-    void connectM(PPackModule m1, int n1, PPackModule m2, int n2=0);
-    void connectM(PPackModule m1, PPackModule m2, int n2=0);
+    void connectM(PMatModule m1, PMatModule m2);  // mat to mat
+    void connectM(PMatModule m1, PPackModule m2, int n2);  // mat to pack
+    void connectM(PPackModule m1, int n1, PMatModule m2);  // pack to mat
+    void connectM(PPackModule m1, int n1, PPackModule m2, int n2);  // pack to pack
 
     // The following functions are used to build a single line connection between:
     //  unit module and multiplex module
@@ -74,17 +70,11 @@ As for PackModule, default zero if port is not specified.
     //  demultiplex module and unit module
     //  demultiplex module and pack module
     //  demultiplex module and multiplex module
-    void connectU(PUnitModule m1, PMux m2, BusSize n2=BusSize());  // unit to mux
+    void connectU(PUnitModule m1, PMux m2, BusSize n2);  // unit to mux
     void connectU(PDeMux m1, BusSize n1, PUnitModule m2);  // demux to unit
-    void connectU(PDeMux m1, PUnitModule m2);  // demux to unit
-    void connectU(PDeMux m1, BusSize n1, PPackModule m2, int n2=0);  // demux to pack
-    void connectU(PDeMux m1, PPackModule m2, int n2=0);  // demux to pack
-    void connectU(PDeMux m1, BusSize n1, PMux m2, BusSize n2=BusSize());  // demux to mux
-    void connectU(PDeMux m1, PMux m2, BusSize n2=BusSize());  // demux to mux
-    void connectU(PPackModule m1, int n1, PMux m2, BusSize n2=BusSize());  // pack to nux
-    void connectU(PPackModule m1, PMux m2, BusSize n2=BusSize());  // pack to mux
-    // void connectM(PPackModule m1, int n1, PDeMux m2, BusSize n2=BusSize());  // pack to demux
-    // void connectM(PPackModule m1, PDeMux m2, BusSize n2=BusSize());  // pack to demux
+    void connectU(PPackModule m1, int n1, PMux m2, BusSize n2);  // pack to nux
+    void connectU(PDeMux m1, BusSize n1, PPackModule m2, int n2);  // demux to pack
+    void connectU(PDeMux m1, BusSize n1, PMux m2, BusSize n2);  // demux to mux
 #pragma endregion connect
 
     // Update the connection between modules which belongs to THIS simulator.

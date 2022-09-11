@@ -149,7 +149,7 @@ void MStateSpace::Set_InitialValue(const zhnmat::Mat& value) {
     }
 }
 zhnmat::Mat MStateSpace::Get_OutValue() {
-    zhnmat::Mat ans;
+    zhnmat::Mat ans(_size.r, _size.c);
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
             if (_isc) ans.set(i, j, _intx[i*_size.c+j]->Get_OutValue());
@@ -169,7 +169,7 @@ u8 MGain::Get_State() const { return _state; }
 void MGain::connect(const PMatModule m) { _next=m; }
 MGain::MGain(Simulator *sim, const zhnmat::Mat& G, bool isleft, std::string name)
     :MatModule(sim, name), _G(G), _isleft(isleft) {
-    _state = 0;
+    _state = false;
     MATMODULE_INIT();
 }
 PUnitModule MGain::Get_OutputPort(BusSize size) const {
@@ -214,7 +214,7 @@ BusSize MProduct::Get_OutputBusSize() const { return _sizeout; }
 u8 MProduct::Get_State() const { return _state; }
 void MProduct::connect(const PMatModule m) { _nexts.push_back(m); }
 MProduct::MProduct(Simulator *sim, std::string name): MatModule(sim, name) {
-    _state = 0;
+    _state = false;
     MATMODULE_INIT();
 }
 PUnitModule MProduct::Get_OutputPort(BusSize size) const {
@@ -228,8 +228,16 @@ bool MProduct::Initialize() {
     BusSize childBusSize;
     PUnitModule childBusPort;
     for (int b=_nexts.size()-1; b>=0; --b) {
+        if (!_nexts[b]->Get_State()) continue;  // Bus size of child module is not determined
+        if (b==_nexts.size()-1) {
+            _sizeout = _nexts[b]->Get_OutputBusSize();
+        } else {
+            childBusSize = _nexts[b]->Get_OutputBusSize();
+            if (_sizeout.c != childBusSize.r)
+                TraceLog(LOG_FATAL, "Bus size mismatch between child modules of matrix module \"%s\"!", _name);
+            _sizeout.c = childBusSize.c;
+        }
     }
-    if (!(_state & BUS_SIZED)) return false;
     _state = BUS_INITIALIZED; return true;
 }
 
@@ -242,7 +250,7 @@ BusSize MSum::Get_OutputBusSize() const { return _size; }
 u8 MSum::Get_State() const { return _state; }
 void MSum::connect(const PMatModule m) { _nexts.push_back(m); }
 MSum::MSum(Simulator *sim, std::string name): MatModule(sim, name) {
-    _state = 0;
+    _state = false;
     MATMODULE_INIT();
 }
 PUnitModule MSum::Get_OutputPort(BusSize size) const {
@@ -282,4 +290,4 @@ bool MSum::Initialize() {
 
 
 NAMESPACE_SIMUCPP_R
-#endif
+#endif  // USE_ZHNMAT
