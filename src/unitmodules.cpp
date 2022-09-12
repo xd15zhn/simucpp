@@ -6,6 +6,8 @@ NAMESPACE_SIMUCPP_L
 UnitModule::UnitModule(Simulator *sim, std::string name)
     : _name(name),_id(-1) {}
 UnitModule::~UnitModule() {}
+UserFunc::UserFunc() {}
+UserFunc::~UserFunc() {}
 double UserFunc::Function(double u) const { return u; }
 double UserFunc::Function(double *u) const  { return u[0]; }
 

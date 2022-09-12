@@ -38,3 +38,7 @@
 - [simulator.cpp/hpp] DELETED: `Set_EnablePrint`,`Set_PrintPrecision`.
 - [unitmodules.cpp/hpp] DELETED: `Set_EnablePrint`.
 - [simulator.cpp/hpp] ADDED: `Print_Modules`.
+
+# V2.0.9
+- [packmodules.cpp/hpp] ADDED: `ProductScalarMatrix`.
+- [matmodules.cpp/hpp] ADDED: `MProduct`.

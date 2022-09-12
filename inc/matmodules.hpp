@@ -91,9 +91,11 @@ class MProduct: public MatModule {
 public:
     MProduct(Simulator *sim, std::string name="mprd");
 private:
-    PUSum *_sumy = nullptr;  // Output port
-    BusSize *_sizein, _sizeout;  // Bus size of input and output
-    std::vector<PMatModule> _nexts;  // input pointers
+    PUFcnMISO *_misoy = nullptr;
+    BusSize _size;
+    PMatModule _nextL = nullptr;
+    PMatModule _nextR = nullptr;
+    u8 _portcnt;
 };
 
 

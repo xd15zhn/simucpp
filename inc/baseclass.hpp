@@ -42,14 +42,17 @@ enum DIVERGENCE_MODE {
 /**********************
 Used to provide another method to replace the pointer to a function.
 pure virture base class.
+Its implementation is in file `unitmodules.cpp`.
 **********************/
 class UserFunc
 {
 public:
+    UserFunc();
+    virtual ~UserFunc() = 0;
     // Used for modules which need a SISO function.
-    virtual double Function(double u) const = 0;
+    virtual double Function(double u) const;
     // Used for modules which need a MISO function.
-    virtual double Function(double *u) const = 0;
+    virtual double Function(double *u) const;
 };
 
 

@@ -18,7 +18,7 @@ void Simulator::Print_Modules() {
         }
     }
 #else
-    TraceLog(LOG_WARNING, "Simucpp: You didn't add debug functions.");
+    TraceLog(LOG_WARNING, "Simulator debug: You didn't add debug functions.");
 #endif  // SUPPORT_DEBUG
 }
 
