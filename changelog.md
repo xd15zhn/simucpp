@@ -42,3 +42,4 @@
 # V2.0.9
 - [packmodules.cpp/hpp] ADDED: `ProductScalarMatrix`.
 - [matmodules.cpp/hpp] ADDED: `MProduct`.
+- [matmodules.cpp/hpp] ADDED: `MTranspose`.

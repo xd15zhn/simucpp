@@ -12,7 +12,9 @@ NAMESPACE_SIMUCPP_L
         virtual u8 Get_State() const override; \
         virtual PUnitModule Get_OutputPort(BusSize size) const override; \
         virtual BusSize Get_OutputBusSize() const override; \
-        virtual void connect(const PMatModule m) override
+        virtual void connect(const PMatModule m) override; \
+    private: \
+        BusSize _size
 
 
 /*********************
@@ -27,7 +29,6 @@ public:
     void connect(PUnitModule m, BusSize n2=BusSize());
 private:
     PUnitModule *_next=nullptr;
-    BusSize _size;
 };
 
 class DeMux: public MatModule {
@@ -38,7 +39,6 @@ public:
 private:
     PMatModule _next;
     PUGain *_gains=nullptr;
-    BusSize _size;
 };
 
 
@@ -56,7 +56,6 @@ public:
     void Set_InitialValue(const zhnmat::Mat& value);
     zhnmat::Mat Get_OutValue();
 private:
-    BusSize _size;
     bool _isc;
     PMatModule _next;
     // Only one of the following two member variables can be a non null pointer.
@@ -76,7 +75,6 @@ public:
     MGain(Simulator *sim, const zhnmat::Mat& G, bool isleft=true, std::string name="mgn");
 private:
     PUSum *_sumy = nullptr;  // Output port
-    BusSize _sizein, _sizeout;  // Bus size of input and output
     zhnmat::Mat _G;
     bool _isleft;
     PMatModule _next;
@@ -92,7 +90,6 @@ public:
     MProduct(Simulator *sim, std::string name="mprd");
 private:
     PUFcnMISO *_misoy = nullptr;
-    BusSize _size;
     PMatModule _nextL = nullptr;
     PMatModule _nextR = nullptr;
     u8 _portcnt;
@@ -106,10 +103,23 @@ class MSum: public MatModule {
     MATMODULE_VIRTUAL(MSum);
 public:
     MSum(Simulator *sim, std::string name="msum");
+    void Set_InputGain(double inputgain, int port=-1);
 private:
-    BusSize _size;
     PUSum *_sumy = nullptr;
+    std::vector<double> _ingain;
     std::vector<PMatModule> _nexts;
+};
+
+
+/*********************
+matrix Transpose module.
+**********************/
+class MTranspose: public MatModule {
+    MATMODULE_VIRTUAL(MTranspose);
+public:
+    MTranspose(Simulator *sim, std::string name="mtsp");
+private:
+    PMatModule _next = nullptr;
 };
 
 

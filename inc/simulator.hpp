@@ -31,6 +31,7 @@ class Simulator
     friend class MGain;
     friend class MProduct;
     friend class MSum;
+    friend class MTranspose;
 public:
     // Init a simulator with end time.
     Simulator(double endtime=10);
