@@ -45,3 +45,6 @@
 - [matmodules.cpp/hpp] ADDED: `MTranspose`.
 - [matmodules.cpp/hpp] ADDED: `MConstant`.
 - [matmodules.cpp/hpp] ADDED: `MFcnMISO`.
+
+# V2.0.10
+- [matmodules.cpp/hpp] BUGFIXED: 矩阵模块初始化的步骤问题。
