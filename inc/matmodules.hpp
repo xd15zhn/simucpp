@@ -65,6 +65,34 @@ private:
 
 
 /*********************
+matrix Constant module.
+**********************/
+class MConstant: public MatModule {
+    MATMODULE_VIRTUAL(MConstant);
+public:
+    MConstant(Simulator *sim, const zhnmat::Mat& A, std::string name="mcst");
+private:
+    PUConstant *_ucst=nullptr;
+};
+
+
+/*********************
+matrix FcnMISO module.
+**********************/
+class MFcnMISO: public MatModule {
+    MATMODULE_VIRTUAL(MFcnMISO);
+public:
+    MFcnMISO(Simulator *sim, BusSize size, std::string name="mfcn");
+    void Set_Function(zhnmat::Mat(*function)(zhnmat::Mat *u));
+private:
+    PUFcnMISO *_misoy=nullptr;
+    std::vector<PMatModule> _nexts;
+    std::vector<BusSize> _buses;
+    zhnmat::Mat(*_f)(zhnmat::Mat *m);
+};
+
+
+/*********************
 matrix Gain module.
 "isleft" refers to the side of matrix multiplication.
 If "isleft=true" then y=Gx, else y=xG

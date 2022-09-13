@@ -43,3 +43,5 @@
 - [packmodules.cpp/hpp] ADDED: `ProductScalarMatrix`.
 - [matmodules.cpp/hpp] ADDED: `MProduct`.
 - [matmodules.cpp/hpp] ADDED: `MTranspose`.
+- [matmodules.cpp/hpp] ADDED: `MConstant`.
+- [matmodules.cpp/hpp] ADDED: `MFcnMISO`.

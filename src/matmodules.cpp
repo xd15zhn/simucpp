@@ -6,9 +6,9 @@ NAMESPACE_SIMUCPP_L
 MatModule::MatModule(Simulator *sim, std::string name): _sim(sim), _name(name) {};
 MatModule::~MatModule() {}
 
-class MatMul: public UserFunc {
+class VecDotInMat: public UserFunc {
 public:
-    MatMul(uint cnt=0): _cnt(cnt) {}
+    VecDotInMat(uint cnt=0): _cnt(cnt) {}
     virtual double Function(double *u) const override {
         double ans = 0;
         for (int i = 0; i < _cnt; i++)
@@ -17,6 +17,30 @@ public:
     }
     uint _cnt;
 };
+
+class MatDemux: public UserFunc {
+public:
+    MatDemux(std::vector<BusSize> sizes, zhnmat::Mat(*function)(zhnmat::Mat *m), BusSize loc)
+    :_sizes(sizes), _f(function), _loc(loc) {}
+    virtual double Function(double *u) const override {
+        uint cntmat = 0;
+        zhnmat::Mat *mats = new zhnmat::Mat[_sizes.size()];
+        for (uint n = 0; n < _sizes.size(); n++) {
+            mats[n] = zhnmat::Mat(_sizes[n].r, _sizes[n].c);
+            for (int i = 0; i < _sizes[n].r; i++)
+                for (int j = 0; j < _sizes[n].c; j++)
+                    mats[n].set(i, j, u[cntmat+i*_sizes[n].c+j]);
+            cntmat += _sizes[n].r * _sizes[n].c;
+        }
+        zhnmat::Mat ansmat = _f(mats);
+        return ansmat.at(_loc.r, _loc.c);
+    }
+private:
+    std::vector<BusSize> _sizes;
+    zhnmat::Mat(*_f)(zhnmat::Mat *m);
+    BusSize _loc;
+};
+
 
 /*********************
 implementation of class BusSize.
@@ -173,6 +197,84 @@ zhnmat::Mat MStateSpace::Get_OutValue() {
 
 
 /*********************
+matrix Constant module.
+**********************/
+MConstant::~MConstant() {}
+BusSize MConstant::Get_OutputBusSize() const { return _size; }
+u8 MConstant::Get_State() const { return _state; }
+void MConstant::connect(const PMatModule m) {}
+bool MConstant::Initialize() { return true; }
+MConstant::MConstant(Simulator *sim, const zhnmat::Mat& A, std::string name)
+    :MatModule(sim, name) {
+    MATMODULE_INIT();
+    _size = BusSize(A.row(), A.col());
+    _ucst = new PUConstant[_size.r*_size.c];
+    for (uint i=0; i<_size.r; ++i) {
+        for (uint j=0; j<_size.c; ++j) {
+            _ucst[i*_size.c+j] = new UConstant(_sim, _name+"_ucst_"+std::to_string(i)+"_"+std::to_string(j));
+            _ucst[i*_size.c+j]->Set_OutValue(A.at(i, j));
+        }
+    }
+    _state = BUS_INITIALIZED;
+}
+PUnitModule MConstant::Get_OutputPort(BusSize size) const {
+    if (!(size<_size)) return nullptr;
+    return _ucst[size.r*_size.c+size.c];
+}
+
+
+/*********************
+matrix FcnMISO module.
+**********************/
+MFcnMISO::~MFcnMISO() {}
+BusSize MFcnMISO::Get_OutputBusSize() const { return _size; }
+u8 MFcnMISO::Get_State() const { return _state; }
+void MFcnMISO::connect(const PMatModule m) { _nexts.push_back(m); }
+void MFcnMISO::Set_Function(zhnmat::Mat(*function)(zhnmat::Mat *u)) { _f=function; }
+MFcnMISO::MFcnMISO(Simulator *sim, BusSize size, std::string name)
+    :MatModule(sim, name), _size(size) {
+    _state = BUS_SIZED;
+    MATMODULE_INIT();
+}
+PUnitModule MFcnMISO::Get_OutputPort(BusSize size) const {
+    if (_misoy==nullptr) TraceLog(LOG_FATAL, "internal error: MFcnMISO.");
+    if (!(size<_size)) return nullptr;
+    return _misoy[size.r*_size.c+size.c];
+}
+bool MFcnMISO::Initialize() {
+    if (_state == BUS_INITIALIZED) return true;
+    if (_nexts.size()==0) TraceLog(LOG_FATAL, "MFcnMISO: \"%s\" doesn't have a child module!", _name.c_str());
+    _misoy = new PUFcnMISO[_size.r*_size.c];
+    MatDemux **matdmx;
+    matdmx = new MatDemux*[_size.r*_size.c];
+    bool success = true;
+    for (PMatModule m: _nexts) { if (!m->Get_State()) { success = false; break; } }
+    if (!success) return false;
+    for (int i=0; i<_nexts.size(); i++)
+        _buses.push_back(_nexts[i]->Get_OutputBusSize());
+    BusSize childSize;
+    PUnitModule childPort;
+    for (uint i=0; i<_size.r; ++i) {
+        for (uint j=0; j<_size.c; ++j) {
+            _misoy[i*_size.c+j] = new UFcnMISO(_sim, _name+"_misoy_"+std::to_string(i)+"_"+std::to_string(j));
+            matdmx[i*_size.c+j] = new MatDemux(_buses, _f, BusSize(i, j));
+            _misoy[i*_size.c+j]->Set_Function(matdmx[i*_size.c+j]);
+            for (int k = 0; k < _nexts.size(); k++) {
+                childSize = _nexts[k]->Get_OutputBusSize();
+                for (int m = 0; m < childSize.r; m++) {
+                    for (int n = 0; n < childSize.c; n++) {
+                        childPort = _nexts[k]->Get_OutputPort(BusSize(m, n));
+                        _sim->connectU(childPort, _misoy[i*_size.c+j]);
+                    }
+                }
+            }
+        }
+    }
+    _state = BUS_INITIALIZED; return true;
+}
+
+
+/*********************
 matrix Gain module.
 **********************/
 MGain::~MGain() {}
@@ -246,7 +348,7 @@ bool MProduct::Initialize() {
         TraceLog(LOG_FATAL, "MProduct: Bus size mismatch between child modules of \"%s\"!\n    "
         "left:%d,%d; right:%d,%d", _name.c_str(), _size.r, _size.c, childSize.r, childSize.c);
     _size.c = childSize.c;
-    MatMul *func = new MatMul(childSize.r);
+    VecDotInMat *func = new VecDotInMat(childSize.r);
     _misoy = new PUFcnMISO[_size.r*_size.c];
     for (uint i = 0; i < _size.r; i++) {
         for (uint j = 0; j < _size.c; j++) {
@@ -288,7 +390,7 @@ bool MSum::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
     if (_nexts.size()==0) TraceLog(LOG_FATAL, "MSum: \"%s\" doesn't have a child module!", _name.c_str());
     BusSize childSize;
-    PUnitModule childBusPort;
+    PUnitModule childPort;
     for (int b=_nexts.size()-1; b>=0; --b) {
         if (!_nexts[b]->Get_State()) continue;  // Bus size of child module is not determined
         childSize = _nexts[b]->Get_OutputBusSize();
@@ -305,8 +407,8 @@ bool MSum::Initialize() {
         }
         for (uint i=0; i<_size.r; ++i) {
             for (uint j=0; j<_size.c; ++j) {
-                childBusPort = _nexts[b]->Get_OutputPort(BusSize(i, j));
-                _sim->connectU(childBusPort, _sumy[i*_size.c + j]);
+                childPort = _nexts[b]->Get_OutputPort(BusSize(i, j));
+                _sim->connectU(childPort, _sumy[i*_size.c + j]);
                 _sumy[i*_size.c + j]->Set_InputGain(_ingain[b]);
             }
         }

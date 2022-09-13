@@ -27,7 +27,9 @@ class Simulator
     // All kinds of mat modules.
     friend class Mux;
     friend class DeMux;
+    friend class MConstant;
     friend class MStateSpace;
+    friend class MFcnMISO;
     friend class MGain;
     friend class MProduct;
     friend class MSum;
