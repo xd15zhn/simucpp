@@ -235,6 +235,7 @@ void MFcnMISO::Set_Function(zhnmat::Mat(*function)(zhnmat::Mat *u)) { _f=functio
 MFcnMISO::MFcnMISO(Simulator *sim, BusSize size, std::string name)
     :MatModule(sim, name), _size(size) {
     MATMODULE_INIT();
+    _misoy = new PUFcnMISO[_size.r*_size.c];
     for (uint i=0; i<_size.r; ++i)
         for (uint j=0; j<_size.c; ++j)
             _misoy[i*_size.c+j] = new UFcnMISO(_sim, _name+"_misoy_"+std::to_string(i)+"_"+std::to_string(j));
@@ -248,7 +249,6 @@ PUnitModule MFcnMISO::Get_OutputPort(BusSize size) const {
 bool MFcnMISO::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
     if (_nexts.size()==0) TraceLog(LOG_FATAL, "MFcnMISO: \"%s\" doesn't have a child module!", _name.c_str());
-    _misoy = new PUFcnMISO[_size.r*_size.c];
     MatDemux **matdmx;
     matdmx = new MatDemux*[_size.r*_size.c];
     bool success = true;
@@ -304,7 +304,7 @@ bool MGain::Initialize() {
         TraceLog(LOG_FATAL, "MGain: Bus size of \"%s\" and its child module is mismatch!\n    "
         "child:%d,%d; this:%d,%d", _name.c_str(), childSize.r, childSize.c, _size.r, _size.c);
     _size = _isleft ? BusSize(_G.row(), childSize.c) : BusSize(childSize.r, _G.col());
-    _sumy = new USum*[_size.r*_size.c];
+    _sumy = new PUSum[_size.r*_size.c];
     for (uint i=0; i<_size.r; ++i)
         for (uint j=0; j<_size.c; ++j)
             _sumy[i*_size.c+j] = new USum(_sim, _name+"_inu"+std::to_string(i)+"_"+std::to_string(j));
@@ -358,10 +358,10 @@ bool MProduct::Initialize() {
     _size.c = childSize.c;
     VecDotInMat *func = new VecDotInMat(childSize.r);
     _misoy = new PUFcnMISO[_size.r*_size.c];
-    _state = BUS_GENERATED;
     for (uint i = 0; i < _size.r; i++)
         for (uint j = 0; j < _size.c; j++)
             _misoy[i*_size.c+j] = new UFcnMISO(_sim, _name+"_misoy_"+std::to_string(i)+"_"+std::to_string(j));
+    _state = BUS_GENERATED;
     if (!(_nextL->Get_State() & BUS_GENERATED)) return false;
     if (!(_nextR->Get_State() & BUS_GENERATED)) return false;
     for (uint i = 0; i < _size.r; i++) {
