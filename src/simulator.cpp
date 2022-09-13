@@ -40,7 +40,7 @@ Add a unit module to this simulator, and divide it into Direct-Through modules
  and Endpoint modules.
 **********************/
 void Simulator::Add_Module(const PUnitModule m) {
-    CHECK_NULLPTR(m);
+    CHECK_NULLPTR(m, UnitModule);
     m->_id = _cntM;
     _modules.push_back(m);
     if (typeid(*m) == typeid(UIntegrator)){
@@ -62,7 +62,7 @@ void Simulator::Add_Module(const PUnitModule m) {
     _cntM++;
 }
 void Simulator::Add_Module(const PMatModule m) {
-    CHECK_NULLPTR(m);
+    CHECK_NULLPTR(m, MatModule);
     _matmodules.push_back(m);
 }
 

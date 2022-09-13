@@ -11,10 +11,10 @@ void Simulator::Print_Modules() {
     int childcnt;
     PUnitModule bm;  // pointer to child module
     for (PUnitModule m: _modules) {
-        cout << "name:" << m->_name << "; id:" << m->_id << ". Child modules:" << endl;
+        cout << "name:" << m->_name << "  id:" << m->_id << "  type:" << typeid(*m).name() << endl;
         for (int i=0; i<m->Get_childCnt(); ++i) {
             bm = m->Get_child(i);
-            cout << "    name:" << bm->_name << "; id:" << bm->_id << endl;
+            cout << "    name:" << bm->_name << "  id:" << bm->_id << endl;
         }
     }
 #else

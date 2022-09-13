@@ -260,7 +260,6 @@ bool MFcnMISO::Initialize() {
     PUnitModule childPort;
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
-            _misoy[i*_size.c+j] = new UFcnMISO(_sim, _name+"_misoy_"+std::to_string(i)+"_"+std::to_string(j));
             matdmx[i*_size.c+j] = new MatDemux(_buses, _f, BusSize(i, j));
             _misoy[i*_size.c+j]->Set_Function(matdmx[i*_size.c+j]);
             for (int k = 0; k < _nexts.size(); k++) {

@@ -62,12 +62,12 @@ simulator.cpp
         _modules[_delayIDs[i][j]]->Module_Update(_t)
 #define MODULE_UNITDELAY_UPDATE_OUTPUT() \
     for(int i=0; i<_cntD; ++i) _unitdelays[i]->Output_Update(_t)
-#define CHECK_NULLPTR(x) \
-    if (x==nullptr) TraceLog(LOG_FATAL, "Simucpp: Module "#x" is a null pointer!")
-#define CHECK_NULLID(x) \
-    if (x->_id==-1) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is not added to a simulator!", x->_name.c_str())
-#define CHECK_SIMULATOR(x) \
-    if (x->_sim!=this) TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" is added to a wrong simulator!", x->_name.c_str())
+#define CHECK_NULLPTR(x, type) \
+    if (x==nullptr) TraceLog(LOG_FATAL, #type": Module "#x" is a null pointer!")
+#define CHECK_NULLID(x, type) \
+    if (x->_id==-1) TraceLog(LOG_FATAL, #type": Module \"%s\" is not added to a simulator!", x->_name.c_str())
+#define CHECK_SIMULATOR(x, type) \
+    if (x->_sim!=this) TraceLog(LOG_FATAL, #type": Module \"%s\" is added to a wrong simulator!", x->_name.c_str())
 #define SET_DISCRETE_ENABLE(x) \
     for (int i: _discIDs) \
         _modules[i]->Set_Enable(x)

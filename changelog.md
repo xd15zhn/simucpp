@@ -48,3 +48,5 @@
 
 # V2.0.10
 - [matmodules.cpp/hpp] BUGFIXED: 矩阵模块初始化的步骤问题。
+- [matmodules.cpp] ADDED: typeid.
+- [unitmodules.cpp] ADDED: 信号源模块添加警告信息。

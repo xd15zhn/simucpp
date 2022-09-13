@@ -22,7 +22,7 @@ void UConstant::Module_Update(double time) {}
 void UConstant::Module_Reset() {}
 int UConstant::Get_childCnt() const { return 0; }
 PUnitModule UConstant::Get_child(unsigned int n) const { return nullptr; }
-void UConstant::connect(const PUnitModule m) {}
+void UConstant::connect(const PUnitModule m) { TraceLog(LOG_WARNING, "UConstant: cannot add child modules."); }
 void UConstant::Set_OutValue(double v) { _outvalue=v; };
 UConstant::UConstant(Simulator *sim, std::string name): UnitModule(sim, name)
 {
@@ -164,7 +164,7 @@ double UInput::Get_OutValue() const { return _outvalue; }
 void UInput::Set_Enable(bool enable) { _enable=enable; }
 int UInput::Get_childCnt() const { return 0; }
 PUnitModule UInput::Get_child(unsigned int n) const { return nullptr; }
-void UInput::connect(const PUnitModule m) {}
+void UInput::connect(const PUnitModule m) { TraceLog(LOG_WARNING, "UInput: cannot add child modules."); }
 void UInput::Set_Function(double (*function)(double u)) { _f=function; }
 void UInput::Set_Function(UserFunc *function) { _fu=function; }
 void UInput::Set_InputData(const vecdble &data) { _data=data; }
@@ -251,7 +251,7 @@ int UNoise::Self_Check() const { return 0; }
 void UNoise::Module_Reset() { _outvalue=0;_ltn=-_T; }
 int UNoise::Get_childCnt() const { return 0; }
 PUnitModule UNoise::Get_child(unsigned int n) const { return nullptr; }
-void UNoise::connect(const PUnitModule m) {}
+void UNoise::connect(const PUnitModule m) { TraceLog(LOG_WARNING, "UNoise: cannot add child modules."); }
 void UNoise::Set_Mean(double mean) { _mean=mean; }
 void UNoise::Set_Variance(double var) { _var=var; }
 void UNoise::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
