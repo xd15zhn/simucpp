@@ -165,7 +165,7 @@ int Simulator::Simulate() {
         err = Simulate_OneStep();
         if (!err) continue;
         if (_divmode == 0) {
-            PRINT_CONVERGENCE(err); abort(); }
+            PRINT_CONVERGENCE(err); exit(1); }
         else if ((_divmode == 1) && !_diverge) {
             _diverge = true;
             PRINT_CONVERGENCE(err); }

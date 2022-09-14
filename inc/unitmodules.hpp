@@ -172,7 +172,7 @@ public:
     void Set_SampleTime(double time=-1);
 
     // Is simulation data stored to memory.
-    void Set_EnableStore(bool store=false);
+    void Set_EnableStore(bool store=true);
 
     // all input data will be multiplied by "inputgain" before stored.
     void Set_InputGain(double inputgain=1);

@@ -78,11 +78,10 @@ simulator.cpp
         if (std::isnan(m->_outvalue)) return 3; \
     }
 #define PRINT_CONVERGENCE(x) \
-    TraceLog(LOG_WARNING, "Simulation diverged. Type: "); \
     switch (x) { \
-    case 1: TraceLog(LOG_WARNING, "    Positive infinity."); break; \
-    case 2: TraceLog(LOG_WARNING, "    Negative infinity."); break; \
-    case 3: TraceLog(LOG_WARNING, "    Not a number."); break; \
+    case 1: TraceLog(LOG_WARNING, "Simulation diverged at time %f. Type: Positive infinity.", _t); break; \
+    case 2: TraceLog(LOG_WARNING, "Simulation diverged at time %f. Type: Negative infinity.", _t); break; \
+    case 3: TraceLog(LOG_WARNING, "Simulation diverged at time %f. Type: Not a number.", _t); break; \
     default: break; \
     }
 
