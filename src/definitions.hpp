@@ -33,11 +33,11 @@ enum SIMUCPP_ERROR_CODE{
 
 #define CHECK_CHILD(module) \
     if(_next==nullptr) { \
-        TraceLog(LOG_WARNING, "Simucpp: "#module" module \"%s\" doesn't have a child module.", _name.c_str()); \
+        TRACELOG(LOG_WARNING, "Simucpp: "#module" module \"%s\" doesn't have a child module.", _name.c_str()); \
         return SIMUCPP_NO_ID; }
 #define CHECK_FUNCTION(module) \
     if((_f==nullptr)&&(_fu==nullptr)) { \
-        TraceLog(LOG_WARNING, "Simucpp: "#module" module \"%s\" doesn't have a function.", _name.c_str()); \
+        TRACELOG(LOG_WARNING, "Simucpp: "#module" module \"%s\" doesn't have a function.", _name.c_str()); \
         return SIMUCPP_NO_FUNCTION; }
 
 #define UNITMODULE_INIT() \
@@ -69,11 +69,11 @@ simulator.cpp
 #define MODULE_UNITDELAY_UPDATE_OUTPUT() \
     for(int i=0; i<_cntD; ++i) _unitdelays[i]->Output_Update(_t)
 #define CHECK_NULLPTR(x, type) \
-    if (x==nullptr) TraceLog(LOG_FATAL, #type": Module "#x" is a null pointer!")
+    if (x==nullptr) TRACELOG(LOG_FATAL, #type": Module "#x" is a null pointer!")
 #define CHECK_NULLID(x, type) \
-    if (x->_id==-1) TraceLog(LOG_FATAL, #type": Module \"%s\" is not added to a simulator!", x->_name.c_str())
+    if (x->_id==-1) TRACELOG(LOG_FATAL, #type": Module \"%s\" is not added to a simulator!", x->_name.c_str())
 #define CHECK_SIMULATOR(x, type) \
-    if (x->_sim!=this) TraceLog(LOG_FATAL, #type": Module \"%s\" is added to a wrong simulator!", x->_name.c_str())
+    if (x->_sim!=this) TRACELOG(LOG_FATAL, #type": Module \"%s\" is added to a wrong simulator!", x->_name.c_str())
 #define SET_DISCRETE_ENABLE(x) \
     for (int i: _discIDs) \
         _modules[i]->Set_Enable(x)
@@ -85,9 +85,9 @@ simulator.cpp
     }
 #define PRINT_CONVERGENCE(x) \
     switch (x) { \
-    case 1: TraceLog(LOG_WARNING, "Simulation diverged at time %f. Type: Positive infinity.", _t); break; \
-    case 2: TraceLog(LOG_WARNING, "Simulation diverged at time %f. Type: Negative infinity.", _t); break; \
-    case 3: TraceLog(LOG_WARNING, "Simulation diverged at time %f. Type: Not a number.", _t); break; \
+    case 1: TRACELOG(LOG_WARNING, "Simulation diverged at time %f. Type: Positive infinity.", _t); break; \
+    case 2: TRACELOG(LOG_WARNING, "Simulation diverged at time %f. Type: Negative infinity.", _t); break; \
+    case 3: TRACELOG(LOG_WARNING, "Simulation diverged at time %f. Type: Not a number.", _t); break; \
     default: break; \
     }
 

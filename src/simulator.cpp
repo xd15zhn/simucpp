@@ -91,19 +91,19 @@ void Simulator::Initialize() {
             isInit &= m->Initialize();
         if (isInit) break;
     }
-    if (cntdown<0) TraceLog(LOG_FATAL, "Simucpp: Matrix modules initialization failed!");
+    if (cntdown<0) TRACELOG(LOG_FATAL, "Simucpp: Matrix modules initialization failed!");
     _matmodules.clear();
-    TraceLog(LOG_DEBUG, "Simucpp: Matrix modules initialization completed.");
+    TRACELOG(LOG_DEBUG, "Simucpp: Matrix modules initialization completed.");
 
     /* Self check procedure of unit modules and simulators */
     for(int i=0; i<4; ++i) _ode4K[i] = new double[_cntI];
-    if (_H<=0) TraceLog(LOG_FATAL, "Simucpp: Simulation step must be greator than zero!");
+    if (_H<=0) TRACELOG(LOG_FATAL, "Simucpp: Simulation step must be greator than zero!");
     for(int i=0; i<_cntM; ++i) {
         errcode = _modules[i]->Self_Check();
-        if (errcode!=0) TraceLog(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!"
+        if (errcode!=0) TRACELOG(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!"
             "Errcode: %d", _modules[i]->_name.c_str(), errcode);
     }
-    TraceLog(LOG_DEBUG, "Simucpp: Module self check completed.");
+    TRACELOG(LOG_DEBUG, "Simucpp: Module self check completed.");
 
     /* Delete redundant connections of SUM module */
     for(int i=_cntM-1; i>=0; --i){
@@ -118,7 +118,7 @@ void Simulator::Initialize() {
             mdl->_next.erase(mdl->_next.begin() + i);
         }
     }
-    TraceLog(LOG_DEBUG, "Simucpp: Delete redundant connections completed.");
+    TRACELOG(LOG_DEBUG, "Simucpp: Delete redundant connections completed.");
 
     /* Build sequence table */
     for(int i=0; i<_cntI; ++i)
@@ -127,8 +127,8 @@ void Simulator::Initialize() {
         Build_Connection(_delayIDs[i]);
     for(int i=0; i<_cntO; ++i)
         Build_Connection(_outIDs[i]);
-    if (_cntO==0) TraceLog(LOG_WARNING, "Simucpp: You haven't add any OUTPUT modules.");
-    TraceLog(LOG_DEBUG, "Simucpp: Build sequence table completed.");
+    if (_cntO==0) TRACELOG(LOG_WARNING, "Simucpp: You haven't add any OUTPUT modules.");
+    TRACELOG(LOG_DEBUG, "Simucpp: Build sequence table completed.");
 
     /* Index for discrete modules*/
     _discIDs.clear();
@@ -148,8 +148,8 @@ void Simulator::Initialize() {
             _discIDs.push_back(m->_id);
         }
     }
-    TraceLog(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
-    TraceLog(LOG_INFO, "Simucpp: Simulator initialization completed.");
+    TRACELOG(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
+    TRACELOG(LOG_INFO, "Simucpp: Simulator initialization completed.");
 }
 
 
@@ -266,7 +266,7 @@ void Simulator::Build_Connection(std::vector<int> &ids) {
             bm = _modules[curid]->Get_child(i);
             if (bm==nullptr) continue;
             id = bm->_id;
-            if (id<0) TraceLog(LOG_FATAL, "Simucpp: internal error: connection.");
+            if (id<0) TRACELOG(LOG_FATAL, "Simucpp: internal error: connection.");
             if (typeid(*bm) == typeid(UIntegrator)) continue;
             if (typeid(*bm) == typeid(UUnitDelay)) continue;
             for (int j=0; j<(int)_discIDs.size(); ++j){
@@ -281,7 +281,7 @@ void Simulator::Build_Connection(std::vector<int> &ids) {
                         if (typeid(*bm) == typeid(UIntegrator)) continue;
                         if (typeid(*bm) == typeid(UUnitDelay)) continue;
                         int agid = bm->_id;
-                        if (agid==curid) TraceLog(LOG_FATAL, "Simucpp: Algebraic loop detected!");
+                        if (agid==curid) TRACELOG(LOG_FATAL, "Simucpp: Algebraic loop detected!");
                         agq.push(agid);
                     }
                 }
@@ -320,20 +320,20 @@ Use data stored in OUTPUT modules to draw a waveform.
 **********************/
 void Simulator::Plot() {
 #ifdef USE_MPLT
-    if (!_store) { TraceLog(LOG_WARNING, "Simucpp: There is no data for plotting."); return; }
-    TraceLog(LOG_INFO, "Simucpp: Wait for ploting......");
+    if (!_store) { TRACELOG(LOG_WARNING, "Simucpp: There is no data for plotting."); return; }
+    TRACELOG(LOG_INFO, "Simucpp: Wait for ploting......");
     for (PUOutput m: _outputs) {
         if (!m->_store) continue;
         if (_tvec.size()!=m->_values.size())
-            TraceLog(LOG_FATAL, "Simucpp: Module \"%s\" has a wrong data amount for plotting!"
+            TRACELOG(LOG_FATAL, "Simucpp: Module \"%s\" has a wrong data amount for plotting!"
             "Time points num is %d; data points num is %d.", m->_name.c_str(), _tvec.size(), m->_values.size());
         matplotlibcpp::named_plot(m->_name, _tvec, m->_values);
     }
     matplotlibcpp::legend();
     matplotlibcpp::show();
-    TraceLog(LOG_INFO, "Simucpp: Plot completed.");
+    TRACELOG(LOG_INFO, "Simucpp: Plot completed.");
 #else
-    TraceLog(LOG_WARNING, "Simucpp: You didn't add library \"matplotlibcpp\" for plotting.");
+    TRACELOG(LOG_WARNING, "Simucpp: You didn't add library \"matplotlibcpp\" for plotting.");
 #endif
 }
 

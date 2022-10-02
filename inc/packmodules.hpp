@@ -89,7 +89,6 @@ private:
     int _orderx, _orderu, _ordery;  // Order of states, inputs, outputs.
     bool _isc;  // True if in continuous mode.
 };
-#endif
 
 
 /**********************
@@ -112,6 +111,7 @@ private:
     PMux _mxout=nullptr;
     PUProduct *_prd=nullptr;
 };
+#endif
 
 
 NAMESPACE_SIMUCPP_R

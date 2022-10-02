@@ -63,18 +63,18 @@ Mux::~Mux() { delete[] _next; }
 u8 Mux::Get_State() const { return _state; }
 BusSize Mux::Get_OutputBusSize() const { return _size; }
 bool Mux::Initialize() { return true; }
-void Mux::connect(const PMatModule m) { TraceLog(LOG_FATAL, "Simucpp: internal error: Mux."); }
+void Mux::connect(const PMatModule m) { TRACELOG(LOG_FATAL, "Simucpp: internal error: Mux."); }
 void Mux::connect(const PUnitModule m, BusSize size) { _next[size.r*_size.c+size.c] = m; }
 Mux::Mux(Simulator *sim, BusSize size, std::string name)
     :MatModule(sim, name), _size(size) {
     _state = BUS_INITIALIZED;
-    if (_size<BusSize(1, 1)) TraceLog(LOG_FATAL, "Mux: Size of \"%s\" too small!", _name.c_str());
+    if (_size<BusSize(1, 1)) TRACELOG(LOG_FATAL, "Mux: Size of \"%s\" too small!", _name.c_str());
     _next = new PUnitModule[_size.c*_size.r];
     for (int i=_size.c*_size.r-1; i>=0; --i) _next[i] = nullptr;
     MATMODULE_INIT();
 }
 PUnitModule Mux::Get_OutputPort(BusSize size) const {
-    if (_next==nullptr) TraceLog(LOG_FATAL, "Mux: \"%s\" doesn't have a child module!", _name.c_str());
+    if (_next==nullptr) TRACELOG(LOG_FATAL, "Mux: \"%s\" doesn't have a child module!", _name.c_str());
     if (!(size<_size)) return nullptr;
     return _next[size.r*_size.c+size.c];
 }
@@ -93,7 +93,7 @@ void DeMux::connect(const PUnitModule m, BusSize size) {
 DeMux::DeMux(Simulator *sim, BusSize size, std::string name)
     : MatModule(sim, name), _size(size) {
     _state = BUS_SIZED;
-    if (_size<BusSize(1, 1)) TraceLog(LOG_FATAL, "DeMux: Size of \"%s\" is too small!", _name.c_str());
+    if (_size<BusSize(1, 1)) TRACELOG(LOG_FATAL, "DeMux: Size of \"%s\" is too small!", _name.c_str());
     _gains = new PUGain[_size.c*_size.r];
     for (int i=_size.c*_size.r-1; i>=0; --i)
         _gains[i] = new UGain(sim, name+"_connector_"+std::to_string(i));
@@ -117,7 +117,7 @@ bool DeMux::Initialize() {
             _sim->connectU(_next->Get_OutputPort(BusSize(i, j)), _gains[i*_size.c+j]);
         }
     }
-    if (!full) TraceLog(LOG_WARNING, "DeMux: \"%s\" was not fully connected.", _name.c_str());
+    if (!full) TRACELOG(LOG_WARNING, "DeMux: \"%s\" was not fully connected.", _name.c_str());
     _state = BUS_INITIALIZED; return true;
 }
 
@@ -153,11 +153,11 @@ PUnitModule MStateSpace::Get_OutputPort(BusSize size) const {
 }
 bool MStateSpace::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
-    if (_next==nullptr) TraceLog(LOG_FATAL, "StateSpace: \"%s\" doesn't have a child module!", _name.c_str());
+    if (_next==nullptr) TRACELOG(LOG_FATAL, "StateSpace: \"%s\" doesn't have a child module!", _name.c_str());
     if (!(_next->Get_State() & BUS_GENERATED)) return false;
     BusSize childSize = _next->Get_OutputBusSize();
     if (!(childSize==_size))
-        TraceLog(LOG_FATAL, "StateSpace: Bus size of \"%s\" and its child modules are mismatch!\n    "
+        TRACELOG(LOG_FATAL, "StateSpace: Bus size of \"%s\" and its child modules are mismatch!\n    "
         "child:%d,%d; this:%d,%d", _name.c_str(), childSize.r, childSize.c, _size.r, _size.c);
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
@@ -177,7 +177,7 @@ void MStateSpace::Set_SampleTime(double time) {
 }
 void MStateSpace::Set_InitialValue(const zhnmat::Mat& value) {
     if ((value.row()!=_size.r) || (value.col()!=_size.c))
-        TraceLog(LOG_FATAL, "StateSpace: \"%s\" accepted mismatched initial values!", _name.c_str());
+        TRACELOG(LOG_FATAL, "StateSpace: \"%s\" accepted mismatched initial values!", _name.c_str());
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
             if (_isc) _intx[i*_size.c+j]->Set_InitialValue(value.at(i, j));
@@ -242,13 +242,13 @@ MFcnMISO::MFcnMISO(Simulator *sim, BusSize size, std::string name)
     _state = BUS_GENERATED;
 }
 PUnitModule MFcnMISO::Get_OutputPort(BusSize size) const {
-    if (_misoy==nullptr) TraceLog(LOG_FATAL, "MFcnMISO: internal error.");
+    if (_misoy==nullptr) TRACELOG(LOG_FATAL, "MFcnMISO: internal error.");
     if (!(size<_size)) return nullptr;
     return _misoy[size.r*_size.c+size.c];
 }
 bool MFcnMISO::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
-    if (_nexts.size()==0) TraceLog(LOG_FATAL, "MFcnMISO: \"%s\" doesn't have a child module!", _name.c_str());
+    if (_nexts.size()==0) TRACELOG(LOG_FATAL, "MFcnMISO: \"%s\" doesn't have a child module!", _name.c_str());
     MatDemux **matdmx;
     matdmx = new MatDemux*[_size.r*_size.c];
     bool success = true;
@@ -290,17 +290,17 @@ MGain::MGain(Simulator *sim, const zhnmat::Mat& G, bool isleft, std::string name
     MATMODULE_INIT();
 }
 PUnitModule MGain::Get_OutputPort(BusSize size) const {
-    if (_sumy==nullptr) TraceLog(LOG_FATAL, "internal error: MGain.");
+    if (_sumy==nullptr) TRACELOG(LOG_FATAL, "internal error: MGain.");
     if (!(size<_size)) return nullptr;
     return _sumy[size.r*_size.c+size.c];
 }
 bool MGain::Initialize() {
     if (_state == BUS_INITIALIZED) return true;  // This matrix module has been initialized.
-    if (_next==nullptr) TraceLog(LOG_FATAL, "MGain: \"%s\" doesn't have a child module!", _name.c_str());
+    if (_next==nullptr) TRACELOG(LOG_FATAL, "MGain: \"%s\" doesn't have a child module!", _name.c_str());
     if (!(_next->Get_State() & BUS_SIZED)) return false;
     BusSize childSize = _next->Get_OutputBusSize();
     if ((!_isleft || (childSize.r!=_G.col())) && (_isleft || (childSize.c!=_G.row())))
-        TraceLog(LOG_FATAL, "MGain: Bus size of \"%s\" and its child module is mismatch!\n    "
+        TRACELOG(LOG_FATAL, "MGain: Bus size of \"%s\" and its child module is mismatch!\n    "
         "child:%d,%d; this:%d,%d", _name.c_str(), childSize.r, childSize.c, _size.r, _size.c);
     _size = _isleft ? BusSize(_G.row(), childSize.c) : BusSize(childSize.r, _G.col());
     _sumy = new PUSum[_size.r*_size.c];
@@ -340,19 +340,19 @@ MProduct::MProduct(Simulator *sim, std::string name): MatModule(sim, name) {
     MATMODULE_INIT();
 }
 PUnitModule MProduct::Get_OutputPort(BusSize size) const {
-    if (_misoy==nullptr) TraceLog(LOG_FATAL, "internal error: MProduct.");
+    if (_misoy==nullptr) TRACELOG(LOG_FATAL, "internal error: MProduct.");
     if (!(size<_size)) return nullptr;
     return _misoy[size.r*_size.c+size.c];
 }
 bool MProduct::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
-    if (_nextL==nullptr) TraceLog(LOG_FATAL, "MProduct: \"%s\" doesn't have 2 child modules!", _name.c_str());
+    if (_nextL==nullptr) TRACELOG(LOG_FATAL, "MProduct: \"%s\" doesn't have 2 child modules!", _name.c_str());
     if (!(_nextL->Get_State() & BUS_SIZED)) return false;
     if (!(_nextR->Get_State() & BUS_SIZED)) return false;
     _size = _nextL->Get_OutputBusSize();
     BusSize childSize = _nextR->Get_OutputBusSize();
     if (_size.c != childSize.r)
-        TraceLog(LOG_FATAL, "MProduct: Bus size mismatch between child modules of \"%s\"!\n    "
+        TRACELOG(LOG_FATAL, "MProduct: Bus size mismatch between child modules of \"%s\"!\n    "
         "left:%d,%d; right:%d,%d", _name.c_str(), _size.r, _size.c, childSize.r, childSize.c);
     _size.c = childSize.c;
     VecDotInMat *func = new VecDotInMat(childSize.r);
@@ -377,7 +377,7 @@ bool MProduct::Initialize() {
 void MProduct::connect(const PMatModule m) {
     if (_portcnt==0) _nextR = m;
     else if (_portcnt==1) _nextL = m;
-    else TraceLog(LOG_WARNING, "MProduct: \"%s\" is repeatedly connected.", _name.c_str());
+    else TRACELOG(LOG_WARNING, "MProduct: \"%s\" is repeatedly connected.", _name.c_str());
     _portcnt++;
 }
 
@@ -394,13 +394,13 @@ MSum::MSum(Simulator *sim, std::string name): MatModule(sim, name) {
     MATMODULE_INIT();
 }
 PUnitModule MSum::Get_OutputPort(BusSize size) const {
-    if (_sumy==nullptr) TraceLog(LOG_FATAL, "internal error: MSum.");
+    if (_sumy==nullptr) TRACELOG(LOG_FATAL, "internal error: MSum.");
     if (!(size<_size)) return nullptr;
     return _sumy[size.r*_size.c+size.c];
 }
 bool MSum::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
-    if (_nexts.size()==0) TraceLog(LOG_FATAL, "MSum: \"%s\" doesn't have a child module!", _name.c_str());
+    if (_nexts.size()==0) TRACELOG(LOG_FATAL, "MSum: \"%s\" doesn't have a child module!", _name.c_str());
     BusSize childSize;
     PUnitModule childPort;
     for (int b=_nexts.size()-1; b>=0; --b) {
@@ -408,7 +408,7 @@ bool MSum::Initialize() {
         childSize = _nexts[b]->Get_OutputBusSize();
         if (_state & BUS_GENERATED) {  // Bus size of this module is determined
             if (!(childSize==_size))
-                TraceLog(LOG_FATAL, "MSum: Bus size mismatch between child modules of \"%s\"!\n    "
+                TRACELOG(LOG_FATAL, "MSum: Bus size mismatch between child modules of \"%s\"!\n    "
                 "child:%d,%d; this:%d,%d", _name.c_str(), childSize.r, childSize.c, _size.r, _size.c);
         } else {  // Bus size of this module is not determined
             _size = childSize;
@@ -432,11 +432,11 @@ bool MSum::Initialize() {
 void MSum::Set_InputGain(double inputgain, int port) {
     if (port==-1) {
         if (_nexts.size()<=0)
-            TraceLog(LOG_WARNING, "MSum: \"%s\" doesn't have enough child module.", _name.c_str());
+            TRACELOG(LOG_WARNING, "MSum: \"%s\" doesn't have enough child module.", _name.c_str());
         _ingain[_nexts.size()-1] = inputgain;
     } else {
         if (port<0 || port>=(int)_nexts.size())
-            TraceLog(LOG_WARNING, "MSum: \"%s\" doesn't have enough child module.", _name.c_str());
+            TRACELOG(LOG_WARNING, "MSum: \"%s\" doesn't have enough child module.", _name.c_str());
         _ingain[port] = inputgain;
     }
 }
@@ -459,7 +459,7 @@ PUnitModule MTranspose::Get_OutputPort(BusSize size) const {
 }
 bool MTranspose::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
-    if (_next==nullptr) TraceLog(LOG_FATAL, "MTranspose: \"%s\" doesn't have a child module!", _name.c_str());
+    if (_next==nullptr) TRACELOG(LOG_FATAL, "MTranspose: \"%s\" doesn't have a child module!", _name.c_str());
     if (!(_next->Get_State() & BUS_SIZED)) return false;
     _size = _next->Get_OutputBusSize();
     _size = BusSize(_size.c, _size.r);

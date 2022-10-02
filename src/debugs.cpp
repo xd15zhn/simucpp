@@ -1,6 +1,8 @@
 #include "simulator.hpp"
 #ifdef SUPPORT_DEBUG
-#include <iostream>
+    #include <iostream>
+#else
+    #include "definitions.hpp"
 #endif  // SUPPORT_DEBUG
 NAMESPACE_SIMUCPP_L
 
@@ -16,11 +18,8 @@ void Simulator::Print_Modules() {
             cout << "    name:" << bm->_name << "  id:" << bm->_id << endl;
         }
     }
-#elif defined(USE_TRACELOG)
-    #include "tracelog.h"
-    TraceLog(LOG_WARNING, "Simulator debug: You didn't add debug functions.");
 #else
-    cout << "Simulator debug: You didn't add debug functions." << endl;
+    TRACELOG(LOG_WARNING, "Simulator debug: You didn't add debug functions.");
 #endif  // SUPPORT_DEBUG
 }
 

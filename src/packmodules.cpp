@@ -13,11 +13,11 @@ PMatModule PackModule::Get_OutputBus(int n) const { return nullptr; }
 Continuous transfer function module.
 **********************/
 TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator, const vecdble denominator, std::string name) {
-    if (denominator.size()<2) TraceLog(LOG_FATAL, "Length of the denominator must be equal to or higher than 2!");
-    if (numerator.size()<1) TraceLog(LOG_FATAL, "Length of the numerator must be equal to or higher than 1!");
+    if (denominator.size()<2) TRACELOG(LOG_FATAL, "Length of the denominator must be equal to or higher than 2!");
+    if (numerator.size()<1) TRACELOG(LOG_FATAL, "Length of the numerator must be equal to or higher than 1!");
     if (denominator.size()<numerator.size())
-        TraceLog(LOG_FATAL, "The order of the denominator must be equal to or higher than the order of the numerator!");
-    if (denominator[0]==0) TraceLog(LOG_FATAL, "The highest order of the denominator must not be 0!");
+        TRACELOG(LOG_FATAL, "The order of the denominator must be equal to or higher than the order of the numerator!");
+    if (denominator[0]==0) TRACELOG(LOG_FATAL, "The highest order of the denominator must not be 0!");
     vecdble num = numerator, den = denominator;
     _order = den.size()-1;
     if (den[0]!=1){
@@ -49,7 +49,7 @@ TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator, const vecdble 
 PUnitModule TransferFcn::Get_InputPort(int n) const { return n==0?sum1:nullptr; }
 PUnitModule TransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
 void TransferFcn::Set_InitialValue(vecdble value) {
-    if ((int)value.size()!=_order) TraceLog(LOG_WARNING, "TransferFcn module \"%s\" accepted mismatched initial values.", _name);
+    if ((int)value.size()!=_order) TRACELOG(LOG_WARNING, "TransferFcn module \"%s\" accepted mismatched initial values.", _name);
     for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
         integrators[i]->Set_InitialValue(value[i]);
 }
@@ -65,8 +65,8 @@ vecdble TransferFcn::Get_OutValue() {
 Discrete transfer function module.
 **********************/
 DiscreteTransferFcn::DiscreteTransferFcn(Simulator *sim, const vecdble numerator, const vecdble denominator, std::string name) {
-    if ((int)denominator.size()<1) TraceLog(LOG_FATAL, "Length of the denominator must be equal to or higher than 1!");
-    if ((int)numerator.size()<1) TraceLog(LOG_FATAL, "Length of the numerator must be equal to or higher than 1!");
+    if ((int)denominator.size()<1) TRACELOG(LOG_FATAL, "Length of the denominator must be equal to or higher than 1!");
+    if ((int)numerator.size()<1) TRACELOG(LOG_FATAL, "Length of the numerator must be equal to or higher than 1!");
     _order = SIMUCPP_MAX(numerator.size()-1, denominator.size());
     sum1 = new USum(sim, _name+"_sumi");
     sum2 = new USum(sim, _name+"_sumo");
@@ -96,7 +96,7 @@ void DiscreteTransferFcn::Set_SampleTime(double time) {
 PUnitModule DiscreteTransferFcn::Get_InputPort(int n) const { return n==0?sum1:nullptr; }
 PUnitModule DiscreteTransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
 void DiscreteTransferFcn::Set_InitialValue(vecdble value) {
-    if ((int)value.size()!=_order) TraceLog(LOG_WARNING, "DiscreteTransferFcn module \"%s\" accepted mismatched initial values.", _name);
+    if ((int)value.size()!=_order) TRACELOG(LOG_WARNING, "DiscreteTransferFcn module \"%s\" accepted mismatched initial values.", _name);
     for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
         unitdelays[i]->Set_InitialValue(value[i]);
 }
@@ -140,16 +140,16 @@ State transfer function module.
 StateTransFcn::StateTransFcn(Simulator *sim, const zhnmat::Mat& A, const zhnmat::Mat& B, const zhnmat::Mat& C,
     const zhnmat::Mat& D, bool isc, std::string name): _isc(isc) {
     _orderx = A.row(); _orderu = B.col(); _ordery = C.row();
-    if (_orderx<2) TraceLog(LOG_FATAL, "Order too few!");
-    if (A.col()!=_orderx) TraceLog(LOG_FATAL, "Shape of matrix A error!");
-    if (B.row()!=_orderx) TraceLog(LOG_FATAL, "Shape of matrix B error!");
-    if (C.col()!=_orderx) TraceLog(LOG_FATAL, "Shape of matrix C error!");
+    if (_orderx<2) TRACELOG(LOG_FATAL, "Order too few!");
+    if (A.col()!=_orderx) TRACELOG(LOG_FATAL, "Shape of matrix A error!");
+    if (B.row()!=_orderx) TRACELOG(LOG_FATAL, "Shape of matrix B error!");
+    if (C.col()!=_orderx) TRACELOG(LOG_FATAL, "Shape of matrix C error!");
     zhnmat::Mat tD;
     if ((D.col()==0) && (D.row()==0))
         tD = zhnmat::Mat(_ordery, _orderu);
     else {
-        if (D.row()!=_orderu) TraceLog(LOG_FATAL, "Shape of matrix D error!");
-        if (D.col()!=_ordery) TraceLog(LOG_FATAL, "Shape of matrix D error!");
+        if (D.row()!=_orderu) TRACELOG(LOG_FATAL, "Shape of matrix D error!");
+        if (D.col()!=_ordery) TRACELOG(LOG_FATAL, "Shape of matrix D error!");
         tD = D;
     }
     _statex = new MStateSpace(sim, BusSize(_orderx, 1), true, name+"_msx");
@@ -181,7 +181,6 @@ void StateTransFcn::Set_InitialValue(const zhnmat::Mat& value) {
 zhnmat::Mat StateTransFcn::Get_OutValue() const {
     return _statex->Get_OutValue();
 }
-#endif
 
 
 /**********************
@@ -214,5 +213,6 @@ zhnmat::Mat ProductScalarMatrix::Get_OutValue() {
             ans.set(i, j, _prd[i*_size.c+j]->Get_OutValue());
     return ans;
 }
+#endif
 
 NAMESPACE_SIMUCPP_R
