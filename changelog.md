@@ -50,3 +50,6 @@
 - [matmodules.cpp/hpp] BUGFIXED: 矩阵模块初始化的步骤问题。
 - [matmodules.cpp] ADDED: typeid.
 - [unitmodules.cpp] ADDED: 信号源模块添加警告信息。
+
+# V2.0.11
+- [CMakeLists.txt] 将依赖库`tracelog`由必装改为选装.

@@ -6,11 +6,10 @@ C++重写simulink.
 博客原文 <https://gitee.com/xd15zhn/simucpp_blog>  
 
 有两个分支，master是频繁修改更新的分支，不一定可用；release是经过测试可以使用的稳定版。  
-release:稳定发布版本：V2.0.1  
-master:最新修改版本：V2.0.2  
+release:稳定发布版本：V2.1.0  
 
 # 依赖库
-- <https://gitee.com/xd15zhn/tracelog> (必装)
+- <https://gitee.com/xd15zhn/tracelog> (选装)
 - <https://gitee.com/xd15zhn/matplotlibcpp> (选装)
 - <https://gitee.com/xd15zhn/zhnmat> (选装)
 

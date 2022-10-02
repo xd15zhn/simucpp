@@ -1,12 +1,11 @@
 #include "simulator.hpp"
-#include "tracelog.h"
 #ifdef SUPPORT_DEBUG
 #include <iostream>
 #endif  // SUPPORT_DEBUG
 NAMESPACE_SIMUCPP_L
 
 void Simulator::Print_Modules() {
-#ifdef SUPPORT_DEBUG
+#if defined(SUPPORT_DEBUG)
     using namespace std;
     int childcnt;
     PUnitModule bm;  // pointer to child module
@@ -17,8 +16,11 @@ void Simulator::Print_Modules() {
             cout << "    name:" << bm->_name << "  id:" << bm->_id << endl;
         }
     }
-#else
+#elif defined(USE_TRACELOG)
+    #include "tracelog.h"
     TraceLog(LOG_WARNING, "Simulator debug: You didn't add debug functions.");
+#else
+    cout << "Simulator debug: You didn't add debug functions." << endl;
 #endif  // SUPPORT_DEBUG
 }
 
