@@ -32,19 +32,26 @@ TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator, const vecdble 
     sum1 = new USum(sim, _name+"_sumi");
     sum2 = new USum(sim, _name+"_sumo");
     integrators = new UIntegrator*[_order];
-    for (int i=0; i<_order; ++i){
+    for (int i=0; i<_order; ++i) {
         integrators[i] = new UIntegrator(sim, _name+"_int"+std::to_string(i));
         sim->connectU(integrators[i], sum1);
         sum1->Set_InputGain(-den[i+1]);
         if (i==0) sim->connectU(sum1, integrators[i]);
         else      sim->connectU(integrators[i-1], integrators[i]);
     }
-    for (int i=0; i<=_order; ++i){
+    for (int i=0; i<=_order; ++i) {
         if (num[i] == 0) continue;
         if (i == 0) sim->connectU(sum1, sum2);
         else        sim->connectU(integrators[i-1], sum2);
         sum2->Set_InputGain(num[i]);
     }
+}
+TransferFcn::~TransferFcn() {
+    delete sum1, sum2;
+    for (int i=0; i<_order; ++i) {
+        delete integrators[i];
+    }
+    delete[] integrators;
 }
 PUnitModule TransferFcn::Get_InputPort(int n) const { return n==0?sum1:nullptr; }
 PUnitModule TransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
@@ -88,6 +95,13 @@ DiscreteTransferFcn::DiscreteTransferFcn(Simulator *sim, const vecdble numerator
     }
     sim->connectU(sum1, sum2);
     sum2->Set_InputGain(numerator[0]);
+}
+DiscreteTransferFcn::~DiscreteTransferFcn() {
+    delete sum1, sum2;
+    for (int i=0; i<_order; ++i) {
+        delete unitdelays[i];
+    }
+    delete[] unitdelays;
 }
 void DiscreteTransferFcn::Set_SampleTime(double time) {
     for (int i=0; i<_order; ++i)

@@ -53,4 +53,6 @@
 
 # V2.0.11
 - [CMakeLists.txt] 将依赖库`tracelog`由必装改为选装.
-- [CMakeLists.txt] CHANGED: `nan("")` to `0.0/0.0`.
+- [unitmodules.cpp/hpp] CHANGED: `nan("")` to `0.0/0.0`.
+- [simulator.cpp/hpp] DELETED: `_store`,`_diverge`.
+- [simulator.cpp/hpp] ADDED: `_status`.

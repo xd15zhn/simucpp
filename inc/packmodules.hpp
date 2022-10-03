@@ -10,7 +10,7 @@ Continuous transfer function module.
 class TransferFcn: public PackModule {
 public:
     TransferFcn(Simulator *sim, const vecdble numerator, const vecdble denominator, std::string name="tf");
-    virtual ~TransferFcn() {}
+    virtual ~TransferFcn();
     virtual PUnitModule Get_InputPort(int n=0) const override;
     virtual PUnitModule Get_OutputPort(int n=0) const override;
     void Set_InitialValue(vecdble value);
@@ -29,7 +29,7 @@ Discrete transfer function module.
 class DiscreteTransferFcn: public PackModule {
 public:
     DiscreteTransferFcn(Simulator *sim, const vecdble numerator, const vecdble denominator, std::string name="dtf");
-    virtual ~DiscreteTransferFcn() {}
+    virtual ~DiscreteTransferFcn();
     virtual PUnitModule Get_InputPort(int n=0) const override;
     virtual PUnitModule Get_OutputPort(int n=0) const override;
     void Set_SampleTime(double time);

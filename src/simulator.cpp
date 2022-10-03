@@ -6,8 +6,13 @@
 #ifdef USE_MPLT
 #include "matplotlibcpp.h"
 #endif
-
 NAMESPACE_SIMUCPP_L
+
+enum {
+    FLAG_INITIALIZED  = 0x01,   // Whether to store simulation data to memory
+    FLAG_DIVERGED     = 0x02,   // Set to run program in fullscreen
+    FLAG_STORE        = 0x04,   // Set to allow resizable window
+} SimulatorFlags;
 
 bool Find_vector(std::vector<int>& data, int x) {
     std::vector<int>::iterator iter = std::find(data.begin(), data.end(), x);
@@ -21,11 +26,9 @@ Simulator::Simulator(double endtime) {
     _endtime = endtime;
     _cntM = 0;
     _t = 0;
-    _store = true;
     DISCRETE_INITIALIZE(-1);
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
     _divmode = 0;
-    _diverge = false;
 }
 Simulator::~Simulator() {
     for(int i=0; i<4; ++i) {
@@ -166,8 +169,8 @@ int Simulator::Simulate() {
         if (!err) continue;
         if (_divmode == 0) {
             PRINT_CONVERGENCE(err); exit(1); }
-        else if ((_divmode == 1) && !_diverge) {
-            _diverge = true;
+        else if ((_divmode == 1) && !(_status & FLAG_DIVERGED)) {
+            _status |= FLAG_DIVERGED;
             PRINT_CONVERGENCE(err); }
         else if (_divmode == 3) {
             PRINT_CONVERGENCE(err);
@@ -182,7 +185,7 @@ int Simulator::Simulate_FirstStep() {
     MODULE_INTEGRATOR_UPDATE();
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
-    if (_store) _tvec.push_back(_t);
+    if (_status & FLAG_STORE) _tvec.push_back(_t);
     return 0;
 }
 int Simulator::Simulate_FinalStep() {
@@ -190,11 +193,11 @@ int Simulator::Simulate_FinalStep() {
     MODULE_INTEGRATOR_UPDATE();
     MODULE_UNITDELAY_UPDATE();
     MODULE_OUTPUT_UPDATE();
-    if (_store) _tvec.push_back(_t);
+    if (_status & FLAG_STORE) _tvec.push_back(_t);
     return 0;
 }
 int Simulator::Simulate_OneStep() {
-    if ((_store) && (_t-_ltn >= _T-SIMUCPP_DBL_EPSILON)) {
+    if ((_status & FLAG_STORE) && (_t-_ltn >= _T-SIMUCPP_DBL_EPSILON)) {
         _ltn += _T;
         _tvec.push_back(_t);
     }
@@ -313,7 +316,7 @@ void Simulator::Simulation_Reset() {
         if (m==nullptr) continue;
         m->Module_Reset();
     }
-    _diverge = false;
+    _status &=~ FLAG_DIVERGED;
 }
 /**********************
 Use data stored in OUTPUT modules to draw a waveform.
@@ -340,8 +343,10 @@ void Simulator::Plot() {
 
 /**********************
 **********************/
-void Simulator::Set_EnableStore(bool store) { _store=store;
-    for (PUOutput m: _outputs) m->Set_EnableStore(store); }
+void Simulator::Set_EnableStore(bool store) {
+    if (store) _status |= FLAG_STORE;
+    else _status &=~ FLAG_STORE;
+    for (PUOutput m: _outputs) m->Set_EnableStore(store);}
 void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T;
     for (PUOutput m: _outputs) m->Set_SampleTime(time); }
 void Simulator::Set_t(double t) { _t = t; }

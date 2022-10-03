@@ -97,7 +97,7 @@ As for PackModule, default zero if port is not specified.
     int Simulate_OneStep();
     int Simulate_FinalStep();
 
-    // Is simulation data stored to memory.
+    // Whether to store simulation data to memory.
     // If set false, then function "Simulator::Plot()" won't be executed.
     // It will also set all the OUTPUT modules.
     void Set_EnableStore(bool store=true);
@@ -166,18 +166,15 @@ private:
     std::vector<std::vector<int>> _integIDs, _delayIDs, _outIDs;
     std::vector<int> _discIDs;
 
-    // See public member function "Set_EnableStore".
-    bool _store;
-    // See public member function "Set_SampleTime".
-    DISCRETE_VARIABLES();
-
-    // See public member function "Set_t" and "Get_t".
-    double _t;
+    DISCRETE_VARIABLES();  // See public member function "Set_SampleTime".
+    double _t;  // See public member function "Set_t" and "Get_t".
     std::vector<double> _tvec;
+    int _divmode;  // See public member function "Set_DivergenceCheckMode".
 
-    // See public member function "Set_DivergenceCheckMode".
-    int _divmode;
-    bool _diverge;
+    // BIT0: initialized
+    // BIT1: diverged
+    // BIT2: data store
+    u8 _status;
 };
 
 NAMESPACE_SIMUCPP_R
