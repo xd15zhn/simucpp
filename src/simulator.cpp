@@ -203,7 +203,6 @@ int Simulator::Simulate_OneStep() {
     if ((_status & FLAG_STORE) && (_t-_ltn >= _T-SIMUCPP_DBL_EPSILON)) {
         _ltn += _T;
         _tvec.push_back(_t);
-        TRACELOG(LOG_CYCLE, "pushback%f", _t);
     }
     MODULE_UNITDELAY_UPDATE_OUTPUT();
     for(int i=0; i<_cntI; ++i){

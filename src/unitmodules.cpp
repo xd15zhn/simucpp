@@ -101,6 +101,7 @@ void UFcnMISO::Module_Update(double time)
         param[i] = _next[i]->Get_OutValue();
     if (_fu) _outvalue = _fu->Function(param);
     else _outvalue = _f(param);
+    delete param;
 }
 PUnitModule UFcnMISO::Get_child(unsigned int n) const
 {

@@ -56,3 +56,6 @@
 - [unitmodules.cpp/hpp] CHANGED: `nan("")` to `0.0/0.0`.
 - [simulator.cpp/hpp] DELETED: `_store`,`_diverge`.
 - [simulator.cpp/hpp] ADDED: `_status`.
+
+# V2.0.12
+- [unitmodules.cpp] BUGFIXED: memory leak.
