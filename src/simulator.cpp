@@ -26,6 +26,7 @@ Simulator::Simulator(double endtime) {
     _endtime = endtime;
     _cntM = 0;
     _t = 0;
+    _status = FLAG_STORE;
     DISCRETE_INITIALIZE(-1);
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
     _divmode = 0;
@@ -79,6 +80,7 @@ Simulation initialization procedure, which includes the following steps:
  - Initialize a data file for storage.
 **********************/
 void Simulator::Initialize() {
+    if (_status & FLAG_INITIALIZED) return;
     _cntI = _integIDs.size();
     _cntO = _outIDs.size();
     _cntD = _delayIDs.size();
@@ -153,6 +155,7 @@ void Simulator::Initialize() {
     }
     TRACELOG(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
     TRACELOG(LOG_INFO, "Simucpp: Simulator initialization completed.");
+    _status |= FLAG_INITIALIZED;
 }
 
 
@@ -200,6 +203,7 @@ int Simulator::Simulate_OneStep() {
     if ((_status & FLAG_STORE) && (_t-_ltn >= _T-SIMUCPP_DBL_EPSILON)) {
         _ltn += _T;
         _tvec.push_back(_t);
+        TRACELOG(LOG_CYCLE, "pushback%f", _t);
     }
     MODULE_UNITDELAY_UPDATE_OUTPUT();
     for(int i=0; i<_cntI; ++i){
@@ -323,7 +327,7 @@ Use data stored in OUTPUT modules to draw a waveform.
 **********************/
 void Simulator::Plot() {
 #ifdef USE_MPLT
-    if (!_store) { TRACELOG(LOG_WARNING, "Simucpp: There is no data for plotting."); return; }
+    if (!(_status & FLAG_STORE)) { TRACELOG(LOG_WARNING, "Simucpp: There is no data for plotting."); return; }
     TRACELOG(LOG_INFO, "Simucpp: Wait for ploting......");
     for (PUOutput m: _outputs) {
         if (!m->_store) continue;
