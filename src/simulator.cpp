@@ -81,6 +81,7 @@ Simulation initialization procedure, which includes the following steps:
 **********************/
 void Simulator::Initialize() {
     if (_status & FLAG_INITIALIZED) return;
+    TRACELOG(LOG_INFO, "imulator: Initialization start.");
     _cntI = _integIDs.size();
     _cntO = _outIDs.size();
     _cntD = _delayIDs.size();
@@ -154,7 +155,7 @@ void Simulator::Initialize() {
         }
     }
     TRACELOG(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
-    TRACELOG(LOG_INFO, "Simucpp: Simulator initialization completed.");
+    TRACELOG(LOG_INFO, "Simulator: Initialization completed.");
     _status |= FLAG_INITIALIZED;
 }
 

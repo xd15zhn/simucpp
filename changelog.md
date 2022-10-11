@@ -59,3 +59,6 @@
 
 # V2.0.12
 - [unitmodules.cpp] BUGFIXED: memory leak.
+
+# V2.0.13
+- [debugs.cpp] ADDED: `Print_DebugInfo()`.
