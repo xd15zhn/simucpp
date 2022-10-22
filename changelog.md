@@ -62,3 +62,5 @@
 
 # V2.0.13
 - [debugs.cpp] ADDED: `Print_DebugInfo()`.
+- [matmodules.cpp/hpp] ADDED: `MFcnMISO::Get_OutValue()`
+- [matmodules.cpp/hpp] ADDED: `MConstant::Set_OutValue()`

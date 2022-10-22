@@ -71,6 +71,7 @@ class MConstant: public MatModule {
     MATMODULE_VIRTUAL(MConstant);
 public:
     MConstant(Simulator *sim, const zhnmat::Mat& A, std::string name="mcst");
+    void Set_OutValue(zhnmat::Mat A);
 private:
     PUConstant *_ucst=nullptr;
 };
@@ -84,6 +85,7 @@ class MFcnMISO: public MatModule {
 public:
     MFcnMISO(Simulator *sim, BusSize size, std::string name="mfcn");
     void Set_Function(zhnmat::Mat(*function)(zhnmat::Mat *u));
+    zhnmat::Mat Get_OutValue();
 private:
     PUFcnMISO *_misoy=nullptr;
     std::vector<PMatModule> _nexts;

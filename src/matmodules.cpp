@@ -33,6 +33,7 @@ public:
             cntmat += _sizes[n].r * _sizes[n].c;
         }
         zhnmat::Mat ansmat = _f(mats);
+        delete[] mats;
         return ansmat.at(_loc.r, _loc.c);
     }
 private:
@@ -222,6 +223,11 @@ PUnitModule MConstant::Get_OutputPort(BusSize size) const {
     if (!(size<_size)) return nullptr;
     return _ucst[size.r*_size.c+size.c];
 }
+void MConstant::Set_OutValue(zhnmat::Mat A) {
+    for (uint i=0; i<_size.r; ++i)
+        for (uint j=0; j<_size.c; ++j)
+            _ucst[i*_size.c+j]->Set_OutValue(A.at(i, j));
+}
 
 
 /*********************
@@ -274,6 +280,14 @@ bool MFcnMISO::Initialize() {
         }
     }
     _state = BUS_INITIALIZED; return true;
+}
+zhnmat::Mat MFcnMISO::Get_OutValue() {
+    if (_state != BUS_INITIALIZED) return zhnmat::Mat();
+    zhnmat::Mat ans(_size.r, _size.c);
+    for (uint i=0; i<_size.r; ++i)
+        for (uint j=0; j<_size.c; ++j)
+            ans.set(i, j, _misoy[i*_size.c+j]->Get_OutValue());
+    return ans;
 }
 
 
