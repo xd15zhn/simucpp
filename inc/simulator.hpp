@@ -82,7 +82,8 @@ As for PackModule, default zero if port is not specified.
 
     // Update the connection between modules which belongs to THIS simulator.
     // It must be called before first simulation and has no need to be called afterward.
-    void Initialize();
+    // @print: Print all modules and their connections.
+    void Initialize(bool print=false);
 
     // Reset the parameters of all modules to those before simulation,
     // especially those modules whose values will change during simulation.
@@ -128,9 +129,6 @@ As for PackModule, default zero if port is not specified.
     // other: the same as 2.
     void Set_DivergenceCheckMode(int mode=0);
 
-    // Print all modules and their connections.
-    void Print_Modules();
-
 private:
     // Add a module to this simulator.
     void Add_Module(const PUnitModule m);
@@ -138,6 +136,8 @@ private:
 
     // Build connection of Endpoint modules.
     void Build_Connection(std::vector<int> &ids);
+    // Print all modules and their connections.
+    void Print_Modules();
 
     // Simulation step and end time.
     double _H, _endtime;

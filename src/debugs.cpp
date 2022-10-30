@@ -11,6 +11,7 @@ void Simulator::Print_Modules() {
     using namespace std;
     int childcnt;
     PUnitModule bm;  // pointer to child module
+    cout << "Model structure print start." << endl;
     for (PUnitModule m: _modules) {
         cout << "name:" << m->_name << "  id:" << m->_id << "  type:" << typeid(*m).name() << endl;
         for (int i=0; i<m->Get_childCnt(); ++i) {
@@ -19,6 +20,7 @@ void Simulator::Print_Modules() {
             m->Print_DebugInfo(i);
         }
     }
+    cout << "Model structure print finished." << endl;
 #else
     TRACELOG(LOG_WARNING, "Simulator debug: You didn't add debug functions.");
 #endif  // SUPPORT_DEBUG

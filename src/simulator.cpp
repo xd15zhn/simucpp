@@ -79,7 +79,7 @@ Simulation initialization procedure, which includes the following steps:
  - Index for discrete modules.
  - Initialize a data file for storage.
 **********************/
-void Simulator::Initialize() {
+void Simulator::Initialize(bool print) {
     if (_status & FLAG_INITIALIZED) return;
     TRACELOG(LOG_INFO, "imulator: Initialization start.");
     _cntI = _integIDs.size();
@@ -125,6 +125,7 @@ void Simulator::Initialize() {
         }
     }
     TRACELOG(LOG_DEBUG, "Simucpp: Delete redundant connections completed.");
+    if (print) Print_Modules();
 
     /* Build sequence table */
     for(int i=0; i<_cntI; ++i)
@@ -155,7 +156,7 @@ void Simulator::Initialize() {
         }
     }
     TRACELOG(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
-    TRACELOG(LOG_INFO, "Simulator: Initialization completed.");
+    TRACELOG(LOG_INFO, "Simulator: Initialization successfully completed.");
     _status |= FLAG_INITIALIZED;
 }
 

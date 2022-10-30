@@ -1,6 +1,8 @@
 # SIMUCPP
 
 C++重写simulink.  
+代码仓库 <https://github.com/xd15zhn/simucpp>  
+<https://gitee.com/xd15zhn/simucpp>  
 教程博客 <https://blog.csdn.net/qq_34288751/category_11453352.html>  
 例程 <https://gitee.com/xd15zhn/simucpp_demo>  
 博客原文 <https://gitee.com/xd15zhn/simucpp_blog>  
