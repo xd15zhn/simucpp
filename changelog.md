@@ -64,3 +64,8 @@
 - [debugs.cpp] ADDED: `Print_DebugInfo()`.
 - [matmodules.cpp/hpp] ADDED: `MFcnMISO::Get_OutValue()`
 - [matmodules.cpp/hpp] ADDED: `MConstant::Set_OutValue()`
+- [matmodules.cpp] BUGFIXED: memory leak.
+
+# V2.0.14
+- [matmodules.cpp/hpp] ADDED: `UserFuncM`.
+- [matmodules.cpp/hpp] ADDED: `UserFuncM`.

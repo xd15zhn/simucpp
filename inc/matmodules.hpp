@@ -17,6 +17,20 @@ NAMESPACE_SIMUCPP_L
         BusSize _size
 
 
+/**********************
+Used to provide another method to replace the pointer to a function.
+pure virture base class.
+**********************/
+class UserFuncM
+{
+public:
+    UserFuncM();
+    virtual ~UserFuncM() = 0;
+    // Used for modules which need a MISO function.
+    virtual zhnmat::Mat Function(zhnmat::Mat *u) const;
+};
+
+
 /*********************
 MUX and DEMUX module.
 Used to multiplex and demultiplex a bus port.
@@ -85,12 +99,14 @@ class MFcnMISO: public MatModule {
 public:
     MFcnMISO(Simulator *sim, BusSize size, std::string name="mfcn");
     void Set_Function(zhnmat::Mat(*function)(zhnmat::Mat *u));
+    void Set_Function(UserFuncM *function);
     zhnmat::Mat Get_OutValue();
 private:
     PUFcnMISO *_misoy=nullptr;
     std::vector<PMatModule> _nexts;
     std::vector<BusSize> _buses;
     zhnmat::Mat(*_f)(zhnmat::Mat *m);
+    UserFuncM *_fu=nullptr;
 };
 
 

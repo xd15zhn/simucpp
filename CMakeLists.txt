@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(simucpp VERSION 2.0.13)
+project(simucpp VERSION 2.0.14)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

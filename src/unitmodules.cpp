@@ -47,8 +47,6 @@ UFcn::UFcn(Simulator *sim, std::string name): UnitModule(sim, name)
 {
     _outvalue = 0.0/0.0;
     _f = [](double u){return u;};
-    _fu = nullptr;
-    _next = nullptr;
     UNITMODULE_INIT();
 }
 int UFcn::Self_Check() const
@@ -79,7 +77,6 @@ UFcnMISO::UFcnMISO(Simulator *sim, std::string name): UnitModule(sim, name)
 {
     _outvalue = 0.0/0.0;
     _f = [](double *u){return u[0];};
-    _fu = nullptr;
     UNITMODULE_INIT();
 }
 int UFcnMISO::Self_Check() const
@@ -177,7 +174,6 @@ UInput::UInput(Simulator *sim, std::string name): UnitModule(sim, name)
     _cnt = -1;
     _isc = true;
     _f = [](double t){return 1.0;};
-    _fu = nullptr;
     UNITMODULE_INIT();
     _enable = true;
 }

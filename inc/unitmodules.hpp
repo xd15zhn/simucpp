@@ -29,6 +29,22 @@ typedef std::vector<double>  vecdble;
 
 
 /**********************
+Used to provide another method to replace the pointer to a function.
+pure virture base class.
+**********************/
+class UserFunc
+{
+public:
+    UserFunc();
+    virtual ~UserFunc() = 0;
+    // Used for modules which need a SISO function.
+    virtual double Function(double u) const;
+    // Used for modules which need a MISO function.
+    virtual double Function(double *u) const;
+};
+
+
+/**********************
 CONSTANT module.(cnst)
 User can use INPUT module instead, and this module is added for convenience.
 It outputs a constant value.
@@ -54,8 +70,8 @@ public:
 private:
     double _outvalue;
     double(*_f)(double u);
-    UserFunc *_fu;
-    PUnitModule _next;
+    UserFunc *_fu=nullptr;
+    PUnitModule _next=nullptr;
 };
 
 
@@ -74,7 +90,7 @@ private:
     void disconnect(unsigned int n=0);
     double _outvalue;
     double(*_f)(double* inparam);
-    UserFunc *_fu;
+    UserFunc *_fu=nullptr;
     std::vector<PUnitModule> _next;
 };
 
@@ -118,7 +134,7 @@ private:
     double _T;  // Sample time. Only used when in discrete mode
     bool _isc;  // Be in continuous mode when it's true
     double(*_f)(double t);  // Input function
-    UserFunc *_fu;
+    UserFunc *_fu=nullptr;
     std::vector<double> _data;  // Input data
 };
 

@@ -5,6 +5,9 @@ NAMESPACE_SIMUCPP_L
 
 MatModule::MatModule(Simulator *sim, std::string name): _sim(sim), _name(name) {};
 MatModule::~MatModule() {}
+UserFuncM::UserFuncM() {}
+UserFuncM::~UserFuncM() {}
+zhnmat::Mat UserFuncM::Function(zhnmat::Mat *u) const  { return u[0]; }
 
 class VecDotInMat: public UserFunc {
 public:
@@ -20,8 +23,8 @@ public:
 
 class MatDemux: public UserFunc {
 public:
-    MatDemux(std::vector<BusSize> sizes, zhnmat::Mat(*function)(zhnmat::Mat *m), BusSize loc)
-    :_sizes(sizes), _f(function), _loc(loc) {}
+    MatDemux(std::vector<BusSize> sizes, BusSize loc)
+    :_sizes(sizes), _loc(loc) {}
     virtual double Function(double *u) const override {
         uint cntmat = 0;
         zhnmat::Mat *mats = new zhnmat::Mat[_sizes.size()];
@@ -32,13 +35,16 @@ public:
                     mats[n].set(i, j, u[cntmat+i*_sizes[n].c+j]);
             cntmat += _sizes[n].r * _sizes[n].c;
         }
-        zhnmat::Mat ansmat = _f(mats);
+        zhnmat::Mat ansmat = _fu ? _fu->Function(mats) : _f(mats);
         delete[] mats;
         return ansmat.at(_loc.r, _loc.c);
     }
+    void Set_PointerFunction(zhnmat::Mat(*function)(zhnmat::Mat *u)) {_f=function;};
+    void Set_UserFunction(UserFuncM *function) {_fu=function;};
 private:
     std::vector<BusSize> _sizes;
     zhnmat::Mat(*_f)(zhnmat::Mat *m);
+    UserFuncM *_fu=nullptr;
     BusSize _loc;
 };
 
@@ -238,6 +244,7 @@ BusSize MFcnMISO::Get_OutputBusSize() const { return _size; }
 u8 MFcnMISO::Get_State() const { return _state; }
 void MFcnMISO::connect(const PMatModule m) { _nexts.push_back(m); }
 void MFcnMISO::Set_Function(zhnmat::Mat(*function)(zhnmat::Mat *u)) { _f=function; }
+void MFcnMISO::Set_Function(UserFuncM *function) { _fu=function; }
 MFcnMISO::MFcnMISO(Simulator *sim, BusSize size, std::string name)
     :MatModule(sim, name), _size(size) {
     MATMODULE_INIT();
@@ -266,7 +273,9 @@ bool MFcnMISO::Initialize() {
     PUnitModule childPort;
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
-            matdmx[i*_size.c+j] = new MatDemux(_buses, _f, BusSize(i, j));
+            matdmx[i*_size.c+j] = new MatDemux(_buses, BusSize(i, j));
+            if (_fu) matdmx[i*_size.c+j]->Set_UserFunction(_fu);
+            else     matdmx[i*_size.c+j]->Set_PointerFunction(_f);
             _misoy[i*_size.c+j]->Set_Function(matdmx[i*_size.c+j]);
             for (int k = 0; k < _nexts.size(); k++) {
                 childSize = _nexts[k]->Get_OutputBusSize();
