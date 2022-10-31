@@ -12,6 +12,7 @@ enum {
     FLAG_INITIALIZED  = 0x01,   // Whether to store simulation data to memory
     FLAG_DIVERGED     = 0x02,   // Set to run program in fullscreen
     FLAG_STORE        = 0x04,   // Set to allow resizable window
+    FLAG_REDUNDANT    = 0x08,   // Clear to delete redundant modules
 } SimulatorFlags;
 
 bool Find_vector(std::vector<int>& data, int x) {
@@ -26,7 +27,7 @@ Simulator::Simulator(double endtime) {
     _endtime = endtime;
     _cntM = 0;
     _t = 0;
-    _status = FLAG_STORE;
+    _status = FLAG_STORE | FLAG_REDUNDANT;
     DISCRETE_INITIALIZE(-1);
     for(int i=0; i<4; ++i) _ode4K[i] = nullptr;
     _divmode = 0;
@@ -74,14 +75,17 @@ void Simulator::Add_Module(const PMatModule m) {
 /**********************
 Simulation initialization procedure, which includes the following steps:
  - Self check procedure of unit modules and simulators;
- - Delete redundant connection of SUM module.
+ - Delete redundant connections.
  - Build sequence table.
  - Index for discrete modules.
  - Initialize a data file for storage.
 **********************/
 void Simulator::Initialize(bool print) {
-    if (_status & FLAG_INITIALIZED) return;
-    TRACELOG(LOG_INFO, "imulator: Initialization start.");
+    if (_status & FLAG_INITIALIZED) {
+        TRACELOG(LOG_WARNING, "Simulator: Initialize again. Review your code.");
+        return;
+    }
+    TRACELOG(LOG_INFO, "Simulator: Initialization start.");
     _cntI = _integIDs.size();
     _cntO = _outIDs.size();
     _cntD = _delayIDs.size();
@@ -112,19 +116,21 @@ void Simulator::Initialize(bool print) {
     TRACELOG(LOG_DEBUG, "Simucpp: Module self check completed.");
 
     /* Delete redundant connections of SUM module */
-    for(int i=_cntM-1; i>=0; --i){
-        if (_modules[i]==nullptr) continue;
-        bm = _modules[i];
-        if (typeid(*bm) != typeid(USum)) continue;
-        USum *mdl = (USum*)bm;
-        if (mdl->_rdnt) continue;
-        for (int i=mdl->_next.size()-1; i>=0; --i) {
-            if (mdl->_ingain[i]!=0) continue;
-            mdl->_ingain.erase(mdl->_ingain.begin() + i);
-            mdl->_next.erase(mdl->_next.begin() + i);
+    if (!(_status & FLAG_REDUNDANT)) {
+        for(int i=_cntM-1; i>=0; --i){
+            if (_modules[i]==nullptr) continue;
+            bm = _modules[i];
+            if (typeid(*bm) != typeid(USum)) continue;
+            USum *mdl = (USum*)bm;
+            if (mdl->_rdnt) continue;
+            for (int i=mdl->_next.size()-1; i>=0; --i) {
+                if (mdl->_ingain[i]!=0) continue;
+                mdl->_ingain.erase(mdl->_ingain.begin() + i);
+                mdl->_next.erase(mdl->_next.begin() + i);
+            }
         }
+        TRACELOG(LOG_DEBUG, "Simucpp: Delete redundant connections completed.");
     }
-    TRACELOG(LOG_DEBUG, "Simucpp: Delete redundant connections completed.");
     if (print) Print_Modules();
 
     /* Build sequence table */
@@ -330,11 +336,16 @@ void Simulator::Plot() {
 #ifdef USE_MPLT
     if (!(_status & FLAG_STORE)) { TRACELOG(LOG_WARNING, "Simucpp: There is no data for plotting."); return; }
     TRACELOG(LOG_INFO, "Simucpp: Wait for ploting......");
+    if (_outputs.size() < 1)
+        TRACELOG(LOG_FATAL, "Simucpp plot: No output data for plot!");
     for (PUOutput m: _outputs) {
         if (!m->_store) continue;
+        if (m->_values.size() < 3)
+            TRACELOG(LOG_FATAL, "Simucpp plot: Module \"%s\" has too few data points to plot!"
+            "data points: %d.", m->_name.c_str(), m->_values.size());
         if (_tvec.size()!=m->_values.size())
-            TRACELOG(LOG_FATAL, "Simucpp: Module \"%s\" has a wrong data amount for plotting!"
-            "Time points num is %d; data points num is %d.", m->_name.c_str(), _tvec.size(), m->_values.size());
+            TRACELOG(LOG_FATAL, "Simucpp plot: Module \"%s\" has a wrong data amount for plotting!"
+            "Time points:%d; data points:%d.", m->_name.c_str(), _tvec.size(), m->_values.size());
         matplotlibcpp::named_plot(m->_name, _tvec, m->_values);
     }
     matplotlibcpp::legend();

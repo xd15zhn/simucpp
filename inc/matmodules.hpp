@@ -123,7 +123,20 @@ private:
     PUSum *_sumy = nullptr;  // Output port
     zhnmat::Mat _G;
     bool _isleft;
-    PMatModule _next;
+    PMatModule _next = nullptr;
+};
+
+
+/*********************
+matrix Output module.
+**********************/
+class MOutput: public MatModule {
+    MATMODULE_VIRTUAL(MOutput);
+public:
+    MOutput(Simulator *sim, std::string name="mout");
+private:
+    PUOutput *_out = nullptr;
+    PMatModule _next = nullptr;
 };
 
 

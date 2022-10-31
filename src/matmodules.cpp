@@ -352,6 +352,31 @@ bool MGain::Initialize() {
 
 
 /*********************
+matrix Output module.
+**********************/
+MOutput::~MOutput() {}
+BusSize MOutput::Get_OutputBusSize() const { return _size; }
+u8 MOutput::Get_State() const { return _state; }
+PUnitModule MOutput::Get_OutputPort(BusSize size) const { return nullptr; }
+void MOutput::connect(const PMatModule m) { _next=m; }
+MOutput::MOutput(Simulator *sim, std::string name): MatModule(sim, name) {
+    _state = 0;
+    MATMODULE_INIT();
+}
+bool MOutput::Initialize() {
+    if (_state == BUS_INITIALIZED) return true;
+    if (_next==nullptr) TRACELOG(LOG_FATAL, "MOutput: \"%s\" doesn't have a child module!", _name.c_str());
+    if (!(_next->Get_State() & BUS_SIZED)) return false;
+    _size = _next->Get_OutputBusSize();
+    _out = new PUOutput[_size.r*_size.c];
+    for (uint i=0; i<_size.r; ++i)
+        for (uint j=0; j<_size.c; ++j)
+            _out[i*_size.c+j] = new UOutput(_sim, _name+"_out_"+std::to_string(i)+"_"+std::to_string(j));
+    _state = BUS_INITIALIZED; return true;
+}
+
+
+/*********************
 matrix Product module.
 **********************/
 MProduct::~MProduct() {}

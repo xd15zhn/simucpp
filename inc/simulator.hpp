@@ -31,6 +31,7 @@ class Simulator
     friend class MStateSpace;
     friend class MFcnMISO;
     friend class MGain;
+    friend class MOutput;
     friend class MProduct;
     friend class MSum;
     friend class MTranspose;
