@@ -86,9 +86,6 @@ void Simulator::Initialize(bool print) {
         return;
     }
     TRACELOG(LOG_INFO, "Simulator: Initialization start.");
-    _cntI = _integIDs.size();
-    _cntO = _outIDs.size();
-    _cntD = _delayIDs.size();
     int errcode;
     PUnitModule bm, curm;
 
@@ -103,6 +100,9 @@ void Simulator::Initialize(bool print) {
     }
     if (cntdown<0) TRACELOG(LOG_FATAL, "Simucpp: Matrix modules initialization failed!");
     _matmodules.clear();
+    _cntI = _integIDs.size();
+    _cntO = _outIDs.size();
+    _cntD = _delayIDs.size();
     TRACELOG(LOG_DEBUG, "Simucpp: Matrix modules initialization completed.");
 
     /* Self check procedure of unit modules and simulators */

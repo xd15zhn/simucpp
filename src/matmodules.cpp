@@ -369,9 +369,12 @@ bool MOutput::Initialize() {
     if (!(_next->Get_State() & BUS_SIZED)) return false;
     _size = _next->Get_OutputBusSize();
     _out = new PUOutput[_size.r*_size.c];
-    for (uint i=0; i<_size.r; ++i)
-        for (uint j=0; j<_size.c; ++j)
+    for (uint i=0; i<_size.r; ++i) {
+        for (uint j=0; j<_size.c; ++j) {
             _out[i*_size.c+j] = new UOutput(_sim, _name+"_out_"+std::to_string(i)+"_"+std::to_string(j));
+            _sim->connectU(_next->Get_OutputPort(BusSize(i, j)), _out[i*_size.c+j]);
+        }
+    }
     _state = BUS_INITIALIZED; return true;
 }
 
