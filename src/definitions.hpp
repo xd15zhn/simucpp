@@ -36,7 +36,7 @@ enum SIMUCPP_ERROR_CODE{
         TRACELOG(LOG_WARNING, "Simucpp: "#module" module \"%s\" doesn't have a child module.", _name.c_str()); \
         return SIMUCPP_NO_ID; }
 #define CHECK_FUNCTION(module) \
-    if((_f==nullptr)&&(_fu==nullptr)) { \
+    if(_f==nullptr) { \
         TRACELOG(LOG_WARNING, "Simucpp: "#module" module \"%s\" doesn't have a function.", _name.c_str()); \
         return SIMUCPP_NO_FUNCTION; }
 

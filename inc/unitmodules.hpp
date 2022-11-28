@@ -8,6 +8,7 @@ The first line in code annotations of each unitmodule gives its name and abbrevi
 #ifndef BASEMODULES_H
 #define BASEMODULES_H
 #include <vector>
+#include <functional>
 #include "baseclass.hpp"
 NAMESPACE_SIMUCPP_L
 #define UNITMODULE_VIRTUAL(classname, abbrname) \
@@ -26,22 +27,6 @@ NAMESPACE_SIMUCPP_L
         virtual void connect(const PUnitModule m) override; \
         virtual void Print_DebugInfo(unsigned int n) override
 typedef std::vector<double>  vecdble;
-
-
-/**********************
-Used to provide another method to replace the pointer to a function.
-pure virture base class.
-**********************/
-class UserFunc
-{
-public:
-    UserFunc();
-    virtual ~UserFunc() = 0;
-    // Used for modules which need a SISO function.
-    virtual double Function(double u) const;
-    // Used for modules which need a MISO function.
-    virtual double Function(double *u) const;
-};
 
 
 /**********************
@@ -64,13 +49,10 @@ FCN module.(fcn)
 class UFcn: public UnitModule {
     UNITMODULE_VIRTUAL(UFcn, fcn);
 public:
-    // Set the function. param "u" is the input value and can be null.
-    void Set_Function(double(*function)(double u));
-    void Set_Function(UserFunc *function);
+    void Set_Function(std::function<double(double)> function);
 private:
     double _outvalue;
-    double(*_f)(double u);
-    UserFunc *_fu=nullptr;
+    std::function<double(double)> _f=nullptr;
     PUnitModule _next=nullptr;
 };
 
@@ -83,14 +65,12 @@ class UFcnMISO: public UnitModule {
     UNITMODULE_VIRTUAL(UFcnMISO, miso);
 public:
     // Set the function. param "inparam" is an array, which represents all the input values.
-    void Set_Function(double(*function)(double* inparam));
-    void Set_Function(UserFunc *function);
+    void Set_Function(std::function<double(double*)> function);
 private:
     void connect2(const PUnitModule m, unsigned int n=0);
     void disconnect(unsigned int n=0);
     double _outvalue;
-    double(*_f)(double* inparam);
-    UserFunc *_fu=nullptr;
+    std::function<double(double*)> _f=nullptr;
     std::vector<PUnitModule> _next;
 };
 
@@ -119,8 +99,7 @@ class UInput: public UnitModule {
     UNITMODULE_VIRTUAL(UInput, in);
 public:
     // User should provide an input function when it's in continuous mode.
-    void Set_Function(double(*function)(double u));
-    void Set_Function(UserFunc *function);
+    void Set_Function(std::function<double(double)> function);
     // User should provide sample dataswhen it's in discrete mode.
     void Set_InputData(const std::vector<double>& data);
     // Set if this module is in continuous mode.
@@ -133,8 +112,7 @@ private:
     int _cnt;  // samples count. Only used when in discrete mode
     double _T;  // Sample time. Only used when in discrete mode
     bool _isc;  // Be in continuous mode when it's true
-    double(*_f)(double t);  // Input function
-    UserFunc *_fu=nullptr;
+    std::function<double(double)> _f=nullptr;  // Input function
     std::vector<double> _data;  // Input data
 };
 
@@ -145,7 +123,6 @@ INTEGRATOR module.(int)
 class UIntegrator: public UnitModule {
     UNITMODULE_VIRTUAL(UIntegrator, integ);
 public:
-    // Set the initial value.
     void Set_InitialValue(double value=0);
 private:
     double _outvalue, _iv;

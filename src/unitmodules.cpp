@@ -6,10 +6,6 @@ NAMESPACE_SIMUCPP_L
 UnitModule::UnitModule(Simulator *sim, std::string name)
     : _name(name),_id(-1) {}
 UnitModule::~UnitModule() {}
-UserFunc::UserFunc() {}
-UserFunc::~UserFunc() {}
-double UserFunc::Function(double u) const { return u; }
-double UserFunc::Function(double *u) const  { return u[0]; }
 
 /**********************
 CONSTANT module.
@@ -37,8 +33,7 @@ FCN module.
 UFcn::~UFcn() { _f=nullptr;_next=nullptr; }
 double UFcn::Get_OutValue() const { return _outvalue; }
 void UFcn::Set_Enable(bool enable) { _enable=enable; }
-void UFcn::Set_Function(double (*function)(double)) { _f=function; }
-void UFcn::Set_Function(UserFunc *function) { _fu=function; }
+void UFcn::Set_Function(std::function<double(double)> function) { _f=function; }
 void UFcn::Module_Reset() {}
 int UFcn::Get_childCnt() const { return 1; }
 PUnitModule UFcn::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
@@ -58,8 +53,7 @@ int UFcn::Self_Check() const
 void UFcn::Module_Update(double time)
 {
     if (!_enable) return;
-    if (_fu) _outvalue = _fu->Function(_next->Get_OutValue());
-    else _outvalue = _f(_next->Get_OutValue());
+    _outvalue = _f(_next->Get_OutValue());
 }
 
 
@@ -69,8 +63,7 @@ FCNMISO module.
 UFcnMISO::~UFcnMISO() { _f=nullptr;_next.clear(); }
 double UFcnMISO::Get_OutValue() const { return _outvalue; }
 void UFcnMISO::Set_Enable(bool enable) { _enable=enable; }
-void UFcnMISO::Set_Function(double (*function)(double *)) { _f=function; }
-void UFcnMISO::Set_Function(UserFunc *function) { _fu=function; }
+void UFcnMISO::Set_Function(std::function<double(double*)> function) { _f=function; }
 void UFcnMISO::Module_Reset() {}
 int UFcnMISO::Get_childCnt() const { return _next.size(); }
 UFcnMISO::UFcnMISO(Simulator *sim, std::string name): UnitModule(sim, name)
@@ -84,7 +77,7 @@ int UFcnMISO::Self_Check() const
     if (_next.size() <= 0) TRACELOG(LOG_WARNING, "Simucpp: FCNMISO module \"%s\" doesn't have enough child module.", _name.c_str());
     CHECK_FUNCTION(FCNMISO);
     if (_next.size()==0) return SIMUCPP_NO_CHILD;
-    if ((_f==nullptr)&&(_fu==nullptr)) return SIMUCPP_NO_FUNCTION;
+    if (_f==nullptr) return SIMUCPP_NO_FUNCTION;
     for (int i=0; i<(int)_next.size(); ++i)
         if (_next[i]==nullptr) return SIMUCPP_NULLPTR;
     return 0;
@@ -96,8 +89,7 @@ void UFcnMISO::Module_Update(double time)
     double* param = new double[n];
     for (int i=0; i<n; ++i)
         param[i] = _next[i]->Get_OutValue();
-    if (_fu) _outvalue = _fu->Function(param);
-    else _outvalue = _f(param);
+    _outvalue = _f(param);
     delete[] param;
 }
 PUnitModule UFcnMISO::Get_child(unsigned int n) const
@@ -163,8 +155,7 @@ void UInput::Set_Enable(bool enable) { _enable=enable; }
 int UInput::Get_childCnt() const { return 0; }
 PUnitModule UInput::Get_child(unsigned int n) const { return nullptr; }
 void UInput::connect(const PUnitModule m) { TRACELOG(LOG_WARNING, "UInput: cannot add child modules."); }
-void UInput::Set_Function(double (*function)(double u)) { _f=function; }
-void UInput::Set_Function(UserFunc *function) { _fu=function; }
+void UInput::Set_Function(std::function<double(double)> function) { _f=function; }
 void UInput::Set_InputData(const vecdble &data) { _data=data; }
 void UInput::Set_Continuous(bool isContinuous) { _isc=isContinuous; }
 void UInput::Set_SampleTime(double time) { _T=time; }
@@ -182,7 +173,7 @@ int UInput::Self_Check() const
     if (_isc){
         if (_f == nullptr) TRACELOG(LOG_WARNING, 
             "Simucpp: INPUT module \"%s\" is in continuous mode but doesn't have an input function.", _name.c_str());
-        if ((_f==nullptr)&&(_fu==nullptr)) return SIMUCPP_NO_FUNCTION;
+        if (_f==nullptr) return SIMUCPP_NO_FUNCTION;
     }
     else{
         if (_data.size() <= 0) TRACELOG(LOG_WARNING, 
@@ -195,10 +186,9 @@ int UInput::Self_Check() const
 }
 void UInput::Module_Update(double time)
 {
-    if (_isc) {
-        if (_fu) _outvalue = _fu->Function(time);
-        else _outvalue = _f(time);
-    } else {
+    if (_isc)
+        _outvalue = _f(time);
+    else {
         if (time - _cnt*_T < _T-SIMUCPP_DBL_EPSILON) return;
         _cnt++;
         if (_cnt >= (int)_data.size()) return;

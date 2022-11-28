@@ -5,49 +5,6 @@ NAMESPACE_SIMUCPP_L
 
 MatModule::MatModule(Simulator *sim, std::string name): _sim(sim), _name(name) {};
 MatModule::~MatModule() {}
-UserFuncM::UserFuncM() {}
-UserFuncM::~UserFuncM() {}
-zhnmat::Mat UserFuncM::Function(zhnmat::Mat *u) const  { return u[0]; }
-
-class VecDotInMat: public UserFunc {
-public:
-    VecDotInMat(uint cnt=0): _cnt(cnt) {}
-    virtual double Function(double *u) const override {
-        double ans = 0;
-        for (int i = 0; i < _cnt; i++)
-            ans += u[i+i]*u[i+i+1];
-        return ans;
-    }
-    uint _cnt;
-};
-
-class MatDemux: public UserFunc {
-public:
-    MatDemux(std::vector<BusSize> sizes, BusSize loc)
-    :_sizes(sizes), _loc(loc) {}
-    virtual double Function(double *u) const override {
-        uint cntmat = 0;
-        zhnmat::Mat *mats = new zhnmat::Mat[_sizes.size()];
-        for (uint n = 0; n < _sizes.size(); n++) {
-            mats[n] = zhnmat::Mat(_sizes[n].r, _sizes[n].c);
-            for (int i = 0; i < _sizes[n].r; i++)
-                for (int j = 0; j < _sizes[n].c; j++)
-                    mats[n].set(i, j, u[cntmat+i*_sizes[n].c+j]);
-            cntmat += _sizes[n].r * _sizes[n].c;
-        }
-        zhnmat::Mat ansmat = _fu ? _fu->Function(mats) : _f(mats);
-        delete[] mats;
-        return ansmat.at(_loc.r, _loc.c);
-    }
-    void Set_PointerFunction(zhnmat::Mat(*function)(zhnmat::Mat *u)) {_f=function;};
-    void Set_UserFunction(UserFuncM *function) {_fu=function;};
-private:
-    std::vector<BusSize> _sizes;
-    zhnmat::Mat(*_f)(zhnmat::Mat *m);
-    UserFuncM *_fu=nullptr;
-    BusSize _loc;
-};
-
 
 /*********************
 implementation of class BusSize.
@@ -243,8 +200,7 @@ MFcnMISO::~MFcnMISO() {}
 BusSize MFcnMISO::Get_OutputBusSize() const { return _size; }
 u8 MFcnMISO::Get_State() const { return _state; }
 void MFcnMISO::connect(const PMatModule m) { _nexts.push_back(m); }
-void MFcnMISO::Set_Function(zhnmat::Mat(*function)(zhnmat::Mat *u)) { _f=function; }
-void MFcnMISO::Set_Function(UserFuncM *function) { _fu=function; }
+void MFcnMISO::Set_Function(std::function<zhnmat::Mat(zhnmat::Mat*)> function) { _f=function; }
 MFcnMISO::MFcnMISO(Simulator *sim, BusSize size, std::string name)
     :MatModule(sim, name), _size(size) {
     MATMODULE_INIT();
@@ -262,23 +218,29 @@ PUnitModule MFcnMISO::Get_OutputPort(BusSize size) const {
 bool MFcnMISO::Initialize() {
     if (_state == BUS_INITIALIZED) return true;
     if (_nexts.size()==0) TRACELOG(LOG_FATAL, "MFcnMISO: \"%s\" doesn't have a child module!", _name.c_str());
-    MatDemux **matdmx;
-    matdmx = new MatDemux*[_size.r*_size.c];
     bool success = true;
     for (PMatModule m: _nexts) { if (!(m->Get_State() & BUS_GENERATED)) { success = false; break; } }
     if (!success) return false;
-    for (int i=0; i<_nexts.size(); i++)
-        _buses.push_back(_nexts[i]->Get_OutputBusSize());
-    BusSize childSize;
     PUnitModule childPort;
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
-            matdmx[i*_size.c+j] = new MatDemux(_buses, BusSize(i, j));
-            if (_fu) matdmx[i*_size.c+j]->Set_UserFunction(_fu);
-            else     matdmx[i*_size.c+j]->Set_PointerFunction(_f);
-            _misoy[i*_size.c+j]->Set_Function(matdmx[i*_size.c+j]);
+            _misoy[i*_size.c+j]->Set_Function([&](double *u){
+                uint cntmat = 0;
+                zhnmat::Mat *mats = new zhnmat::Mat[_nexts.size()];
+                for (uint n = 0; n < _nexts.size(); n++) {
+                    BusSize size = _nexts[n]->Get_OutputBusSize();
+                    mats[n] = zhnmat::Mat(size.r, size.c);
+                    for (int i = 0; i < size.r; i++)
+                        for (int j = 0; j < size.c; j++)
+                            mats[n].set(i, j, u[cntmat+i*size.c+j]);
+                    cntmat += size.r * size.c;
+                }
+                zhnmat::Mat ansmat = _f(mats);
+                delete[] mats;
+                return ansmat.at(i, j);
+            });
             for (int k = 0; k < _nexts.size(); k++) {
-                childSize = _nexts[k]->Get_OutputBusSize();
+                BusSize childSize = _nexts[k]->Get_OutputBusSize();
                 for (int m = 0; m < childSize.r; m++) {
                     for (int n = 0; n < childSize.c; n++) {
                         childPort = _nexts[k]->Get_OutputPort(BusSize(m, n));
@@ -406,7 +368,6 @@ bool MProduct::Initialize() {
         TRACELOG(LOG_FATAL, "MProduct: Bus size mismatch between child modules of \"%s\"!\n    "
         "left:%d,%d; right:%d,%d", _name.c_str(), _size.r, _size.c, childSize.r, childSize.c);
     _size.c = childSize.c;
-    VecDotInMat *func = new VecDotInMat(childSize.r);
     _misoy = new PUFcnMISO[_size.r*_size.c];
     for (uint i = 0; i < _size.r; i++)
         for (uint j = 0; j < _size.c; j++)
@@ -416,7 +377,12 @@ bool MProduct::Initialize() {
     if (!(_nextR->Get_State() & BUS_GENERATED)) return false;
     for (uint i = 0; i < _size.r; i++) {
         for (uint j = 0; j < _size.c; j++) {
-            _misoy[i*_size.c+j]->Set_Function(func);
+            _misoy[i*_size.c+j]->Set_Function([childSize](double *u){
+                double ans = 0;
+                for (int i = 0; i < childSize.r; i++)
+                    ans += u[i+i]*u[i+i+1];
+                return ans;
+            });
             for (uint k=0; k<childSize.r; ++k) {
                 _sim->connectU(_nextL->Get_OutputPort(BusSize(i, k)), _misoy[i*_size.c+j]);
                 _sim->connectU(_nextR->Get_OutputPort(BusSize(k, j)), _misoy[i*_size.c+j]);
