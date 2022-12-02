@@ -295,7 +295,10 @@ void Simulator::Build_Connection(std::vector<int> &ids) {
                         if (typeid(*bm) == typeid(UIntegrator)) continue;
                         if (typeid(*bm) == typeid(UUnitDelay)) continue;
                         int agid = bm->_id;
-                        if (agid==curid) TRACELOG(LOG_FATAL, "Simucpp: Algebraic loop detected!");
+                        if (agid==curid) {
+                            Print_Connection(ids);
+                            TRACELOG(LOG_FATAL, "Simucpp: Algebraic loop detected!");
+                        }
                         agq.push(agid);
                     }
                 }

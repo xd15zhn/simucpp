@@ -137,6 +137,8 @@ private:
 
     // Build connection of Endpoint modules.
     void Build_Connection(std::vector<int> &ids);
+    // Print connection of current Endpoint module. Used to debug algebraic loop.
+    void Print_Connection(std::vector<int> &ids);
     // Print all modules and their connections.
     void Print_Modules();
 

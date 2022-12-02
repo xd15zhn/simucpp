@@ -26,6 +26,16 @@ void Simulator::Print_Modules() {
 #endif  // SUPPORT_DEBUG
 }
 
+void Simulator::Print_Connection(std::vector<int> &ids) {
+#if defined(SUPPORT_DEBUG)
+    std::cout << "Sequence table: ";
+    for (int i: ids) {
+        std::cout << i << ", ";
+    }
+    std::cout << std::endl;
+#endif  // SUPPORT_DEBUG
+}
+
 #if defined(SUPPORT_DEBUG)
 void UConstant::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
 void UFcn::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
@@ -34,9 +44,9 @@ void UGain::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
 void UInput::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
 void UIntegrator::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
 void UNoise::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
-void UOutput::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
-void UProduct::Print_DebugInfo(unsigned int n) { std::cout << _ingain[n] << std::endl; }
-void USum::Print_DebugInfo(unsigned int n) { std::cout << _ingain[n] << std::endl; }
+void UOutput::Print_DebugInfo(unsigned int n) { std::cout << "  gain:" << _ingain << std::endl; }
+void UProduct::Print_DebugInfo(unsigned int n) { std::cout << "  gain:" << _ingain[n] << std::endl; }
+void USum::Print_DebugInfo(unsigned int n) { std::cout << "  gain:" << _ingain[n] << std::endl; }
 void UTransportDelay::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
 void UUnitDelay::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}
 void UZOH::Print_DebugInfo(unsigned int n) {std::cout<<std::endl;}

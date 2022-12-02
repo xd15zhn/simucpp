@@ -224,7 +224,7 @@ bool MFcnMISO::Initialize() {
     PUnitModule childPort;
     for (uint i=0; i<_size.r; ++i) {
         for (uint j=0; j<_size.c; ++j) {
-            _misoy[i*_size.c+j]->Set_Function([&](double *u){
+            _misoy[i*_size.c+j]->Set_Function([=](double *u){
                 uint cntmat = 0;
                 zhnmat::Mat *mats = new zhnmat::Mat[_nexts.size()];
                 for (uint n = 0; n < _nexts.size(); n++) {
