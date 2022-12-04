@@ -136,9 +136,9 @@ private:
     void Add_Module(const PMatModule m);
 
     // Build connection of Endpoint modules.
-    void Build_Connection(std::vector<int> &ids);
+    void Build_Connection(std::vector<uint> &ids);
     // Print connection of current Endpoint module. Used to debug algebraic loop.
-    void Print_Connection(std::vector<int> &ids);
+    void Print_Connection(std::vector<uint> &ids);
     // Print all modules and their connections.
     void Print_Modules();
 
@@ -146,7 +146,7 @@ private:
     double _H, _endtime;
 
     // Number of total modules, INTEGRATOR/UNITDELAY/OUTPUT modules.
-    int _cntM, _cntI, _cntD, _cntO;
+    uint _cntM, _cntI, _cntD, _cntO;
 
     // Parameters for 4-order runge-kutta algorithm.
     double *_ode4K[4];
@@ -166,7 +166,7 @@ private:
     // @_discIDs: Its name is "_allIDs" in previous version. Itis used to make
     //  sure that every modules will update only once in every simulation step,
     //  and it will be reused as discrete ids after building sequence table.
-    std::vector<std::vector<int>> _integIDs, _delayIDs, _outIDs;
+    std::vector<std::vector<uint>> _integIDs, _delayIDs, _outIDs;
     std::vector<int> _discIDs;
 
     DISCRETE_VARIABLES();  // See public member function "Set_SampleTime".

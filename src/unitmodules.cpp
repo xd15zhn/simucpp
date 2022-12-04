@@ -17,7 +17,7 @@ int UConstant::Self_Check() const { return 0; }
 void UConstant::Module_Update(double time) {}
 void UConstant::Module_Reset() {}
 int UConstant::Get_childCnt() const { return 0; }
-PUnitModule UConstant::Get_child(unsigned int n) const { return nullptr; }
+PUnitModule UConstant::Get_child(uint n) const { return nullptr; }
 void UConstant::connect(const PUnitModule m) { TRACELOG(LOG_WARNING, "UConstant: cannot add child modules."); }
 void UConstant::Set_OutValue(double v) { _outvalue=v; };
 UConstant::UConstant(Simulator *sim, std::string name): UnitModule(sim, name)
@@ -36,7 +36,7 @@ void UFcn::Set_Enable(bool enable) { _enable=enable; }
 void UFcn::Set_Function(std::function<double(double)> function) { _f=function; }
 void UFcn::Module_Reset() {}
 int UFcn::Get_childCnt() const { return 1; }
-PUnitModule UFcn::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
+PUnitModule UFcn::Get_child(uint n) const { return n==0?_next:nullptr; }
 void UFcn::connect(const PUnitModule m) { _next=m;_enable=true; }
 UFcn::UFcn(Simulator *sim, std::string name): UnitModule(sim, name)
 {
@@ -92,9 +92,9 @@ void UFcnMISO::Module_Update(double time)
     _outvalue = _f(param);
     delete[] param;
 }
-PUnitModule UFcnMISO::Get_child(unsigned int n) const
+PUnitModule UFcnMISO::Get_child(uint n) const
 {
-    if (n >= (unsigned int)_next.size())
+    if (n >= (uint)_next.size())
         return nullptr;
     return _next[n];
 }
@@ -103,13 +103,13 @@ void UFcnMISO::connect(const PUnitModule m)
     _next.push_back(m);
     _enable = true;
 }
-void UFcnMISO::connect2(const PUnitModule m, unsigned int n)
+void UFcnMISO::connect2(const PUnitModule m, uint n)
 {
     if (n>=_next.size()) TRACELOG(LOG_FATAL, "Simucpp internal error: reconnect.");
     if (_next[n]!=nullptr) TRACELOG(LOG_FATAL, "Simucpp internal error: reconnect.");
     _next[n] = m;
 }
-void UFcnMISO::disconnect(unsigned int n)
+void UFcnMISO::disconnect(uint n)
 {
     if (n>=(int)_next.size()) TRACELOG(LOG_FATAL, "Simucpp internal error: disconnect.");
     _next[n] = nullptr;
@@ -125,7 +125,7 @@ void UGain::Set_Enable(bool enable) { _enable=enable; }
 void UGain::Set_Gain(double gain) { _gain=gain; }
 void UGain::Module_Reset() {}
 int UGain::Get_childCnt() const { return 1; }
-PUnitModule UGain::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
+PUnitModule UGain::Get_child(uint n) const { return n==0?_next:nullptr; }
 void UGain::connect(const PUnitModule m) { _next=m;_enable=true; }
 UGain::UGain(Simulator *sim, std::string name): UnitModule(sim, name)
 {
@@ -153,7 +153,7 @@ UInput::~UInput() { _data.clear();_f=nullptr; }
 double UInput::Get_OutValue() const { return _outvalue; }
 void UInput::Set_Enable(bool enable) { _enable=enable; }
 int UInput::Get_childCnt() const { return 0; }
-PUnitModule UInput::Get_child(unsigned int n) const { return nullptr; }
+PUnitModule UInput::Get_child(uint n) const { return nullptr; }
 void UInput::connect(const PUnitModule m) { TRACELOG(LOG_WARNING, "UInput: cannot add child modules."); }
 void UInput::Set_Function(std::function<double(double)> function) { _f=function; }
 void UInput::Set_InputData(const vecdble &data) { _data=data; }
@@ -212,7 +212,7 @@ void UIntegrator::Set_InitialValue(double value) { _outvalue=_iv=value; }
 void UIntegrator::Module_Update(double time) {}
 void UIntegrator::Module_Reset() { _outvalue=_iv; }
 int UIntegrator::Get_childCnt() const { return 1; }
-PUnitModule UIntegrator::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
+PUnitModule UIntegrator::Get_child(uint n) const { return n==0?_next:nullptr; }
 void UIntegrator::connect(const PUnitModule m) { _next=m;_enable=true; }
 UIntegrator::UIntegrator(Simulator *sim, std::string name): UnitModule(sim, name)
 {
@@ -237,7 +237,7 @@ void UNoise::Set_Enable(bool enable) { _enable=enable; }
 int UNoise::Self_Check() const { return 0; }
 void UNoise::Module_Reset() { _outvalue=0;_ltn=-_T; }
 int UNoise::Get_childCnt() const { return 0; }
-PUnitModule UNoise::Get_child(unsigned int n) const { return nullptr; }
+PUnitModule UNoise::Get_child(uint n) const { return nullptr; }
 void UNoise::connect(const PUnitModule m) { TRACELOG(LOG_WARNING, "UNoise: cannot add child modules."); }
 void UNoise::Set_Mean(double mean) { _mean=mean; }
 void UNoise::Set_Variance(double var) { _var=var; }
@@ -270,7 +270,7 @@ double UOutput::Get_OutValue() const { return _outvalue; }
 void UOutput::Set_Enable(bool enable) { _enable=enable; }
 void UOutput::Module_Reset() { _values.clear();_outvalue=0;_ltn=-_T; }
 int UOutput::Get_childCnt() const { return 1; }
-PUnitModule UOutput::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
+PUnitModule UOutput::Get_child(uint n) const { return n==0?_next:nullptr; }
 void UOutput::connect(const PUnitModule m) { _next=m;_enable=true; }
 vecdble& UOutput::Get_StoredData() { return _values; }
 void UOutput::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
@@ -347,9 +347,9 @@ void UProduct::Module_Update(double time)
         ans *= _ingain[i] * _next[i]->Get_OutValue();
     _outvalue = ans;
 }
-PUnitModule UProduct::Get_child(unsigned int n) const
+PUnitModule UProduct::Get_child(uint n) const
 {
-    if (n >= (unsigned int)_next.size())
+    if (n >= (uint)_next.size())
         return nullptr;
     return _next[n];
 }
@@ -359,13 +359,13 @@ void UProduct::connect(const PUnitModule m)
     _ingain.push_back(1);
     _enable = true;
 }
-void UProduct::connect2(const PUnitModule m, unsigned int n)
+void UProduct::connect2(const PUnitModule m, uint n)
 {
     if (n>=_next.size()) TRACELOG(LOG_FATAL, "Simucpp: internal error: reconnect.");
     if (_next[n]!=nullptr) TRACELOG(LOG_FATAL, "Simucpp: internal error: reconnect.");
     _next[n] = m;
 }
-void UProduct::disconnect(unsigned int n)
+void UProduct::disconnect(uint n)
 {
     if (n>=(int)_next.size()) TRACELOG(LOG_FATAL, "Simucpp: internal error: disconnect.");
     _next[n] = nullptr;
@@ -418,9 +418,9 @@ void USum::Module_Update(double time)
         ans += _ingain[i] * _next[i]->Get_OutValue();
     _outvalue = ans;
 }
-PUnitModule USum::Get_child(unsigned int n) const
+PUnitModule USum::Get_child(uint n) const
 {
-    if (n >= (unsigned int)_next.size())
+    if (n >= (uint)_next.size())
         return nullptr;
     return _next[n];
 }
@@ -430,14 +430,14 @@ void USum::connect(const PUnitModule m)
     _ingain.push_back(1);
     _enable = true;
 }
-void USum::connect2(const PUnitModule m, unsigned int n)
+void USum::connect2(const PUnitModule m, uint n)
 {
     if (n<0) TRACELOG(LOG_FATAL, "internal error: reconnect.");
     if (n>=0) TRACELOG(LOG_FATAL, "internal error: reconnect.");
     if (_next[n]!=nullptr) TRACELOG(LOG_FATAL, "internal error: reconnect.");
     _next[n] = m;
 }
-void USum::disconnect(unsigned int n)
+void USum::disconnect(uint n)
 {
     if (n>=(int)_next.size()) TRACELOG(LOG_FATAL, "internal error: disconnect.");
     _next[n] = nullptr;
@@ -452,7 +452,7 @@ double UTransportDelay::Get_OutValue() const { return _outvalue; }
 void UTransportDelay::Set_Enable(bool enable) { _enable=enable; }
 void UTransportDelay::Set_InitialValue(double value) { _outvalue=_iv=value; }
 int UTransportDelay::Get_childCnt() const { return 1; }
-PUnitModule UTransportDelay::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
+PUnitModule UTransportDelay::Get_child(uint n) const { return n==0?_next:nullptr; }
 void UTransportDelay::connect(const PUnitModule m) { _next=m;_enable=true; }
 UTransportDelay::UTransportDelay(Simulator *sim, std::string name): UnitModule(sim, name)
 {
@@ -511,7 +511,7 @@ void UUnitDelay::Set_Enable(bool enable) { _enable=enable; }
 void UUnitDelay::Set_InitialValue(double value) { _outvalue=_lv=_iv=value; }
 void UUnitDelay::Module_Reset() { _outvalue=_lv=_iv; }
 int UUnitDelay::Get_childCnt() const { return 1; }
-PUnitModule UUnitDelay::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
+PUnitModule UUnitDelay::Get_child(uint n) const { return n==0?_next:nullptr; }
 void UUnitDelay::connect(const PUnitModule m) { _next=m;_enable=true; }
 void UUnitDelay::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 UUnitDelay::UUnitDelay(Simulator *sim, std::string name): UnitModule(sim, name)
@@ -547,7 +547,7 @@ double UZOH::Get_OutValue() const { return _outvalue; }
 void UZOH::Set_Enable(bool enable) { _enable=enable; }
 void UZOH::Module_Reset() { _outvalue=0;_ltn=-_T; }
 int UZOH::Get_childCnt() const { return 1; }
-PUnitModule UZOH::Get_child(unsigned int n) const { return n==0?_next:nullptr; }
+PUnitModule UZOH::Get_child(uint n) const { return n==0?_next:nullptr; }
 void UZOH::connect(const PUnitModule m) { _next=m;_enable=true; }
 void UZOH::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 UZOH::UZOH(Simulator *sim, std::string name): UnitModule(sim, name)

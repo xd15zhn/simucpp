@@ -40,12 +40,12 @@ enum DIVERGENCE_MODE {
 };
 
 
-/**********************
-The bus between two matrix modules has "row" and "column" properties.
-It should be noticed that the cases between using BusSize as "size" and "point" is different.
-For example, a bus with 3 rows and 4 columns has points from (0,0) to (2,3).
-Its implementation is in file `matmodules.cpp`.
-**********************/
+/**
+ * @brief The bus between two matrix modules has "row" and "column" properties.  
+ * It should be noticed that the cases between using BusSize as "size" and "point" is different.
+ * For example, a bus with 3 rows and 4 columns has points from (0,0) to (2,3).
+ * Its implementation is in file `matmodules.cpp`.
+ */
 class BusSize {
 public:
     BusSize(uint row=0, uint col=0);
@@ -61,9 +61,9 @@ public:
 };
 
 
-/**********************
-Base class of every unit modules.
-**********************/
+/**
+ * @brief Base class of every unit modules.
+ */
 class UnitModule
 {
     friend class Simulator;
@@ -115,9 +115,9 @@ private:
 };
 
 
-/**********************
-Base class of every matrix(state) modules.
-**********************/
+/**
+ * @brief Base class of every matrix(state) modules.
+ */
 class MatModule
 {
     friend class Simulator;
@@ -149,9 +149,9 @@ private:
 };
 
 
-/**********************
-Base class of every pack(combination) modules.
-**********************/
+/**
+ * @brief Base class of every pack(combination) modules.
+ */
 class PackModule
 {
     friend class Simulator;

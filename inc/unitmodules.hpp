@@ -23,17 +23,17 @@ NAMESPACE_SIMUCPP_L
         virtual void Module_Update(double time) override; \
         virtual void Module_Reset() override; \
         virtual int Get_childCnt() const override; \
-        virtual PUnitModule Get_child(unsigned int n=0) const override; \
+        virtual PUnitModule Get_child(uint n=0) const override; \
         virtual void connect(const PUnitModule m) override; \
-        virtual void Print_DebugInfo(unsigned int n) override
+        virtual void Print_DebugInfo(uint n) override
 typedef std::vector<double>  vecdble;
 
 
 /**********************
-CONSTANT module.(cnst)
-User can use INPUT module instead, and this module is added for convenience.
-It outputs a constant value.
-**********************/
+ * CONSTANT module.(cnst)  
+ * User can use INPUT module instead, and this module is added for convenience.  
+ * It outputs a constant value.
+ *********************/
 class UConstant: public UnitModule {
     UNITMODULE_VIRTUAL(UConstant, cnst);
 public:
@@ -44,8 +44,8 @@ private:
 
 
 /**********************
-FCN module.(fcn)
-**********************/
+ * FCN module.(fcn)
+ *********************/
 class UFcn: public UnitModule {
     UNITMODULE_VIRTUAL(UFcn, fcn);
 public:
@@ -58,17 +58,17 @@ private:
 
 
 /**********************
-FCNMISO module.(miso)
-This module is similar to FCN module but it has multiple input ports.
-**********************/
+ * @brief module.(miso)  
+ * This module is similar to FCN module but it has multiple input ports.
+ *********************/
 class UFcnMISO: public UnitModule {
     UNITMODULE_VIRTUAL(UFcnMISO, miso);
 public:
     // Set the function. param "inparam" is an array, which represents all the input values.
     void Set_Function(std::function<double(double*)> function);
 private:
-    void connect2(const PUnitModule m, unsigned int n=0);
-    void disconnect(unsigned int n=0);
+    void connect2(const PUnitModule m, uint n=0);
+    void disconnect(uint n=0);
     double _outvalue;
     std::function<double(double*)> _f=nullptr;
     std::vector<PUnitModule> _next;
@@ -205,8 +205,8 @@ public:
     // Set the input gain of current connection, or the connection specified by param "port".
     void Set_InputGain(double inputgain, int port=-1);
 private:
-    void connect2(const PUnitModule m, unsigned int n=0);
-    void disconnect(unsigned int n=0);
+    void connect2(const PUnitModule m, uint n=0);
+    void disconnect(uint n=0);
     double _outvalue;
     std::vector<PUnitModule> _next;
     std::vector<double> _ingain;
@@ -226,8 +226,8 @@ public:
     void Set_InputGain(double inputgain, int port=-1);
     void Set_Redundant(bool rdnt=true);
 private:
-    void connect2(const PUnitModule m, unsigned int n=0);
-    void disconnect(unsigned int n=0);
+    void connect2(const PUnitModule m, uint n=0);
+    void disconnect(uint n=0);
     double _outvalue;
     std::vector<PUnitModule> _next;
     std::vector<double> _ingain;

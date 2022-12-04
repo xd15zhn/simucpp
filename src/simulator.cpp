@@ -15,8 +15,8 @@ enum {
     FLAG_REDUNDANT    = 0x08,   // Clear to delete redundant modules
 } SimulatorFlags;
 
-bool Find_vector(std::vector<int>& data, int x) {
-    std::vector<int>::iterator iter = std::find(data.begin(), data.end(), x);
+bool Find_vector(std::vector<uint>& data, int x) {
+    std::vector<uint>::iterator iter = std::find(data.begin(), data.end(), x);
     return iter != data.end();
 }
 
@@ -50,18 +50,18 @@ void Simulator::Add_Module(const PUnitModule m) {
     _modules.push_back(m);
     if (typeid(*m) == typeid(UIntegrator)){
         _integrators.push_back((PUIntegrator)m);
-        _integIDs.push_back(std::vector<int>{_cntM});
+        _integIDs.push_back(std::vector<uint>{_cntM});
         _discIDs.push_back(_cntM);
         _outref.push_back(m->Get_OutValue());
     }
     else if (typeid(*m) == typeid(UOutput)){
         _outputs.push_back((PUOutput)m);
-        _outIDs.push_back(std::vector<int>{_cntM});
+        _outIDs.push_back(std::vector<uint>{_cntM});
         _discIDs.push_back(_cntM);
     }
     else if (typeid(*m) == typeid(UUnitDelay)){
         _unitdelays.push_back((PUUnitDelay)m);
-        _delayIDs.push_back(std::vector<int>{_cntM});
+        _delayIDs.push_back(std::vector<uint>{_cntM});
         _discIDs.push_back(_cntM);
     }
     _cntM++;
@@ -266,9 +266,9 @@ The input is a sequence table and has only one element, and this function
  build the connection accroding to the modules' children modules and add
  them to that sequence table and return it.
 **********************/
-void Simulator::Build_Connection(std::vector<int> &ids) {
-    std::stack<int> idq;  // ids in stack
-    std::vector<int> idqv;  // compare in idq
+void Simulator::Build_Connection(std::vector<uint> &ids) {
+    std::stack<uint> idq;  // ids in stack
+    std::vector<uint> idqv;  // compare in idq
     int id;  // id of child module
     int curid;  // id of module in top of stack
     bool equal = false;  // if repetitive id detected
