@@ -146,7 +146,7 @@ public:
     //  in every sample points.
     void Set_SampleTime(double time=-1);
 private:
-    DISCRETE_VARIABLES();
+    DISCRETE_VARIABLES;
     double _outvalue;
     double _mean, _var;
 };
@@ -177,7 +177,7 @@ public:
     void Set_MaxDataStorage(int n=-1);
 
 private:
-    DISCRETE_VARIABLES();
+    DISCRETE_VARIABLES;
 
     // Stored data.
     std::vector<double> _values;
@@ -268,7 +268,7 @@ public:
     // Set the sample time. Default 1.
     void Set_SampleTime(double time=1);
 private:
-    DISCRETE_VARIABLES();
+    DISCRETE_VARIABLES;
     void Output_Update(double time);
     double _outvalue;
     // previous value, initial value.
@@ -286,7 +286,7 @@ public:
     // Set the sample time. Default 1.
     void Set_SampleTime(double time);
 private:
-    DISCRETE_VARIABLES();
+    DISCRETE_VARIABLES;
     double _outvalue;
     PUnitModule _next;
 };

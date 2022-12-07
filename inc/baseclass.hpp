@@ -7,7 +7,7 @@ This file contains some base class definitions.
 #include <string>
 #define NAMESPACE_SIMUCPP_L                  namespace simucpp {
 #define NAMESPACE_SIMUCPP_R                  }
-#define DISCRETE_VARIABLES() \
+#define DISCRETE_VARIABLES \
     double _T, _ltn
 NAMESPACE_SIMUCPP_L
 

@@ -169,7 +169,7 @@ private:
     std::vector<std::vector<uint>> _integIDs, _delayIDs, _outIDs;
     std::vector<int> _discIDs;
 
-    DISCRETE_VARIABLES();  // See public member function "Set_SampleTime".
+    DISCRETE_VARIABLES;  // See public member function "Set_SampleTime".
     double _t;  // See public member function "Set_t" and "Get_t".
     std::vector<double> _tvec;
     int _divmode;  // See public member function "Set_DivergenceCheckMode".
