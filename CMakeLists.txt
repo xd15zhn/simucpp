@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(simucpp VERSION 2.1.5)
+project(simucpp VERSION 2.1.6)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -15,7 +15,6 @@ set(SIMUCPP_SOURCES
     ${PROJECT_SOURCE_DIR}/src/matmodules.cpp
     ${PROJECT_SOURCE_DIR}/src/simulator.cpp
     ${PROJECT_SOURCE_DIR}/src/connector.cpp
-    ${PROJECT_SOURCE_DIR}/src/debugs.cpp
 )
 
 if (WIN32)

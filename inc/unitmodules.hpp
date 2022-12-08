@@ -24,8 +24,7 @@ NAMESPACE_SIMUCPP_L
         virtual void Module_Reset() override; \
         virtual int Get_childCnt() const override; \
         virtual PUnitModule Get_child(uint n=0) const override; \
-        virtual void connect(const PUnitModule m) override; \
-        virtual void Print_DebugInfo(uint n) override
+        virtual void connect(const PUnitModule m) override;
 typedef std::vector<double>  vecdble;
 
 

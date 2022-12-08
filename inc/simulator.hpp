@@ -137,8 +137,6 @@ private:
 
     // Build connection of Endpoint modules.
     void Build_Connection(std::vector<uint> &ids);
-    // Print connection of current Endpoint module. Used to debug algebraic loop.
-    void Print_Connection(std::vector<uint> &ids);
     // Print all modules and their connections.
     void Print_Modules();
 
@@ -154,9 +152,21 @@ private:
     // Temporarily save output value of every integrator.
     std::vector<double> _outref;
 
-    // Pointers to every modules which belongs to this simulator.
+    // Pointers to every unit modules which belongs to this simulator.
     std::vector<PUnitModule> _modules;
+    // Pointers to every mat modules which belongs to this simulator.
+    // Mat modules will be broke up during initialization.
     std::vector<PMatModule> _matmodules;
+
+    // 3 kinds of pointers below are pointers to endpoint modules.
+    // The reason why they should exist is they all have some private members or
+    //  member functions that different to others and should be treated distunguishly.
+    // "_integrators" has private member variations "_outvalue"
+    //  which will be called in "Simulate_OneStep()".
+    // "_outputs" has private member variations "_values"
+    //  which will be called in "Plot()".
+    // "_unitdelays" has private member functions "Output_Update()"
+    //  which will be called in "Simulate_OneStep()".
     std::vector<PUIntegrator> _integrators;
     std::vector<PUOutput> _outputs;
     std::vector<PUUnitDelay> _unitdelays;

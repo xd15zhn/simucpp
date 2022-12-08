@@ -20,6 +20,16 @@ bool Find_vector(std::vector<uint>& data, int x) {
     return iter != data.end();
 }
 
+void Print_Connection(std::vector<uint> &ids) {
+#if defined(SUPPORT_DEBUG)
+    std::cout << "Sequence table: ";
+    for (int i: ids) {
+        std::cout << i << ", ";
+    }
+    std::cout << std::endl;
+#endif  // SUPPORT_DEBUG
+}
+
 /**********************
 **********************/
 Simulator::Simulator(double endtime) {
@@ -357,6 +367,35 @@ void Simulator::Plot() {
 #else
     TRACELOG(LOG_WARNING, "Simucpp: You didn't add library \"matplotlibcpp\" for plotting.");
 #endif
+}
+/**********************
+Print connection information.
+**********************/
+void Simulator::Print_Modules() {
+#if defined(SUPPORT_DEBUG)
+    using namespace std;
+    int childcnt;
+    PUnitModule bm;  // pointer to child module
+    cout << "Model structure print start." << endl;
+    for (PUnitModule m: _modules) {
+        cout << "name:" << m->_name << "  id:" << m->_id << "  type:" << typeid(*m).name() << endl;
+        for (int i=0; i<m->Get_childCnt(); ++i) {
+            bm = m->Get_child(i);
+            cout << "    name:" << bm->_name << "  id:" << bm->_id;
+            if (typeid(*m) == typeid(UOutput))
+                std::cout << "  gain:" << PUOutput(m)->_ingain << std::endl;
+            else if (typeid(*m) == typeid(UProduct))
+                std::cout << "  gain:" << PUProduct(m)->_ingain[i] << std::endl;
+            else if (typeid(*m) == typeid(USum))
+                std::cout << "  gain:" << PUProduct(m)->_ingain[i] << std::endl;
+            else
+                std::cout << std::endl;
+        }
+    }
+    cout << "Model structure print finished." << endl;
+#else
+    TRACELOG(LOG_WARNING, "Simulator debug: You didn't add debug functions.");
+#endif  // SUPPORT_DEBUG
 }
 
 

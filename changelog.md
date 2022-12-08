@@ -18,3 +18,7 @@
 ## V2.1.5
 - [baseclass.hpp/unitmodules.hpp] CHANGED: 部分注释适配doxygen。
 - [baseclass.hpp/unitmodules.cpp/hpp] CHANGED: 部分int类型改为uint。
+
+## V2.1.6
+- [unitmodules.cpp/hpp] DELETED: `Print_DebugInfo`.改为指针类型强制转换。
+- [simulator.cpp/hpp] CHANGED: `Print_Connection`改为局部函数.

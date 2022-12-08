@@ -104,10 +104,6 @@ private:
     // Connect the output port of "m" to the input port of this module.
     virtual void connect(PUnitModule m) = 0;
 
-    // Print every module's debug information in Simulator::Print_Modules()
-    //  "SUPPORT_DEBUG" required.
-    virtual void Print_DebugInfo(unsigned int n) = 0;
-
     // ID of this module, which will be used as modules' subscript index,
     //  so it should start at 0, and its default value is -1,
     //  which implies that it does not belong to any simulator temporarily.
