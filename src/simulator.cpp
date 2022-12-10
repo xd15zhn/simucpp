@@ -59,18 +59,14 @@ void Simulator::Add_Module(const PUnitModule m) {
     m->_id = _cntM;
     _modules.push_back(m);
     if (typeid(*m) == typeid(UIntegrator)){
-        _integrators.push_back((PUIntegrator)m);
         _integIDs.push_back(std::vector<uint>{_cntM});
         _discIDs.push_back(_cntM);
-        _outref.push_back(m->Get_OutValue());
     }
     else if (typeid(*m) == typeid(UOutput)){
-        _outputs.push_back((PUOutput)m);
         _outIDs.push_back(std::vector<uint>{_cntM});
         _discIDs.push_back(_cntM);
     }
     else if (typeid(*m) == typeid(UUnitDelay)){
-        _unitdelays.push_back((PUUnitDelay)m);
         _delayIDs.push_back(std::vector<uint>{_cntM});
         _discIDs.push_back(_cntM);
     }
@@ -124,23 +120,6 @@ void Simulator::Initialize(bool print) {
             "Errcode: %d", _modules[i]->_name.c_str(), errcode);
     }
     TRACELOG(LOG_DEBUG, "Simucpp: Module self check completed.");
-
-    /* Delete redundant connections of SUM module */
-    if (!(_status & FLAG_REDUNDANT)) {
-        for(int i=_cntM-1; i>=0; --i){
-            if (_modules[i]==nullptr) continue;
-            bm = _modules[i];
-            if (typeid(*bm) != typeid(USum)) continue;
-            USum *mdl = (USum*)bm;
-            if (mdl->_rdnt) continue;
-            for (int i=mdl->_next.size()-1; i>=0; --i) {
-                if (mdl->_ingain[i]!=0) continue;
-                mdl->_ingain.erase(mdl->_ingain.begin() + i);
-                mdl->_next.erase(mdl->_next.begin() + i);
-            }
-        }
-        TRACELOG(LOG_DEBUG, "Simucpp: Delete redundant connections completed.");
-    }
     if (print) Print_Modules();
 
     /* Build sequence table */
@@ -178,13 +157,11 @@ void Simulator::Initialize(bool print) {
 
 
 /**********************
-Simulate();
-Simulate_FirstStep();
-Simulate_FinalStep();
-Simulate_OneStep();
+
 **********************/
 int Simulator::Simulate() {
     int err = 0;
+    Simulate_FirstStep();
     while (_t < _endtime-SIMUCPP_DBL_EPSILON) {
         err = Simulate_OneStep();
         if (!err) continue;
@@ -199,73 +176,79 @@ int Simulator::Simulate() {
         else if (_divmode == 4) {
             return err; }
     }
-    err = Simulate_FinalStep();
     return err;
 }
+
 int Simulator::Simulate_FirstStep() {
-    MODULE_INTEGRATOR_UPDATE();
-    MODULE_UNITDELAY_UPDATE();
-    MODULE_OUTPUT_UPDATE();
+    for(int i=0; i<_cntI; ++i){
+        _outref.push_back(PUIntegrator(_modules[_integIDs[i][0]])->_outvalue);
+        for (int j=_integIDs[i].size()-1; j>0; --j)
+            _modules[_integIDs[i][j]]->Module_Update(_t);
+        _ode4K[0][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
+    }
+    for(int i=0; i<_cntI; ++i)
+        for (int j=_integIDs[i].size()-1; j>0; --j)
+            _modules[_integIDs[i][j]]->Module_Update(_t);
+    for(int i=0; i<_cntD; ++i)
+        for (int j=_delayIDs[i].size()-1; j>=0; --j)
+            _modules[_delayIDs[i][j]]->Module_Update(_t);
+    for(int i=0; i<_cntO; ++i)
+        for (int j=_outIDs[i].size()-1; j>=0; --j)
+            _modules[_outIDs[i][j]]->Module_Update(_t);
     if (_status & FLAG_STORE) _tvec.push_back(_t);
     return 0;
 }
-int Simulator::Simulate_FinalStep() {
-    MODULE_UNITDELAY_UPDATE_OUTPUT();
-    MODULE_INTEGRATOR_UPDATE();
-    MODULE_UNITDELAY_UPDATE();
-    MODULE_OUTPUT_UPDATE();
-    if (_status & FLAG_STORE) _tvec.push_back(_t);
-    return 0;
-}
+
 int Simulator::Simulate_OneStep() {
     if ((_status & FLAG_STORE) && (_t-_ltn >= _T-SIMUCPP_DBL_EPSILON)) {
         _ltn += _T;
         _tvec.push_back(_t);
     }
-    MODULE_UNITDELAY_UPDATE_OUTPUT();
-    for(int i=0; i<_cntI; ++i){
-        _outref[i] = _integrators[i]->_outvalue;
-        for (int j=_integIDs[i].size()-1; j>0; --j)
-            _modules[_integIDs[i][j]]->Module_Update(_t);
-        _ode4K[0][i] = _integrators[i]->Get_child()->Get_OutValue();
-    }
-    MODULE_UNITDELAY_UPDATE();
-    MODULE_OUTPUT_UPDATE();
 
+    /* t = t(n)+h/2 */
     _t += _H;
     SET_DISCRETE_ENABLE(false);
     for(int i=0; i<_cntI; ++i)
-        _integrators[i]->_outvalue = _outref[i] + _H*_ode4K[0][i];
+        PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + _H*_ode4K[0][i];
     for(int i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
-        _ode4K[1][i] = _integrators[i]->Get_child()->Get_OutValue();
+        _ode4K[1][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
     for(int i=0; i<_cntI; ++i)
-        _integrators[i]->_outvalue = _outref[i] + _H*_ode4K[1][i];
+        PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + _H*_ode4K[1][i];
     for(int i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
-        _ode4K[2][i] = _integrators[i]->Get_child()->Get_OutValue();
+        _ode4K[2][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
 
+    /* t = t(n)+h */
     _t += _H;
     for(int i=0; i<_cntI; ++i)
-        _integrators[i]->_outvalue = _outref[i] + (_H+_H)*_ode4K[2][i];
+        PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + (_H+_H)*_ode4K[2][i];
     for(int i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
-        _ode4K[3][i] = _integrators[i]->Get_child()->Get_OutValue();
+        _ode4K[3][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
     for(int i=0; i<_cntI; ++i)
-        _integrators[i]->_outvalue = _outref[i] +
+        PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] +
             _H/3*(_ode4K[0][i] + _ode4K[1][i] + _ode4K[1][i] + _ode4K[2][i] + _ode4K[2][i] + _ode4K[3][i]);
     SET_DISCRETE_ENABLE(true);
 
-    // Convergence and divergence check
-    CHECK_CONVERGENCE(PUIntegrator, _integrators);
-    CHECK_CONVERGENCE(PUUnitDelay, _unitdelays);
-    CHECK_CONVERGENCE(PUOutput, _outputs);
+    /*  t = t(n+1) */
+    for(int i=0; i<_cntI; ++i){
+        _outref[i] = PUIntegrator(_modules[_integIDs[i][0]])->_outvalue;
+        for (int j=_integIDs[i].size()-1; j>0; --j)
+            _modules[_integIDs[i][j]]->Module_Update(_t);
+        _ode4K[0][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
+    }
+
+    /* Convergence and divergence check */
+    CHECK_CONVERGENCE(PUIntegrator, _integIDs);
+    CHECK_CONVERGENCE(PUUnitDelay, _delayIDs);
+    CHECK_CONVERGENCE(PUOutput, _outIDs);
     return 0;
 }
 
@@ -349,9 +332,11 @@ void Simulator::Plot() {
 #ifdef USE_MPLT
     if (!(_status & FLAG_STORE)) { TRACELOG(LOG_WARNING, "Simucpp: There is no data for plotting."); return; }
     TRACELOG(LOG_INFO, "Simucpp: Wait for ploting......");
-    if (_outputs.size() < 1)
+    if (_outIDs.size() < 1)
         TRACELOG(LOG_FATAL, "Simucpp plot: No output data for plot!");
-    for (PUOutput m: _outputs) {
+    PUOutput m;
+    for (uint i=0; i<_outIDs.size(); i++) {
+        m = PUOutput(_modules[_outIDs[i][0]]);
         if (!m->_store) continue;
         if (m->_values.size() < 3)
             TRACELOG(LOG_FATAL, "Simucpp plot: Module \"%s\" has too few data points to plot!"
@@ -404,9 +389,9 @@ void Simulator::Print_Modules() {
 void Simulator::Set_EnableStore(bool store) {
     if (store) _status |= FLAG_STORE;
     else _status &=~ FLAG_STORE;
-    for (PUOutput m: _outputs) m->Set_EnableStore(store);}
+    for (uint i=0; i<_outIDs.size(); i++) PUOutput(_modules[_outIDs[i][0]])->Set_EnableStore(store);}
 void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T;
-    for (PUOutput m: _outputs) m->Set_SampleTime(time); }
+    for (uint i=0; i<_outIDs.size(); i++) PUOutput(_modules[_outIDs[i][0]])->Set_SampleTime(time); }
 void Simulator::Set_t(double t) { _t = t; }
 double Simulator::Get_t() { return _t; }
 void Simulator::Set_Endtime(double t) { _endtime=t; }

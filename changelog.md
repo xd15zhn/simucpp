@@ -22,3 +22,8 @@
 ## V2.1.6
 - [unitmodules.cpp/hpp] DELETED: `Print_DebugInfo`.改为指针类型强制转换。
 - [simulator.cpp/hpp] CHANGED: `Print_Connection`改为局部函数.
+- [debugs.cpp] DELETED: 删除文件，将函数移入`simulator.cpp`.
+
+## V2.1.7
+- [simulator.cpp/hpp] DELETED: `Simulate_FinalStep`.
+- [unitmodules.cpp/hpp] DELETED: 因为没找到合适的算法，所以暂时取消删除多余模块的功能.

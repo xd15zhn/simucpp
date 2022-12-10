@@ -204,8 +204,6 @@ public:
     // Set the input gain of current connection, or the connection specified by param "port".
     void Set_InputGain(double inputgain, int port=-1);
 private:
-    void connect2(const PUnitModule m, uint n=0);
-    void disconnect(uint n=0);
     double _outvalue;
     std::vector<PUnitModule> _next;
     std::vector<double> _ingain;
@@ -225,8 +223,6 @@ public:
     void Set_InputGain(double inputgain, int port=-1);
     void Set_Redundant(bool rdnt=true);
 private:
-    void connect2(const PUnitModule m, uint n=0);
-    void disconnect(uint n=0);
     double _outvalue;
     std::vector<PUnitModule> _next;
     std::vector<double> _ingain;

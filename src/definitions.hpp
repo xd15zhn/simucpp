@@ -78,10 +78,10 @@ simulator.cpp
     for (int i: _discIDs) \
         _modules[i]->Set_Enable(x)
 #define CHECK_CONVERGENCE(x, y) \
-    for (x m: y) { \
-        if (m->_outvalue > SIMUCPP_INFINITE1) return 1; \
-        if (m->_outvalue < -SIMUCPP_INFINITE1) return 2; \
-        if (std::isnan(m->_outvalue)) return 3; \
+    for (uint i=0; i<y.size(); i++) { \
+        if (x(_modules[y[i][0]])->_outvalue > SIMUCPP_INFINITE1) return 1; \
+        if (x(_modules[y[i][0]])->_outvalue < -SIMUCPP_INFINITE1) return 2; \
+        if (std::isnan(x(_modules[y[i][0]])->_outvalue)) return 3; \
     }
 #define PRINT_CONVERGENCE(x) \
     switch (x) { \

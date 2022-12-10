@@ -359,17 +359,6 @@ void UProduct::connect(const PUnitModule m)
     _ingain.push_back(1);
     _enable = true;
 }
-void UProduct::connect2(const PUnitModule m, uint n)
-{
-    if (n>=_next.size()) TRACELOG(LOG_FATAL, "Simucpp: internal error: reconnect.");
-    if (_next[n]!=nullptr) TRACELOG(LOG_FATAL, "Simucpp: internal error: reconnect.");
-    _next[n] = m;
-}
-void UProduct::disconnect(uint n)
-{
-    if (n>=(int)_next.size()) TRACELOG(LOG_FATAL, "Simucpp: internal error: disconnect.");
-    _next[n] = nullptr;
-}
 
 
 /**********************
@@ -429,18 +418,6 @@ void USum::connect(const PUnitModule m)
     _next.push_back(m);
     _ingain.push_back(1);
     _enable = true;
-}
-void USum::connect2(const PUnitModule m, uint n)
-{
-    if (n<0) TRACELOG(LOG_FATAL, "internal error: reconnect.");
-    if (n>=0) TRACELOG(LOG_FATAL, "internal error: reconnect.");
-    if (_next[n]!=nullptr) TRACELOG(LOG_FATAL, "internal error: reconnect.");
-    _next[n] = m;
-}
-void USum::disconnect(uint n)
-{
-    if (n>=(int)_next.size()) TRACELOG(LOG_FATAL, "internal error: disconnect.");
-    _next[n] = nullptr;
 }
 
 
