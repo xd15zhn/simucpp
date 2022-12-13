@@ -78,13 +78,8 @@ protected:
     std::string _name;
     // Which simulator does this module belongs to.
     PSimulator _sim = nullptr;
-    // See private member function "Set_Enable".
-    bool _enable;
 
 private:
-    // Enable or disable this module. Mainly used for discrete modules.
-    virtual void Set_Enable(bool enable) = 0;
-
     // Self check. return 0 for everything is ok.
     virtual int Self_Check() const = 0;
 

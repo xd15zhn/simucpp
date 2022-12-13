@@ -207,7 +207,6 @@ int Simulator::Simulate_OneStep() {
 
     /* t = t(n)+h/2 */
     _t += _H;
-    SET_DISCRETE_ENABLE(false);
     for(int i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + _H*_ode4K[0][i];
     for(int i=0; i<_cntI; ++i){
@@ -235,7 +234,6 @@ int Simulator::Simulate_OneStep() {
     for(int i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] +
             _H/3*(_ode4K[0][i] + _ode4K[1][i] + _ode4K[1][i] + _ode4K[2][i] + _ode4K[2][i] + _ode4K[3][i]);
-    SET_DISCRETE_ENABLE(true);
 
     /*  t = t(n+1) */
     for(int i=0; i<_cntI; ++i){

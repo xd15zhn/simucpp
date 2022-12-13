@@ -27,3 +27,4 @@
 ## V2.1.7
 - [simulator.cpp/hpp] DELETED: `Simulate_FinalStep`.
 - [unitmodules.cpp/hpp] DELETED: 因为没找到合适的算法，所以暂时取消删除多余模块的功能.
+- [baseclass.hpp] DELETED: `Set_Enable`.

@@ -74,9 +74,6 @@ simulator.cpp
     if (x->_id==-1) TRACELOG(LOG_FATAL, #type": Module \"%s\" is not added to a simulator!", x->_name.c_str())
 #define CHECK_SIMULATOR(x, type) \
     if (x->_sim!=this) TRACELOG(LOG_FATAL, #type": Module \"%s\" is added to a wrong simulator!", x->_name.c_str())
-#define SET_DISCRETE_ENABLE(x) \
-    for (int i: _discIDs) \
-        _modules[i]->Set_Enable(x)
 #define CHECK_CONVERGENCE(x, y) \
     for (uint i=0; i<y.size(); i++) { \
         if (x(_modules[y[i][0]])->_outvalue > SIMUCPP_INFINITE1) return 1; \

@@ -7,8 +7,8 @@ C++重写simulink.
 例程 <https://gitee.com/xd15zhn/simucpp_demo>  
 博客原文 <https://gitee.com/xd15zhn/simucpp_blog>  
 
-有两个分支，master是频繁修改更新的分支，不一定可用；release是经过测试可以使用的稳定版。  
-release:稳定发布版本：V2.1.0  
+多个分支中，master是频繁修改更新的分支，不一定可用；release是经过测试可以使用的稳定版。  
+当前稳定发布版本：V2.1.6  
 
 # 依赖库
 - <https://gitee.com/xd15zhn/tracelog> (选装)

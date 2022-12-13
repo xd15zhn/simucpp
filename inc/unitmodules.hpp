@@ -18,7 +18,6 @@ NAMESPACE_SIMUCPP_L
         virtual ~classname() override; \
         virtual double Get_OutValue() const override; \
     private: \
-        virtual void Set_Enable(bool enable=false) override; \
         virtual int Self_Check() const override; \
         virtual void Module_Update(double time) override; \
         virtual void Module_Reset() override; \
