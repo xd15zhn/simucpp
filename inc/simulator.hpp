@@ -55,18 +55,18 @@ As for PackModule, default zero if port is not specified.
     //  unit module and pack module
     //  pack module and pack module
     void connectU(PUnitModule m1, PUnitModule m2);  // unit to unit
-    void connectU(PUnitModule m1, PPackModule m2, int n2);  // unit to pack
-    void connectU(PPackModule m1, int n1, PUnitModule m2);  // pack to unit
-    void connectU(PPackModule m1, int n1, PPackModule m2, int n2);  // pack to pack
+    void connectU(PUnitModule m1, PPackModule m2, uint n2);  // unit to pack
+    void connectU(PPackModule m1, uint n1, PUnitModule m2);  // pack to unit
+    void connectU(PPackModule m1, uint n1, PPackModule m2, uint n2);  // pack to pack
 
     // The following functions are used to build a bus connection between:
     //  matrix module and matrix module
     //  matrix module and pack module
     //  pack module and pack module
     void connectM(PMatModule m1, PMatModule m2);  // mat to mat
-    void connectM(PMatModule m1, PPackModule m2, int n2);  // mat to pack
-    void connectM(PPackModule m1, int n1, PMatModule m2);  // pack to mat
-    void connectM(PPackModule m1, int n1, PPackModule m2, int n2);  // pack to pack
+    void connectM(PMatModule m1, PPackModule m2, uint n2);  // mat to pack
+    void connectM(PPackModule m1, uint n1, PMatModule m2);  // pack to mat
+    void connectM(PPackModule m1, uint n1, PPackModule m2, uint n2);  // pack to pack
 
     // The following functions are used to build a single line connection between:
     //  unit module and multiplex module
@@ -76,8 +76,8 @@ As for PackModule, default zero if port is not specified.
     //  demultiplex module and multiplex module
     void connectU(PUnitModule m1, PMux m2, BusSize n2);  // unit to mux
     void connectU(PDeMux m1, BusSize n1, PUnitModule m2);  // demux to unit
-    void connectU(PPackModule m1, int n1, PMux m2, BusSize n2);  // pack to nux
-    void connectU(PDeMux m1, BusSize n1, PPackModule m2, int n2);  // demux to pack
+    void connectU(PPackModule m1, uint n1, PMux m2, BusSize n2);  // pack to nux
+    void connectU(PDeMux m1, BusSize n1, PPackModule m2, uint n2);  // demux to pack
     void connectU(PDeMux m1, BusSize n1, PMux m2, BusSize n2);  // demux to mux
 #pragma endregion connect
 
@@ -163,7 +163,7 @@ private:
     //  sure that every modules will update only once in every simulation step,
     //  and it will be reused as discrete ids after building sequence table.
     std::vector<std::vector<uint>> _integIDs, _delayIDs, _outIDs;
-    std::vector<int> _discIDs;
+    std::vector<uint> _discIDs;
 
     DISCRETE_VARIABLES;  // See public member function "Set_SampleTime".
     double _t;  // See public member function "Set_t" and "Get_t".

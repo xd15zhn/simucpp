@@ -21,7 +21,7 @@ NAMESPACE_SIMUCPP_L
         virtual int Self_Check() const override; \
         virtual void Module_Update(double time) override; \
         virtual void Module_Reset() override; \
-        virtual int Get_childCnt() const override; \
+        virtual uint Get_childCnt() const override; \
         virtual PUnitModule Get_child(uint n=0) const override; \
         virtual void connect(const PUnitModule m) override;
 typedef std::vector<double>  vecdble;
@@ -107,7 +107,7 @@ public:
     void Set_SampleTime(double time=-1);
 private:
     double _outvalue;
-    int _cnt;  // samples count. Only used when in discrete mode
+    uint _cnt;  // samples count. Only used when in discrete mode
     double _T;  // Sample time. Only used when in discrete mode
     bool _isc;  // Be in continuous mode when it's true
     std::function<double(double)> _f=nullptr;  // Input function
@@ -169,7 +169,7 @@ public:
     // all input data will be multiplied by "inputgain" before stored.
     void Set_InputGain(double inputgain=1);
 
-    // Set the maximum amount of data it can hold.
+    // Set the maximum amount of data it will store.
     // -1 for don't set a limitation.
     // If too many data was stored, then earliest data will be removed.
     void Set_MaxDataStorage(int n=-1);
@@ -182,12 +182,13 @@ private:
 
     // See public member function "Set_EnableStore".
     bool _store;
-    // _maxstorage: How many samples will it store.
+    // See public member function "Set_MaxDataStorage".
     int _maxstorage;
+    // See public member function "Set_InputGain".
+    double _ingain;
 
-    // @_outvalue: value of its latest sample point.
-    // @_ingain: See public member function "Set_InputGain".
-    double _outvalue, _ingain;
+    // value of its latest sample point.
+    double _outvalue;
 
     PUnitModule _next;
 };

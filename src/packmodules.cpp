@@ -4,10 +4,10 @@ NAMESPACE_SIMUCPP_L
 
 PackModule::PackModule(Simulator *sim, std::string name): _name(name) {};
 PackModule::~PackModule() {}
-PUnitModule PackModule::Get_InputPort(int n) const { return nullptr; }
-PUnitModule PackModule::Get_OutputPort(int n) const { return nullptr; }
-PMatModule PackModule::Get_InputBus(int n) const { return nullptr; }
-PMatModule PackModule::Get_OutputBus(int n) const { return nullptr; }
+PUnitModule PackModule::Get_InputPort(uint n) const { return nullptr; }
+PUnitModule PackModule::Get_OutputPort(uint n) const { return nullptr; }
+PMatModule PackModule::Get_InputBus(uint n) const { return nullptr; }
+PMatModule PackModule::Get_OutputBus(uint n) const { return nullptr; }
 
 /**********************
 Continuous transfer function module.
@@ -53,8 +53,8 @@ TransferFcn::~TransferFcn() {
     }
     delete[] integrators;
 }
-PUnitModule TransferFcn::Get_InputPort(int n) const { return n==0?sum1:nullptr; }
-PUnitModule TransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
+PUnitModule TransferFcn::Get_InputPort(uint n) const { return n==0?sum1:nullptr; }
+PUnitModule TransferFcn::Get_OutputPort(uint n) const { return n==0?sum2:nullptr; }
 void TransferFcn::Set_InitialValue(vecdble value) {
     if ((int)value.size()!=_order) TRACELOG(LOG_WARNING, "TransferFcn module \"%s\" accepted mismatched initial values.", _name);
     for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
@@ -107,8 +107,8 @@ void DiscreteTransferFcn::Set_SampleTime(double time) {
     for (int i=0; i<_order; ++i)
         unitdelays[i]->Set_SampleTime(time);
 }
-PUnitModule DiscreteTransferFcn::Get_InputPort(int n) const { return n==0?sum1:nullptr; }
-PUnitModule DiscreteTransferFcn::Get_OutputPort(int n) const { return n==0?sum2:nullptr; }
+PUnitModule DiscreteTransferFcn::Get_InputPort(uint n) const { return n==0?sum1:nullptr; }
+PUnitModule DiscreteTransferFcn::Get_OutputPort(uint n) const { return n==0?sum2:nullptr; }
 void DiscreteTransferFcn::Set_InitialValue(vecdble value) {
     if ((int)value.size()!=_order) TRACELOG(LOG_WARNING, "DiscreteTransferFcn module \"%s\" accepted mismatched initial values.", _name);
     for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
@@ -143,8 +143,8 @@ void DiscreteIntegrator::Set_SampleTime(double time) {
     delay1->Set_SampleTime(_T);
     zoh1->Set_SampleTime(_T);
 }
-PUnitModule DiscreteIntegrator::Get_InputPort(int n) const { return n==0?in1:nullptr; }
-PUnitModule DiscreteIntegrator::Get_OutputPort(int n) const { return n==0?delay1:nullptr; }
+PUnitModule DiscreteIntegrator::Get_InputPort(uint n) const { return n==0?in1:nullptr; }
+PUnitModule DiscreteIntegrator::Get_OutputPort(uint n) const { return n==0?delay1:nullptr; }
 
 
 #ifdef USE_ZHNMAT
@@ -169,8 +169,8 @@ StateTransFcn::StateTransFcn(Simulator *sim, const zhnmat::Mat& A, const zhnmat:
     sim->connectM(_sum1, _statex);  // x'=Ax+Bu
     sim->connectM(_statex, _gainC);  // Cx
 }
-PMatModule StateTransFcn::Get_InputBus(int n) const { return n==0?_gainB:nullptr; }
-PMatModule StateTransFcn::Get_OutputBus(int n) const { return n==0?_gainC:nullptr; }
+PMatModule StateTransFcn::Get_InputBus(uint n) const { return n==0?_gainB:nullptr; }
+PMatModule StateTransFcn::Get_OutputBus(uint n) const { return n==0?_gainC:nullptr; }
 void StateTransFcn::Set_SampleTime(double time) {
     _statex->Set_SampleTime(time);
 }
@@ -185,9 +185,9 @@ zhnmat::Mat StateTransFcn::Get_OutValue() const {
 /**********************
 Number multiplication of matrix.
 **********************/
-PUnitModule ProductScalarMatrix::Get_InputPort(int n) const { return n==0?_ugainin:nullptr; }
-PMatModule ProductScalarMatrix::Get_InputBus(int n) const { return n==0?_dmxin:nullptr; }
-PMatModule ProductScalarMatrix::Get_OutputBus(int n) const { return n==0?_mxout:nullptr; }
+PUnitModule ProductScalarMatrix::Get_InputPort(uint n) const { return n==0?_ugainin:nullptr; }
+PMatModule ProductScalarMatrix::Get_InputBus(uint n) const { return n==0?_dmxin:nullptr; }
+PMatModule ProductScalarMatrix::Get_OutputBus(uint n) const { return n==0?_mxout:nullptr; }
 ProductScalarMatrix::ProductScalarMatrix(Simulator *sim, BusSize size, std::string name)
     : PackModule(sim, name) {
     if (size<BusSize(1, 1)) return;

@@ -43,7 +43,6 @@ enum SIMUCPP_ERROR_CODE{
 #define UNITMODULE_INIT() \
     if(!sim) return; \
     sim->Add_Module(this); \
-    _enable = false; \
     _sim = sim
 
 #define DISCRETE_INITIALIZE(x) \

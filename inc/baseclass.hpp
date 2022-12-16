@@ -91,10 +91,10 @@ private:
     virtual void Module_Reset() = 0;
 
     // Return how many child modules does this module have.
-    virtual int Get_childCnt() const = 0;
+    virtual uint Get_childCnt() const = 0;
 
     // Get the pointer of this module's nth child module.
-    virtual PUnitModule Get_child(unsigned int n=0) const = 0;
+    virtual PUnitModule Get_child(uint n=0) const = 0;
 
     // Connect the output port of "m" to the input port of this module.
     virtual void connect(PUnitModule m) = 0;
@@ -155,10 +155,10 @@ protected:
 private:
     // Get nth input/output module of this PackModule.
     // It is used to build connections with other modules.
-    virtual PUnitModule Get_InputPort(int n=0) const;
-    virtual PUnitModule Get_OutputPort(int n=0) const;
-    virtual PMatModule Get_InputBus(int n=0) const;
-    virtual PMatModule Get_OutputBus(int n=0) const;
+    virtual PUnitModule Get_InputPort(uint n=0) const;
+    virtual PUnitModule Get_OutputPort(uint n=0) const;
+    virtual PMatModule Get_InputBus(uint n=0) const;
+    virtual PMatModule Get_OutputBus(uint n=0) const;
 };
 
 
