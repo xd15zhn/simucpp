@@ -143,6 +143,7 @@ INPUT module.
 **********************/
 UInput::~UInput() { _data.clear();_f=nullptr; }
 double UInput::Get_OutValue() const { return _outvalue; }
+void UInput::Set_Enable(bool enable) { _enable=enable; }
 uint UInput::Get_childCnt() const { return 0; }
 PUnitModule UInput::Get_child(uint n) const { return nullptr; }
 void UInput::connect(const PUnitModule m) { TRACELOG(LOG_WARNING, "UInput: cannot add child modules."); }
@@ -223,6 +224,7 @@ NOISE module.
 UNoise::~UNoise() {}
 double UNoise::Get_OutValue() const { return _outvalue; }
 int UNoise::Self_Check() const { return 0; }
+void UNoise::Set_Enable(bool enable) { _enable=enable; }
 void UNoise::Module_Reset() { _outvalue=0;_ltn=-_T; }
 uint UNoise::Get_childCnt() const { return 0; }
 PUnitModule UNoise::Get_child(uint n) const { return nullptr; }
@@ -495,6 +497,7 @@ ZOH module.
 **********************/
 UZOH::~UZOH() { _next=nullptr; }
 double UZOH::Get_OutValue() const { return _outvalue; }
+void UZOH::Set_Enable(bool enable) { _enable=enable; }
 void UZOH::Module_Reset() { _outvalue=0;_ltn=-_T; }
 uint UZOH::Get_childCnt() const { return 1; }
 PUnitModule UZOH::Get_child(uint n) const { return n==0?_next:nullptr; }

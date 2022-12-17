@@ -139,7 +139,7 @@ private:
     // Print all modules and their connections.
     void Print_Modules();
 
-    // Simulation step and end time.
+    // Simulation half step, simulation end time.
     double _H, _endtime;
 
     // Number of total modules, INTEGRATOR/UNITDELAY/OUTPUT modules.

@@ -19,6 +19,7 @@ NAMESPACE_SIMUCPP_L
         virtual double Get_OutValue() const override; \
     private: \
         virtual int Self_Check() const override; \
+        virtual void Set_Enable(bool enable=false) override; \
         virtual void Module_Update(double time) override; \
         virtual void Module_Reset() override; \
         virtual uint Get_childCnt() const override; \
@@ -110,6 +111,7 @@ private:
     uint _cnt;  // samples count. Only used when in discrete mode
     double _T;  // Sample time. Only used when in discrete mode
     bool _isc;  // Be in continuous mode when it's true
+    bool _enable;  // Used in discrete mode
     std::function<double(double)> _f=nullptr;  // Input function
     std::vector<double> _data;  // Input data
 };
@@ -145,6 +147,7 @@ public:
     void Set_SampleTime(double time=-1);
 private:
     DISCRETE_VARIABLES;
+    bool _enable;
     double _outvalue;
     double _mean, _var;
 };
@@ -282,6 +285,7 @@ public:
     void Set_SampleTime(double time);
 private:
     DISCRETE_VARIABLES;
+    bool _enable;
     double _outvalue;
     PUnitModule _next;
 };

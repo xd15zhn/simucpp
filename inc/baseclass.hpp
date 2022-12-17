@@ -83,6 +83,9 @@ private:
     // Self check. return 0 for everything is ok.
     virtual int Self_Check() const = 0;
 
+    // Enable or disable this module. Mainly used for discrete modules.
+    virtual void Set_Enable(bool enable) = 0;
+
     // Calculate output value for every simulation step.
     virtual void Module_Update(double time) = 0;
 
