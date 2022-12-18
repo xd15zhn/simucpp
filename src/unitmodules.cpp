@@ -13,6 +13,7 @@ CONSTANT module.
 UConstant::~UConstant() {}
 double UConstant::Get_OutValue() const { return _outvalue; }
 int UConstant::Self_Check() const { return 0; }
+void UConstant::Set_Enable(bool enable) {}
 void UConstant::Module_Update(double time) {}
 void UConstant::Module_Reset() {}
 uint UConstant::Get_childCnt() const { return 0; }
@@ -31,6 +32,7 @@ FCN module.
 **********************/
 UFcn::~UFcn() { _f=nullptr;_next=nullptr; }
 double UFcn::Get_OutValue() const { return _outvalue; }
+void UFcn::Set_Enable(bool enable) {}
 void UFcn::Set_Function(std::function<double(double)> function) { _f=function; }
 void UFcn::Module_Reset() {}
 uint UFcn::Get_childCnt() const { return 1; }
@@ -59,6 +61,7 @@ FCNMISO module.
 **********************/
 UFcnMISO::~UFcnMISO() { _f=nullptr;_next.clear(); }
 double UFcnMISO::Get_OutValue() const { return _outvalue; }
+void UFcnMISO::Set_Enable(bool enable) {}
 void UFcnMISO::Set_Function(std::function<double(double*)> function) { _f=function; }
 void UFcnMISO::Module_Reset() {}
 uint UFcnMISO::Get_childCnt() const { return _next.size(); }
@@ -115,6 +118,7 @@ GAIN module.
 **********************/
 UGain::~UGain() { _next=nullptr; }
 double UGain::Get_OutValue() const { return _outvalue; }
+void UGain::Set_Enable(bool enable) {}
 void UGain::Set_Gain(double gain) { _gain=gain; }
 void UGain::Module_Reset() {}
 uint UGain::Get_childCnt() const { return 1; }
@@ -198,6 +202,7 @@ INTEGRATOR module.
 **********************/
 UIntegrator::~UIntegrator() { _next=nullptr; }
 double UIntegrator::Get_OutValue() const { return _outvalue; }
+void UIntegrator::Set_Enable(bool enable) {}
 void UIntegrator::Set_InitialValue(double value) { _outvalue=_iv=value; }
 void UIntegrator::Module_Update(double time) {}
 void UIntegrator::Module_Reset() { _outvalue=_iv; }
@@ -255,6 +260,7 @@ OUTPUT module.
 **********************/
 UOutput::~UOutput() { _values.clear(); }
 double UOutput::Get_OutValue() const { return _outvalue; }
+void UOutput::Set_Enable(bool enable) {}
 void UOutput::Module_Reset() { _values.clear();_outvalue=0;_ltn=-_T; }
 uint UOutput::Get_childCnt() const { return 1; }
 PUnitModule UOutput::Get_child(uint n) const { return n==0?_next:nullptr; }
@@ -295,6 +301,7 @@ PRODUCT module.
 **********************/
 UProduct::~UProduct() { _next.clear();_ingain.clear(); }
 double UProduct::Get_OutValue() const { return _outvalue; }
+void UProduct::Set_Enable(bool enable) {}
 void UProduct::Module_Reset() {}
 uint UProduct::Get_childCnt() const { return _next.size(); }
 UProduct::UProduct(Simulator *sim, std::string name): UnitModule(sim, name)
@@ -349,6 +356,7 @@ SUM module.
 **********************/
 USum::~USum() { _next.clear();_ingain.clear(); }
 double USum::Get_OutValue() const { return _outvalue; }
+void USum::Set_Enable(bool enable) {}
 void USum::Module_Reset() {}
 uint USum::Get_childCnt() const { return _next.size(); }
 void USum::Set_Redundant(bool rdnt) { _rdnt=rdnt; };
@@ -406,6 +414,7 @@ TRANSPORTDELAY module.
 **********************/
 UTransportDelay::~UTransportDelay() { _next=nullptr; }
 double UTransportDelay::Get_OutValue() const { return _outvalue; }
+void UTransportDelay::Set_Enable(bool enable) {}
 void UTransportDelay::Set_InitialValue(double value) { _outvalue=_iv=value; }
 uint UTransportDelay::Get_childCnt() const { return 1; }
 PUnitModule UTransportDelay::Get_child(uint n) const { return n==0?_next:nullptr; }
@@ -462,6 +471,7 @@ UNITDELAY module.
 **********************/
 UUnitDelay::~UUnitDelay() { _next=nullptr; }
 double UUnitDelay::Get_OutValue() const { return _outvalue; }
+void UUnitDelay::Set_Enable(bool enable) {}
 void UUnitDelay::Set_InitialValue(double value) { _outvalue=_lv=_iv=value; }
 void UUnitDelay::Module_Reset() { _outvalue=_lv=_iv; }
 uint UUnitDelay::Get_childCnt() const { return 1; }
