@@ -149,7 +149,7 @@ private:
     double *_ode4K[4];
 
     // Temporarily save output value of every integrator.
-    std::vector<double> _outref;
+    double *_outref;
 
     // Pointers to every unit modules which belongs to this simulator.
     std::vector<PUnitModule> _modules;

@@ -15,7 +15,7 @@ enum {
     FLAG_REDUNDANT    = 0x08,   // Clear to delete redundant modules
 } SimulatorFlags;
 
-bool Find_vector(std::vector<uint>& data, int x) {
+bool Find_vector(std::vector<uint>& data, uint x) {
     std::vector<uint>::iterator iter = std::find(data.begin(), data.end(), x);
     return iter != data.end();
 }
@@ -23,7 +23,7 @@ bool Find_vector(std::vector<uint>& data, int x) {
 void Print_Connection(std::vector<uint> &ids) {
 #if defined(SUPPORT_DEBUG)
     std::cout << "Sequence table: ";
-    for (int i: ids) {
+    for (uint i: ids) {
         std::cout << i << ", ";
     }
     std::cout << std::endl;
@@ -56,20 +56,14 @@ Add a unit module to this simulator, and divide it into Direct-Through modules
 **********************/
 void Simulator::Add_Module(const PUnitModule m) {
     CHECK_NULLPTR(m, UnitModule);
-    m->_id = _cntM;
+    m->_id = int(_cntM);
     _modules.push_back(m);
-    if (typeid(*m) == typeid(UIntegrator)){
+    if (typeid(*m) == typeid(UIntegrator))
         _integIDs.push_back(std::vector<uint>{_cntM});
-        _discIDs.push_back(_cntM);
-    }
-    else if (typeid(*m) == typeid(UOutput)){
+    else if (typeid(*m) == typeid(UOutput))
         _outIDs.push_back(std::vector<uint>{_cntM});
-        _discIDs.push_back(_cntM);
-    }
-    else if (typeid(*m) == typeid(UUnitDelay)){
+    else if (typeid(*m) == typeid(UUnitDelay))
         _delayIDs.push_back(std::vector<uint>{_cntM});
-        _discIDs.push_back(_cntM);
-    }
     _cntM++;
 }
 void Simulator::Add_Module(const PMatModule m) {
@@ -93,12 +87,11 @@ void Simulator::Initialize(bool print) {
     }
     TRACELOG(LOG_INFO, "Simulator: Initialization start.");
     int errcode;
-    PUnitModule bm, curm;
 
     /* Decompose and destroy every matrix modules */
     bool isInit;
-    int cntdown;
-    for (cntdown=_matmodules.size()+1; cntdown>0; --cntdown) {
+    int cntdown = int(_matmodules.size())+1;
+    for (; cntdown>0; --cntdown) {
         isInit = true;
         for (PMatModule m: _matmodules)
             isInit &= m->Initialize();
@@ -113,8 +106,12 @@ void Simulator::Initialize(bool print) {
 
     /* Self check procedure of unit modules and simulators */
     for(int i=0; i<4; ++i) _ode4K[i] = new double[_cntI];
+    _outref = new double[_cntI];
+    for (uint i=0; i<_cntI; i++) {
+        _outref[i] = PUIntegrator(_modules[_integIDs[i][0]])->_outvalue;
+    }
     if (_H<=0) TRACELOG(LOG_FATAL, "Simucpp: Simulation step must be greator than zero!");
-    for(int i=0; i<_cntM; ++i) {
+    for(uint i=0; i<_cntM; ++i) {
         errcode = _modules[i]->Self_Check();
         if (errcode!=0) TRACELOG(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!"
             "Errcode: %d", _modules[i]->_name.c_str(), errcode);
@@ -123,11 +120,11 @@ void Simulator::Initialize(bool print) {
     if (print) Print_Modules();
 
     /* Build sequence table */
-    for(int i=0; i<_cntI; ++i)
+    for(uint i=0; i<_cntI; ++i)
         Build_Connection(_integIDs[i]);
-    for(int i=0; i<_cntD; ++i)
+    for(uint i=0; i<_cntD; ++i)
         Build_Connection(_delayIDs[i]);
-    for(int i=0; i<_cntO; ++i)
+    for(uint i=0; i<_cntO; ++i)
         Build_Connection(_outIDs[i]);
     if (_cntO==0) TRACELOG(LOG_WARNING, "Simucpp: You haven't add any OUTPUT modules.");
     TRACELOG(LOG_DEBUG, "Simucpp: Build sequence table completed.");
@@ -136,14 +133,15 @@ void Simulator::Initialize(bool print) {
     _discIDs.clear();
     for (PUnitModule m: _modules) {
         if (m==nullptr) continue;
-        if (typeid(*m) == typeid(UZOH))
-            _discIDs.push_back(m->_id);
-        else if (typeid(*m) == typeid(UInput))
+        if (typeid(*m) == typeid(UZOH)) {
+            _discIDs.push_back(uint(m->_id));
+        } else if (typeid(*m) == typeid(UInput)) {
             if (!(PUInput(m)->_isc))
-                _discIDs.push_back(m->_id);
-        else if (typeid(*m) == typeid(UNoise))
+                _discIDs.push_back(uint(m->_id));
+        } else if (typeid(*m) == typeid(UNoise)) {
             if (PUNoise(m)->_T > 0)
-                _discIDs.push_back(m->_id);
+                _discIDs.push_back(uint(m->_id));
+        }
     }
     TRACELOG(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
     TRACELOG(LOG_INFO, "Simulator: Initialization successfully completed.");
@@ -174,20 +172,19 @@ int Simulator::Simulate() {
 }
 
 int Simulator::Simulate_FirstStep() {
-    for(int i=0; i<_cntI; ++i){
-        _outref.push_back(PUIntegrator(_modules[_integIDs[i][0]])->_outvalue);
-        for (int j=_integIDs[i].size()-1; j>0; --j)
+    for(uint i=0; i<_cntI; ++i){
+        for (int j=int(_integIDs[i].size())-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[0][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
-    for(int i=0; i<_cntI; ++i)
-        for (int j=_integIDs[i].size()-1; j>0; --j)
+    for(uint i=0; i<_cntI; ++i)
+        for (int j=int(_integIDs[i].size())-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
-    for(int i=0; i<_cntD; ++i)
-        for (int j=_delayIDs[i].size()-1; j>=0; --j)
+    for(uint i=0; i<_cntD; ++i)
+        for (int j=int(_delayIDs[i].size())-1; j>=0; --j)
             _modules[_delayIDs[i][j]]->Module_Update(_t);
-    for(int i=0; i<_cntO; ++i)
-        for (int j=_outIDs[i].size()-1; j>=0; --j)
+    for(uint i=0; i<_cntO; ++i)
+        for (int j=int(_outIDs[i].size())-1; j>=0; --j)
             _modules[_outIDs[i][j]]->Module_Update(_t);
     if (_status & FLAG_STORE) _tvec.push_back(_t);
     return 0;
@@ -200,35 +197,35 @@ int Simulator::Simulate_OneStep() {
     }
 
     /*  t = t(n) */
-    for(int i=0; i<_cntD; ++i)
+    for(uint i=0; i<_cntD; ++i)
         PUUnitDelay(_modules[_integIDs[i][0]])->Output_Update(_t);
-    for(int i=0; i<_cntI; ++i) {
+    for(uint i=0; i<_cntI; ++i) {
         _outref[i] = PUIntegrator(_modules[_integIDs[i][0]])->_outvalue;
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[0][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
-    for(int i=0; i<_cntD; ++i)
+    for(uint i=0; i<_cntD; ++i)
         for (int j=_delayIDs[i].size()-1; j>=0; --j)
             _modules[_delayIDs[i][j]]->Module_Update(_t);
-    for(int i=0; i<_cntO; ++i)
+    for(uint i=0; i<_cntO; ++i)
         for (int j=_outIDs[i].size()-1; j>=0; --j)
             _modules[_outIDs[i][j]]->Module_Update(_t);
 
     /* t = t(n)+h/2 */
     _t += _H;
-    for (int i: _discIDs)
+    for (uint i: _discIDs)
         _modules[i]->Set_Enable(false);
-    for(int i=0; i<_cntI; ++i)
+    for(uint i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + _H*_ode4K[0][i];
-    for(int i=0; i<_cntI; ++i){
+    for(uint i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[1][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
-    for(int i=0; i<_cntI; ++i)
+    for(uint i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + _H*_ode4K[1][i];
-    for(int i=0; i<_cntI; ++i){
+    for(uint i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[2][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
@@ -236,17 +233,17 @@ int Simulator::Simulate_OneStep() {
 
     /* t = t(n)+h */
     _t += _H;
-    for(int i=0; i<_cntI; ++i)
+    for(uint i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + (_H+_H)*_ode4K[2][i];
-    for(int i=0; i<_cntI; ++i){
+    for(uint i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[3][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
-    for(int i=0; i<_cntI; ++i)
+    for(uint i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] +
             _H/3.0*(_ode4K[0][i] + _ode4K[1][i]+_ode4K[1][i] + _ode4K[2][i]+_ode4K[2][i] + _ode4K[3][i]);
-    for (int i: _discIDs)
+    for (uint i: _discIDs)
         _modules[i]->Set_Enable(true);
 
     /* Convergence and divergence check */
@@ -264,6 +261,9 @@ The input is a sequence table and has only one element, and this function
  them to that sequence table and return it.
 **********************/
 void Simulator::Build_Connection(std::vector<uint> &ids) {
+    if (Find_vector(_discIDs, ids[0]))
+        TRACELOG(LOG_FATAL, "Simucpp: internal error: connection.");
+    _discIDs.push_back(ids[0]);
     std::stack<uint> idq;  // ids in stack
     std::vector<uint> idqv;  // compare in idq
     int id;  // id of child module
@@ -280,7 +280,7 @@ void Simulator::Build_Connection(std::vector<uint> &ids) {
             if (id<0) TRACELOG(LOG_FATAL, "Simucpp: internal error: connection.");
             if (typeid(*bm) == typeid(UIntegrator)) continue;
             if (typeid(*bm) == typeid(UUnitDelay)) continue;
-            for (int j=0; j<(int)_discIDs.size(); ++j){
+            for (uint j=0; j<_discIDs.size(); ++j){
                 if (_discIDs[j] != id) continue;
                 std::stack<int> agq;  // ids in another stack
                 agq.push(id);
@@ -299,11 +299,11 @@ void Simulator::Build_Connection(std::vector<uint> &ids) {
                         agq.push(agid);
                     }
                 }
-                if (Find_vector(ids, id)) {
+                if (Find_vector(ids, (uint)id)) {
                     std::remove(std::begin(ids), std::end(ids), id);
                     ids.pop_back(); }
-                else {
-                    equal = true; }
+                else
+                    equal = true;
                 break;
             }
             if (equal) {
@@ -363,7 +363,6 @@ Print connection information.
 void Simulator::Print_Modules() {
 #if defined(SUPPORT_DEBUG)
     using namespace std;
-    int childcnt;
     PUnitModule bm;  // pointer to child module
     cout << "Model structure print start." << endl;
     for (PUnitModule m: _modules) {
