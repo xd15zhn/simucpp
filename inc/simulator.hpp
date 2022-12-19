@@ -87,16 +87,22 @@ As for PackModule, default zero if port is not specified.
     void Initialize(bool print=false);
 
     // Reset the parameters of all modules to those before simulation,
-    // especially those modules whose values will change during simulation.
+    //  especially those modules whose values will change during simulation.
     // This function doesn't need to be called for the first simulation,
-    // and it should be called from the second and subsequent simulation.
+    //  and it should be called from the second and subsequent simulation.
     void Simulation_Reset();
 
-    // Run a simulation once or step by step.
-    // They return 0 for everything is normal and others for some errors.
+    // Run a complete simulation once.
+    // It calls `Simulate_OneStep` but doesn't call `Simulate_FirstStep`
+    //  and `Simulate_FinalStep`.
     int Simulate();
-    int Simulate_FirstStep();
+    // Run a simulation step.
     int Simulate_OneStep();
+    // Call it if values at time 0 are required.
+    void Simulate_FirstStep();
+    // After calling `Simulate`, values of every Integrators are right but others are not.
+    // Call it if values of other modules except Integrators are required.
+    void Simulate_FinalStep();
 
     // Whether to store simulation data to memory.
     // If set false, then function "Simulator::Plot()" won't be executed.
@@ -136,7 +142,7 @@ private:
 
     // Build connection of Endpoint modules.
     void Build_Connection(std::vector<uint> &ids);
-    // Print all modules and their connections.
+    // Print connection information of every modules and their connections.
     void Print_Modules();
 
     // Simulation half step, simulation end time.
@@ -147,8 +153,7 @@ private:
 
     // Parameters for 4-order runge-kutta algorithm.
     double *_ode4K[4];
-
-    // Temporarily save output value of every integrator.
+    // Temporarily save output value of every Integrators (y_n).
     double *_outref;
 
     // Pointers to every unit modules which belongs to this simulator.

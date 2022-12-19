@@ -30,3 +30,6 @@
 - [baseclass.hpp] DELETED: `Set_Enable`.
 - CHANGED: 所有应该使用uint的int类型改为uint。
 - [simulator.cpp/hpp] CHANGED: `_outref`改为数组.
+
+## V2.1.8
+- [simulator.cpp/hpp] ADDED: `Simulate_FinalStep`.

@@ -15,11 +15,15 @@ enum {
     FLAG_REDUNDANT    = 0x08,   // Clear to delete redundant modules
 } SimulatorFlags;
 
+/**********************
+**********************/
 bool Find_vector(std::vector<uint>& data, uint x) {
     std::vector<uint>::iterator iter = std::find(data.begin(), data.end(), x);
     return iter != data.end();
 }
 
+/**********************
+**********************/
 void Print_Connection(std::vector<uint> &ids) {
 #if defined(SUPPORT_DEBUG)
     std::cout << "Sequence table: ";
@@ -150,7 +154,6 @@ void Simulator::Initialize(bool print) {
 
 
 /**********************
-
 **********************/
 int Simulator::Simulate() {
     int err = 0;
@@ -170,10 +173,11 @@ int Simulator::Simulate() {
     }
     return err;
 }
-
-int Simulator::Simulate_FirstStep() {
-    for(uint i=0; i<_cntI; ++i){
-        for (int j=int(_integIDs[i].size())-1; j>0; --j)
+/**********************
+**********************/
+void Simulator::Simulate_FirstStep() {
+    for(int i=0; i<_cntI; ++i){
+        for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[0][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
@@ -187,9 +191,25 @@ int Simulator::Simulate_FirstStep() {
         for (int j=int(_outIDs[i].size())-1; j>=0; --j)
             _modules[_outIDs[i][j]]->Module_Update(_t);
     if (_status & FLAG_STORE) _tvec.push_back(_t);
-    return 0;
 }
-
+/**********************
+**********************/
+void Simulator::Simulate_FinalStep() {
+    for(int i=0; i<_cntD; ++i)
+        PUUnitDelay(_modules[_integIDs[i][0]])->Output_Update(_t);
+    for(int i=0; i<_cntI; ++i)
+        for (int j=_integIDs[i].size()-1; j>0; --j)
+            _modules[_integIDs[i][j]]->Module_Update(_t);
+    for(int i=0; i<_cntD; ++i)
+        for (int j=_delayIDs[i].size()-1; j>=0; --j)
+            _modules[_delayIDs[i][j]]->Module_Update(_t);
+    for(int i=0; i<_cntO; ++i)
+        for (int j=_outIDs[i].size()-1; j>=0; --j)
+            _modules[_outIDs[i][j]]->Module_Update(_t);
+    if (_status & FLAG_STORE) _tvec.push_back(_t);
+}
+/**********************
+**********************/
 int Simulator::Simulate_OneStep() {
     if ((_status & FLAG_STORE) && (_t-_ltn >= _T-SIMUCPP_DBL_EPSILON)) {
         _ltn += _T;
@@ -318,7 +338,6 @@ void Simulator::Build_Connection(std::vector<uint> &ids) {
 
 
 /**********************
-Reset all modules of this simulation to their initial state.
 **********************/
 void Simulator::Simulation_Reset() {
      _t = 0; _tvec.clear();
@@ -330,7 +349,6 @@ void Simulator::Simulation_Reset() {
     _status &=~ FLAG_DIVERGED;
 }
 /**********************
-Use data stored in OUTPUT modules to draw a waveform.
 **********************/
 void Simulator::Plot() {
 #ifdef USE_MPLT
@@ -358,7 +376,6 @@ void Simulator::Plot() {
 #endif
 }
 /**********************
-Print connection information.
 **********************/
 void Simulator::Print_Modules() {
 #if defined(SUPPORT_DEBUG)
