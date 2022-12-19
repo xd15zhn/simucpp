@@ -218,7 +218,7 @@ int Simulator::Simulate_OneStep() {
 
     /*  t = t(n) */
     for(uint i=0; i<_cntD; ++i)
-        PUUnitDelay(_modules[_integIDs[i][0]])->Output_Update(_t);
+        PUUnitDelay(_modules[_delayIDs[i][0]])->Output_Update(_t);
     for(uint i=0; i<_cntI; ++i) {
         _outref[i] = PUIntegrator(_modules[_integIDs[i][0]])->_outvalue;
         for (int j=_integIDs[i].size()-1; j>0; --j)

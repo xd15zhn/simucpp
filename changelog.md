@@ -33,3 +33,5 @@
 
 ## V2.1.8
 - [simulator.cpp/hpp] ADDED: `Simulate_FinalStep`.
+- [matmodules.hpp] CHANGED.
+- [baseclass.hpp] CHANGED.

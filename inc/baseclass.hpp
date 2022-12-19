@@ -48,7 +48,7 @@ enum DIVERGENCE_MODE {
  */
 class BusSize {
 public:
-    BusSize(uint row=0, uint col=0);
+    explicit BusSize(uint row=0, uint col=0);
     BusSize(const BusSize& size);
     BusSize& operator=(const BusSize& size);
     bool operator==(const BusSize &size) const;

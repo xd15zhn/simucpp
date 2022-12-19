@@ -12,8 +12,8 @@ NAMESPACE_SIMUCPP_L
         virtual u8 Get_State() const override; \
         virtual PUnitModule Get_OutputPort(BusSize size) const override; \
         virtual BusSize Get_OutputBusSize() const override; \
-        virtual void connect(const PMatModule m) override; \
     private: \
+        virtual void connect(const PMatModule m) override; \
         BusSize _size
 
 
@@ -26,8 +26,8 @@ class Mux: public MatModule {
     MATMODULE_VIRTUAL(Mux);
 public:
     Mux(Simulator *sim=nullptr, BusSize size=BusSize(), std::string name="mx");
-    void connect(PUnitModule m, BusSize n2=BusSize());
 private:
+    void connect(PUnitModule m, BusSize n2=BusSize());
     PUnitModule *_next=nullptr;
 };
 
@@ -35,8 +35,8 @@ class DeMux: public MatModule {
     MATMODULE_VIRTUAL(DeMux);
 public:
     DeMux(Simulator *sim=nullptr, BusSize size=BusSize(), std::string name="dmx");
-    void connect(PUnitModule m, BusSize n2=BusSize());
 private:
+    void connect(PUnitModule m, BusSize n2=BusSize());
     PMatModule _next;
     PUGain *_gains=nullptr;
 };
