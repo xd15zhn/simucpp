@@ -111,7 +111,7 @@ private:
     uint _cnt;  // samples count. Only used when in discrete mode
     double _T;  // Sample time. Only used when in discrete mode
     bool _isc;  // Be in continuous mode when it's true
-    bool _enable;  // Used in discrete mode
+    bool _enable=true;  // Used in discrete mode
     std::function<double(double)> _f=nullptr;  // Input function
     std::vector<double> _data;  // Input data
 };
@@ -147,7 +147,7 @@ public:
     void Set_SampleTime(double time=-1);
 private:
     DISCRETE_VARIABLES;
-    bool _enable;
+    bool _enable=true;
     double _outvalue;
     double _mean, _var;
 };
@@ -285,7 +285,7 @@ public:
     void Set_SampleTime(double time);
 private:
     DISCRETE_VARIABLES;
-    bool _enable;
+    bool _enable=true;
     double _outvalue;
     PUnitModule _next;
 };

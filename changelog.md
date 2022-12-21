@@ -35,3 +35,7 @@
 - [simulator.cpp/hpp] ADDED: `Simulate_FinalStep`.
 - [matmodules.hpp] CHANGED.
 - [baseclass.hpp] CHANGED.
+
+## V2.1.9
+- [unitmodules.hpp] DELETED: 默认自定义函数.
+- [unitmodules.hpp] BUGFIXED: `_enabled`.
