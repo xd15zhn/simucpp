@@ -105,7 +105,7 @@ private:
     PMux _mxout=nullptr;
     PUProduct *_prd=nullptr;
 };
-#endif
+#endif  // USE_ZHNMAT
 
 
 NAMESPACE_SIMUCPP_R

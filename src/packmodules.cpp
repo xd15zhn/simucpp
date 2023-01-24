@@ -212,6 +212,6 @@ zhnmat::Mat ProductScalarMatrix::Get_OutValue() {
             ans.set(i, j, _prd[i*_size.c+j]->Get_OutValue());
     return ans;
 }
-#endif
+#endif  // USE_ZHNMAT
 
 NAMESPACE_SIMUCPP_R

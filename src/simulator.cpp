@@ -64,10 +64,10 @@ void Simulator::Add_Module(const PUnitModule m) {
     _modules.push_back(m);
     if (typeid(*m) == typeid(UIntegrator))
         _integIDs.push_back(std::vector<uint>{_cntM});
-    else if (typeid(*m) == typeid(UOutput))
-        _outIDs.push_back(std::vector<uint>{_cntM});
     else if (typeid(*m) == typeid(UUnitDelay))
         _delayIDs.push_back(std::vector<uint>{_cntM});
+    else if (typeid(*m) == typeid(UOutput))
+        _outIDs.push_back(std::vector<uint>{_cntM});
     _cntM++;
 }
 void Simulator::Add_Module(const PMatModule m) {
@@ -104,8 +104,8 @@ void Simulator::Initialize(bool print) {
     if (cntdown<0) TRACELOG(LOG_FATAL, "Simucpp: Matrix modules initialization failed!");
     _matmodules.clear();
     _cntI = _integIDs.size();
-    _cntO = _outIDs.size();
     _cntD = _delayIDs.size();
+    _cntO = _outIDs.size();
     TRACELOG(LOG_DEBUG, "Simucpp: Matrix modules initialization completed.");
 
     /* Self check procedure of unit modules and simulators */

@@ -33,6 +33,8 @@ C++重写simulink.
 - [降维状态观测器的直观理解与仿真](https://blog.csdn.net/qq_34288751/article/details/123061451)
 - [导弹追踪问题](https://blog.csdn.net/qq_34288751/article/details/122725421)
 - [水流冲重物问题](https://blog.csdn.net/qq_34288751/article/details/123159543)
+- [小推力地火转移轨道设计与优化](https://github.com/xd15zhn/paperlowthrust/releases/download/V1.0/main.pdf)
+- [火星气动捕获的建模、制导与仿真](https://github.com/xd15zhn/paperaerocapture/releases/download/V1.0/default.pdf)
 
 # 版本说明
 当前为V2版本，V1版本已废弃，代码见<https://gitee.com/xd15zhn/simucpp-V1>。次版本号的发布版在release中。
