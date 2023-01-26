@@ -180,38 +180,6 @@ void StateTransFcn::Set_InitialValue(const zhnmat::Mat& value) {
 zhnmat::Mat StateTransFcn::Get_OutValue() const {
     return _statex->Get_OutValue();
 }
-
-
-/**********************
-Number multiplication of matrix.
-**********************/
-PUnitModule ProductScalarMatrix::Get_InputPort(uint n) const { return n==0?_ugainin:nullptr; }
-PMatModule ProductScalarMatrix::Get_InputBus(uint n) const { return n==0?_dmxin:nullptr; }
-PMatModule ProductScalarMatrix::Get_OutputBus(uint n) const { return n==0?_mxout:nullptr; }
-ProductScalarMatrix::ProductScalarMatrix(Simulator *sim, BusSize size, std::string name)
-    : PackModule(sim, name) {
-    if (size<BusSize(1, 1)) return;
-    _size = size;
-    _ugainin = new UGain(sim, "_dmxin");
-    _dmxin = new DeMux(sim, _size, "dmxin");
-    _mxout = new Mux(sim, _size, "mxout");
-    _prd = new PUProduct[_size.r*_size.c];
-    for (uint i = 0; i < _size.r; i++) {
-        for (uint j = 0; j < _size.c; j++) {
-            _prd[i*_size.c+j] = new UProduct(sim, _name+"_prd"+std::to_string(i)+"_"+std::to_string(j));
-            sim->connectU(_dmxin, BusSize(i, j), _prd[i*_size.c+j]);
-            sim->connectU(_ugainin, _prd[i*_size.c+j]);
-            sim->connectU(_prd[i*_size.c+j], _mxout, BusSize(i, j));
-        }
-    }
-}
-zhnmat::Mat ProductScalarMatrix::Get_OutValue() {
-    zhnmat::Mat ans(_size.r, _size.c);
-    for (uint i = 0; i < _size.r; i++)
-        for (uint j = 0; j < _size.c; j++)
-            ans.set(i, j, _prd[i*_size.c+j]->Get_OutValue());
-    return ans;
-}
 #endif  // USE_ZHNMAT
 
 NAMESPACE_SIMUCPP_R

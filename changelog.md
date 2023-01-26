@@ -39,3 +39,8 @@
 ## V2.1.9
 - [unitmodules.hpp] DELETED: 默认自定义函数.
 - [unitmodules.hpp] BUGFIXED: `_enabled`.
+
+## V2.1.10
+- [matmodules.hpp] BUGFIXED: `MStateSpace::_next`.
+- [matmodules.cpp/hpp] DELETED: `MProduct`,`MTranspose`.
+- [packmodules.hpp] DELETED: `ProductScalarMatrix`.

@@ -83,30 +83,7 @@ private:
     MGain *_gainC=nullptr;
     MSum *_sum1=nullptr;
 };
-
-
-/**********************
-Number multiplication of matrix.
-Y=kX
-**********************/
-class ProductScalarMatrix: public PackModule
-{
-public:
-    ProductScalarMatrix(Simulator *sim, BusSize size, std::string name="psv");
-    virtual ~ProductScalarMatrix() {}
-    virtual PUnitModule Get_InputPort(uint n=0) const override;
-    virtual PMatModule Get_InputBus(uint n=0) const override;
-    virtual PMatModule Get_OutputBus(uint n=0) const override;
-    zhnmat::Mat Get_OutValue();
-private:
-    BusSize _size;
-    PUnitModule _ugainin=nullptr;
-    PDeMux _dmxin=nullptr;
-    PMux _mxout=nullptr;
-    PUProduct *_prd=nullptr;
-};
 #endif  // USE_ZHNMAT
-
 
 NAMESPACE_SIMUCPP_R
 #endif  // PACKMODULES_H

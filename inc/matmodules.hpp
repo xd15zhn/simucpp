@@ -57,10 +57,10 @@ public:
     zhnmat::Mat Get_OutValue();
 private:
     bool _isc;
-    PMatModule _next;
+    PMatModule _next=nullptr;
     // Only one of the following two member variables can be a non null pointer.
-    PUIntegrator *_intx = nullptr;
-    PUUnitDelay *_udx = nullptr;
+    PUIntegrator *_intx=nullptr;
+    PUUnitDelay *_udx=nullptr;
 };
 
 
@@ -103,10 +103,10 @@ class MGain: public MatModule {
 public:
     MGain(Simulator *sim, const zhnmat::Mat& G, bool isleft=true, std::string name="mgn");
 private:
-    PUSum *_sumy = nullptr;  // Output port
+    PUSum *_sumy=nullptr;  // Output port
     zhnmat::Mat _G;
     bool _isleft;
-    PMatModule _next = nullptr;
+    PMatModule _next=nullptr;
 };
 
 
@@ -118,23 +118,8 @@ class MOutput: public MatModule {
 public:
     MOutput(Simulator *sim, std::string name="mout");
 private:
-    PUOutput *_out = nullptr;
-    PMatModule _next = nullptr;
-};
-
-
-/*********************
-matrix Product module.
-**********************/
-class MProduct: public MatModule {
-    MATMODULE_VIRTUAL(MProduct);
-public:
-    MProduct(Simulator *sim, std::string name="mprd");
-private:
-    PUFcnMISO *_misoy = nullptr;
-    PMatModule _nextL = nullptr;
-    PMatModule _nextR = nullptr;
-    u8 _portcnt;
+    PUOutput *_out=nullptr;
+    PMatModule _next=nullptr;
 };
 
 
@@ -147,24 +132,12 @@ public:
     MSum(Simulator *sim, std::string name="msum");
     void Set_InputGain(double inputgain, int port=-1);
 private:
-    PUSum *_sumy = nullptr;
+    PUSum *_sumy=nullptr;
     std::vector<double> _ingain;
     std::vector<PMatModule> _nexts;
 };
 
 
-/*********************
-matrix Transpose module.
-**********************/
-class MTranspose: public MatModule {
-    MATMODULE_VIRTUAL(MTranspose);
-public:
-    MTranspose(Simulator *sim, std::string name="mtsp");
-private:
-    PMatModule _next = nullptr;
-};
-
-
 NAMESPACE_SIMUCPP_R
-#endif
+#endif  // USE_ZHNMAT
 #endif  // MATMODULES_H
