@@ -78,11 +78,10 @@ void Simulator::Add_Module(const PMatModule m) {
 
 /**********************
 Simulation initialization procedure, which includes the following steps:
- - Self check procedure of unit modules and simulators;
- - Delete redundant connections.
- - Build sequence table.
- - Index for discrete modules.
- - Initialize a data file for storage.
+- Decompose and destroy every matrix modules
+- Self check procedure of unit modules and simulators
+- Build sequence table
+- Index for discrete modules
 **********************/
 void Simulator::Initialize(bool print) {
     if (_status & FLAG_INITIALIZED) {

@@ -99,7 +99,7 @@ class UInput: public UnitModule {
 public:
     // User should provide an input function when it's in continuous mode.
     void Set_Function(std::function<double(double)> function);
-    // User should provide sample dataswhen it's in discrete mode.
+    // User should provide sample datas when it's in discrete mode.
     void Set_InputData(const std::vector<double>& data);
     // Set if this module is in continuous mode.
     void Set_Continuous(bool isContinuous=true);
@@ -125,7 +125,8 @@ class UIntegrator: public UnitModule {
 public:
     void Set_InitialValue(double value=0);
 private:
-    double _outvalue, _iv;
+    double _outvalue;
+    double _iv;  // initial value
     PUnitModule _next;
 };
 
@@ -247,9 +248,9 @@ public:
     //  computer simulation is discrete.
     void Set_DelayTime(double time);
 private:
-    double _outvalue, _iv;
-    // delay times and previous values
-    std::vector<double> _lv;
+    double _outvalue;
+    double _iv;  // initial value
+    std::vector<double> _lv;  // delay times and previous values
     double _simstep, _nexttime;
     PUnitModule _next;
 };
@@ -269,8 +270,7 @@ private:
     DISCRETE_VARIABLES;
     void Output_Update(double time);
     double _outvalue;
-    // previous value, initial value.
-    double _lv, _iv;
+    double _lv, _iv;  // previous value, initial value
     PUnitModule _next;
 };
 
