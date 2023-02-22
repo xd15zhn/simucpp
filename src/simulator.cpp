@@ -176,31 +176,31 @@ int Simulator::Simulate() {
 /**********************
 **********************/
 void Simulator::Simulate_FirstStep() {
-    for(int i=0; i<_cntI; ++i)
+    for(uint i=0; i<_cntI; ++i)
         for (int j=int(_integIDs[i].size())-1; j>0; --j)
-            _modules[_integIDs[i][j]]->Module_Update(_t);
-    for(int i=0; i<_cntD; ++i)
+            _modules[_integIDs[i][uint(j)]]->Module_Update(_t);
+    for(uint i=0; i<_cntD; ++i)
         for (int j=int(_delayIDs[i].size())-1; j>=0; --j)
-            _modules[_delayIDs[i][j]]->Module_Update(_t);
-    for(int i=0; i<_cntO; ++i)
+            _modules[_delayIDs[i][uint(j)]]->Module_Update(_t);
+    for(uint i=0; i<_cntO; ++i)
         for (int j=int(_outIDs[i].size())-1; j>=0; --j)
-            _modules[_outIDs[i][j]]->Module_Update(_t);
+            _modules[_outIDs[i][uint(j)]]->Module_Update(_t);
     if (_status & FLAG_STORE) _tvec.push_back(_t);
 }
 /**********************
 **********************/
 void Simulator::Simulate_FinalStep() {
-    for(int i=0; i<_cntD; ++i)
+    for(uint i=0; i<_cntD; ++i)
         PUUnitDelay(_modules[_delayIDs[i][0]])->Output_Update(_t);
-    for(int i=0; i<_cntI; ++i)
-        for (int j=_integIDs[i].size()-1; j>0; --j)
-            _modules[_integIDs[i][j]]->Module_Update(_t);
-    for(int i=0; i<_cntD; ++i)
-        for (int j=_delayIDs[i].size()-1; j>=0; --j)
-            _modules[_delayIDs[i][j]]->Module_Update(_t);
-    for(int i=0; i<_cntO; ++i)
-        for (int j=_outIDs[i].size()-1; j>=0; --j)
-            _modules[_outIDs[i][j]]->Module_Update(_t);
+    for(uint i=0; i<_cntI; ++i)
+        for (int j=int(_integIDs[i].size())-1; j>0; --j)
+            _modules[_integIDs[i][uint(j)]]->Module_Update(_t);
+    for(uint i=0; i<_cntD; ++i)
+        for (int j=int(_delayIDs[i].size())-1; j>=0; --j)
+            _modules[_delayIDs[i][uint(j)]]->Module_Update(_t);
+    for(uint i=0; i<_cntO; ++i)
+        for (int j=int(_outIDs[i].size())-1; j>=0; --j)
+            _modules[_outIDs[i][uint(j)]]->Module_Update(_t);
     if (_status & FLAG_STORE) _tvec.push_back(_t);
 }
 /**********************
@@ -216,16 +216,16 @@ int Simulator::Simulate_OneStep() {
         PUUnitDelay(_modules[_delayIDs[i][0]])->Output_Update(_t);
     for(uint i=0; i<_cntI; ++i) {
         _outref[i] = PUIntegrator(_modules[_integIDs[i][0]])->_outvalue;
-        for (int j=_integIDs[i].size()-1; j>0; --j)
-            _modules[_integIDs[i][j]]->Module_Update(_t);
+        for (int j=int(_integIDs[i].size())-1; j>0; --j)
+            _modules[_integIDs[i][uint(j)]]->Module_Update(_t);
         _ode4K[0][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
     for(uint i=0; i<_cntD; ++i)
-        for (int j=_delayIDs[i].size()-1; j>=0; --j)
-            _modules[_delayIDs[i][j]]->Module_Update(_t);
+        for (int j=int(_delayIDs[i].size())-1; j>=0; --j)
+            _modules[_delayIDs[i][uint(j)]]->Module_Update(_t);
     for(uint i=0; i<_cntO; ++i)
-        for (int j=_outIDs[i].size()-1; j>=0; --j)
-            _modules[_outIDs[i][j]]->Module_Update(_t);
+        for (int j=int(_outIDs[i].size())-1; j>=0; --j)
+            _modules[_outIDs[i][uint(j)]]->Module_Update(_t);
 
     /* t = t(n)+h/2 */
     _t += _H;
