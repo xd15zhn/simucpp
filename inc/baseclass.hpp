@@ -125,12 +125,16 @@ public:
     virtual bool Initialize() = 0;
     virtual u8 Get_State() const = 0;
 
+    // Return the pointer of inner unit module given by bus point "point" of this matrix module.
+    virtual PUnitModule Get_UnitModule(BusSize point) const = 0;
     // Return the output unit module given by bus point "size" of this matrix module.
     virtual PUnitModule Get_OutputPort(BusSize size) const = 0;
+    // Return bus size of this matrix module.
     virtual BusSize Get_OutputBusSize() const = 0;
 
     // Connect the output port of "m" to the input port of this module.
     virtual void connect(const PMatModule m) = 0;
+
 protected:
     // Name of this matrix module.
     std::string _name;
@@ -139,6 +143,7 @@ protected:
     // bit0 indicates whether the size of this module is determined
     // bit1 indicates whether child module of is connected to this module
     u8 _state=0;
+
 private:
 };
 

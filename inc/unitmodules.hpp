@@ -161,7 +161,7 @@ class UOutput: public UnitModule {
     UNITMODULE_VIRTUAL(UOutput, out);
 public:
     // Return all the stored data.
-    std::vector<double>& Get_StoredData();
+    vecdble& Get_StoredData();
 
     // How long should this module collect a sample data.
     // All samples will be collected by default.

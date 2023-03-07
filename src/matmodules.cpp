@@ -25,6 +25,7 @@ Mux module.
 **********************/
 Mux::~Mux() { delete[] _next; }
 u8 Mux::Get_State() const { return _state; }
+PUnitModule Mux::Get_UnitModule(BusSize point) const { return nullptr; }
 BusSize Mux::Get_OutputBusSize() const { return _size; }
 bool Mux::Initialize() { return true; }
 void Mux::connect(const PMatModule m) { TRACELOG(LOG_FATAL, "Simucpp: internal error: Mux."); }
@@ -49,6 +50,7 @@ DeMux module.
 **********************/
 DeMux::~DeMux() {}
 u8 DeMux::Get_State() const { return _state; }
+PUnitModule DeMux::Get_UnitModule(BusSize point) const { return nullptr; }
 BusSize DeMux::Get_OutputBusSize() const { return _size; }
 void DeMux::connect(const PMatModule m) { _next = m; }
 void DeMux::connect(const PUnitModule m, BusSize size) {
@@ -159,12 +161,18 @@ zhnmat::Mat MStateSpace::Get_OutValue() {
     }
     return ans;
 }
+PUnitModule MStateSpace::Get_UnitModule(BusSize point) const {
+    if (_isc) return _intx[point.r*_size.c+point.c];
+    else return _udx[point.r*_size.c+point.c];
+    // return _isc ? _intx[point.r*_size.c+point.c] : _udx[point.r*_size.c+point.c];
+}
 
 
 /*********************
 matrix Constant module.
 **********************/
 MConstant::~MConstant() {}
+PUnitModule MConstant::Get_UnitModule(BusSize point) const { return _ucst[point.r*_size.c+point.c]; }
 BusSize MConstant::Get_OutputBusSize() const { return _size; }
 u8 MConstant::Get_State() const { return _state; }
 void MConstant::connect(const PMatModule m) {}
@@ -197,6 +205,7 @@ void MConstant::Set_OutValue(zhnmat::Mat A) {
 matrix FcnMISO module.
 **********************/
 MFcnMISO::~MFcnMISO() {}
+PUnitModule MFcnMISO::Get_UnitModule(BusSize point) const { return _misoy[point.r*_size.c+point.c]; }
 BusSize MFcnMISO::Get_OutputBusSize() const { return _size; }
 u8 MFcnMISO::Get_State() const { return _state; }
 void MFcnMISO::connect(const PMatModule m) { _nexts.push_back(m); }
@@ -266,6 +275,7 @@ zhnmat::Mat MFcnMISO::Get_OutValue() {
 matrix Gain module.
 **********************/
 MGain::~MGain() {}
+PUnitModule MGain::Get_UnitModule(BusSize point) const { return _sumy[point.r*_size.c+point.c]; }
 BusSize MGain::Get_OutputBusSize() const { return _size; }
 u8 MGain::Get_State() const { return _state; }
 void MGain::connect(const PMatModule m) { _next=m; }
@@ -319,6 +329,7 @@ matrix Output module.
 MOutput::~MOutput() {}
 BusSize MOutput::Get_OutputBusSize() const { return _size; }
 u8 MOutput::Get_State() const { return _state; }
+PUnitModule MOutput::Get_UnitModule(BusSize point) const { return _out[point.r*_size.c+point.c]; }
 PUnitModule MOutput::Get_OutputPort(BusSize size) const { return nullptr; }
 void MOutput::connect(const PMatModule m) { _next=m; }
 MOutput::MOutput(Simulator *sim, std::string name): MatModule(sim, name) {
@@ -345,6 +356,7 @@ bool MOutput::Initialize() {
 matrix Sum module.
 **********************/
 MSum::~MSum() {}
+PUnitModule MSum::Get_UnitModule(BusSize point) const { return _sumy[point.r*_size.c+point.c]; }
 BusSize MSum::Get_OutputBusSize() const { return _size; }
 u8 MSum::Get_State() const { return _state; }
 void MSum::connect(const PMatModule m) { _nexts.push_back(m); _ingain.push_back(1); }

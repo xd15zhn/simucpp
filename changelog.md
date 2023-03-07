@@ -44,3 +44,7 @@
 - [matmodules.hpp] BUGFIXED: `MStateSpace::_next`.
 - [matmodules.cpp/hpp] DELETED: `MProduct`,`MTranspose`.
 - [packmodules.hpp] DELETED: `ProductScalarMatrix`.
+- [unitmodules.hpp/simulator.cpp] CHANGED: 修改部分注释.
+
+## V2.1.11
+- [baseclass.hpp] ADDED: `Get_UnitModule()`.

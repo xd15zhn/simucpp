@@ -12,6 +12,7 @@ NAMESPACE_SIMUCPP_L
         virtual u8 Get_State() const override; \
         virtual PUnitModule Get_OutputPort(BusSize size) const override; \
         virtual BusSize Get_OutputBusSize() const override; \
+        virtual PUnitModule Get_UnitModule(BusSize point) const override;\
     private: \
         virtual void connect(const PMatModule m) override; \
         BusSize _size
