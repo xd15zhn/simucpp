@@ -6,6 +6,7 @@ NAMESPACE_SIMUCPP_L
 UnitModule::UnitModule(Simulator *sim, std::string name)
     : _name(name),_id(-1) {}
 UnitModule::~UnitModule() {}
+double UnitModule::Get_ID() const { return _id; }
 
 /**********************
 CONSTANT module.

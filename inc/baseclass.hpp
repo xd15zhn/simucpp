@@ -71,6 +71,7 @@ class UnitModule
 public:
     UnitModule(Simulator *sim=nullptr, std::string name="unitmodule");
     virtual ~UnitModule();
+    double Get_ID() const;
     virtual double Get_OutValue() const = 0;
 
 protected:

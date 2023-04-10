@@ -48,3 +48,5 @@
 
 ## V2.1.11
 - [baseclass.hpp] ADDED: `Get_UnitModule()`.
+- [baseclass.hpp] ADDED: `Get_ID()`.
+- [packmodules.cpp] BUGFIXED: `delete`,`c_str()`.

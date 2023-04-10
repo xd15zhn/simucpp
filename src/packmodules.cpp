@@ -47,7 +47,7 @@ TransferFcn::TransferFcn(Simulator *sim, const vecdble numerator, const vecdble 
     }
 }
 TransferFcn::~TransferFcn() {
-    delete sum1, sum2;
+    delete sum1; delete sum2;
     for (int i=0; i<_order; ++i) {
         delete integrators[i];
     }
@@ -56,7 +56,8 @@ TransferFcn::~TransferFcn() {
 PUnitModule TransferFcn::Get_InputPort(uint n) const { return n==0?sum1:nullptr; }
 PUnitModule TransferFcn::Get_OutputPort(uint n) const { return n==0?sum2:nullptr; }
 void TransferFcn::Set_InitialValue(vecdble value) {
-    if ((int)value.size()!=_order) TRACELOG(LOG_WARNING, "TransferFcn module \"%s\" accepted mismatched initial values.", _name);
+    if ((int)value.size()!=_order) TRACELOG(LOG_WARNING,
+        "TransferFcn module \"%s\" accepted mismatched initial values.", _name.c_str());
     for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
         integrators[i]->Set_InitialValue(value[i]);
 }
@@ -97,7 +98,7 @@ DiscreteTransferFcn::DiscreteTransferFcn(Simulator *sim, const vecdble numerator
     sum2->Set_InputGain(numerator[0]);
 }
 DiscreteTransferFcn::~DiscreteTransferFcn() {
-    delete sum1, sum2;
+    delete sum1; delete sum2;
     for (int i=0; i<_order; ++i) {
         delete unitdelays[i];
     }
@@ -110,7 +111,8 @@ void DiscreteTransferFcn::Set_SampleTime(double time) {
 PUnitModule DiscreteTransferFcn::Get_InputPort(uint n) const { return n==0?sum1:nullptr; }
 PUnitModule DiscreteTransferFcn::Get_OutputPort(uint n) const { return n==0?sum2:nullptr; }
 void DiscreteTransferFcn::Set_InitialValue(vecdble value) {
-    if ((int)value.size()!=_order) TRACELOG(LOG_WARNING, "DiscreteTransferFcn module \"%s\" accepted mismatched initial values.", _name);
+    if ((int)value.size()!=_order) TRACELOG(LOG_WARNING,
+        "DiscreteTransferFcn module \"%s\" accepted mismatched initial values.", _name.c_str());
     for (int i=SIMUCPP_MIN((int)value.size(), _order)-1; i>=0; --i)
         unitdelays[i]->Set_InitialValue(value[i]);
 }
