@@ -17,17 +17,17 @@ enum {
 
 /**********************
 **********************/
-bool Find_vector(std::vector<uint>& data, uint x) {
-    std::vector<uint>::iterator iter = std::find(data.begin(), data.end(), x);
+bool Find_vector(std::vector<uint32_t>& data, uint32_t x) {
+    std::vector<uint32_t>::iterator iter = std::find(data.begin(), data.end(), x);
     return iter != data.end();
 }
 
 /**********************
 **********************/
-void Print_Connection(std::vector<uint> &ids) {
+void Print_Connection(std::vector<uint32_t> &ids) {
 #if defined(SUPPORT_DEBUG)
     std::cout << "Sequence table: ";
-    for (uint i: ids) {
+    for (uint32_t i: ids) {
         std::cout << i << ", ";
     }
     std::cout << std::endl;
@@ -36,9 +36,8 @@ void Print_Connection(std::vector<uint> &ids) {
 
 /**********************
 **********************/
-Simulator::Simulator(double endtime) {
+Simulator::Simulator() {
     Set_SimStep();
-    _endtime = endtime;
     _cntM = 0;
     _t = 0;
     _status = FLAG_STORE | FLAG_REDUNDANT;
@@ -63,11 +62,11 @@ void Simulator::Add_Module(const PUnitModule m) {
     m->_id = int(_cntM);
     _modules.push_back(m);
     if (typeid(*m) == typeid(UIntegrator))
-        _integIDs.push_back(std::vector<uint>{_cntM});
+        _integIDs.push_back(std::vector<uint32_t>{_cntM});
     else if (typeid(*m) == typeid(UUnitDelay))
-        _delayIDs.push_back(std::vector<uint>{_cntM});
+        _delayIDs.push_back(std::vector<uint32_t>{_cntM});
     else if (typeid(*m) == typeid(UOutput))
-        _outIDs.push_back(std::vector<uint>{_cntM});
+        _outIDs.push_back(std::vector<uint32_t>{_cntM});
     _cntM++;
 }
 void Simulator::Add_Module(const PMatModule m) {
@@ -83,7 +82,7 @@ Simulation initialization procedure, which includes the following steps:
 - Build sequence table
 - Index for discrete modules
 **********************/
-void Simulator::Initialize(bool print) {
+void Simulator::Initialize(uint32_t print) {
     if (_status & FLAG_INITIALIZED) {
         TRACELOG(LOG_WARNING, "Simulator: Initialize again. Review your code.");
         return;
@@ -110,40 +109,41 @@ void Simulator::Initialize(bool print) {
     /* Self check procedure of unit modules and simulators */
     for(int i=0; i<4; ++i) _ode4K[i] = new double[_cntI];
     _outref = new double[_cntI];
-    for (uint i=0; i<_cntI; i++) {
+    for (uint32_t i=0; i<_cntI; i++) {
         _outref[i] = PUIntegrator(_modules[_integIDs[i][0]])->_outvalue;
     }
     if (_H<=0) TRACELOG(LOG_FATAL, "Simucpp: Simulation step must be greator than zero!");
-    for(uint i=0; i<_cntM; ++i) {
+    for(uint32_t i=0; i<_cntM; ++i) {
         errcode = _modules[i]->Self_Check();
         if (errcode!=0) TRACELOG(LOG_ERROR, "Simucpp: Self check of module \"%s\" failed!"
             "Errcode: %d", _modules[i]->_name.c_str(), errcode);
     }
     TRACELOG(LOG_DEBUG, "Simucpp: Module self check completed.");
-    if (print) Print_Modules();
+    if (print == 2) Print_Modules_Information();
 
     /* Build sequence table */
-    for(uint i=0; i<_cntI; ++i)
+    for(uint32_t i=0; i<_cntI; ++i)
         Build_Connection(_integIDs[i]);
-    for(uint i=0; i<_cntD; ++i)
+    for(uint32_t i=0; i<_cntD; ++i)
         Build_Connection(_delayIDs[i]);
-    for(uint i=0; i<_cntO; ++i)
+    for(uint32_t i=0; i<_cntO; ++i)
         Build_Connection(_outIDs[i]);
     if (_cntO==0) TRACELOG(LOG_WARNING, "Simucpp: You haven't add any OUTPUT modules.");
     TRACELOG(LOG_DEBUG, "Simucpp: Build sequence table completed.");
+    if (print == 1) Print_Modules_SequenceTable();
 
     /* Index for discrete modules*/
     _discIDs.clear();
     for (PUnitModule m: _modules) {
         if (m==nullptr) continue;
         if (typeid(*m) == typeid(UZOH)) {
-            _discIDs.push_back(uint(m->_id));
+            _discIDs.push_back(uint32_t(m->_id));
         } else if (typeid(*m) == typeid(UInput)) {
             if (!(PUInput(m)->_isc))
-                _discIDs.push_back(uint(m->_id));
+                _discIDs.push_back(uint32_t(m->_id));
         } else if (typeid(*m) == typeid(UNoise)) {
             if (PUNoise(m)->_T > 0)
-                _discIDs.push_back(uint(m->_id));
+                _discIDs.push_back(uint32_t(m->_id));
         }
     }
     TRACELOG(LOG_DEBUG, "Simucpp: Discrete modules indexing completed.");
@@ -154,9 +154,9 @@ void Simulator::Initialize(bool print) {
 
 /**********************
 **********************/
-int Simulator::Simulate() {
+int Simulator::Simulate(double endtime) {
     int err = 0;
-    while (_t < _endtime-SIMUCPP_DBL_EPSILON) {
+    while (_t < endtime-SIMUCPP_DBL_EPSILON) {
         err = Simulate_OneStep();
         if (!err) continue;
         if (_divmode == 0) {
@@ -175,31 +175,31 @@ int Simulator::Simulate() {
 /**********************
 **********************/
 void Simulator::Simulate_FirstStep() {
-    for(uint i=0; i<_cntI; ++i)
+    for(uint32_t i=0; i<_cntI; ++i)
         for (int j=int(_integIDs[i].size())-1; j>0; --j)
-            _modules[_integIDs[i][uint(j)]]->Module_Update(_t);
-    for(uint i=0; i<_cntD; ++i)
+            _modules[_integIDs[i][uint32_t(j)]]->Module_Update(_t);
+    for(uint32_t i=0; i<_cntD; ++i)
         for (int j=int(_delayIDs[i].size())-1; j>=0; --j)
-            _modules[_delayIDs[i][uint(j)]]->Module_Update(_t);
-    for(uint i=0; i<_cntO; ++i)
+            _modules[_delayIDs[i][uint32_t(j)]]->Module_Update(_t);
+    for(uint32_t i=0; i<_cntO; ++i)
         for (int j=int(_outIDs[i].size())-1; j>=0; --j)
-            _modules[_outIDs[i][uint(j)]]->Module_Update(_t);
+            _modules[_outIDs[i][uint32_t(j)]]->Module_Update(_t);
     if (_status & FLAG_STORE) _tvec.push_back(_t);
 }
 /**********************
 **********************/
 void Simulator::Simulate_FinalStep() {
-    for(uint i=0; i<_cntD; ++i)
+    for(uint32_t i=0; i<_cntD; ++i)
         PUUnitDelay(_modules[_delayIDs[i][0]])->Output_Update(_t);
-    for(uint i=0; i<_cntI; ++i)
+    for(uint32_t i=0; i<_cntI; ++i)
         for (int j=int(_integIDs[i].size())-1; j>0; --j)
-            _modules[_integIDs[i][uint(j)]]->Module_Update(_t);
-    for(uint i=0; i<_cntD; ++i)
+            _modules[_integIDs[i][uint32_t(j)]]->Module_Update(_t);
+    for(uint32_t i=0; i<_cntD; ++i)
         for (int j=int(_delayIDs[i].size())-1; j>=0; --j)
-            _modules[_delayIDs[i][uint(j)]]->Module_Update(_t);
-    for(uint i=0; i<_cntO; ++i)
+            _modules[_delayIDs[i][uint32_t(j)]]->Module_Update(_t);
+    for(uint32_t i=0; i<_cntO; ++i)
         for (int j=int(_outIDs[i].size())-1; j>=0; --j)
-            _modules[_outIDs[i][uint(j)]]->Module_Update(_t);
+            _modules[_outIDs[i][uint32_t(j)]]->Module_Update(_t);
     if (_status & FLAG_STORE) _tvec.push_back(_t);
 }
 /**********************
@@ -211,35 +211,35 @@ int Simulator::Simulate_OneStep() {
     }
 
     /*  t = t(n) */
-    for(uint i=0; i<_cntD; ++i)
+    for(uint32_t i=0; i<_cntD; ++i)
         PUUnitDelay(_modules[_delayIDs[i][0]])->Output_Update(_t);
-    for(uint i=0; i<_cntI; ++i) {
+    for(uint32_t i=0; i<_cntI; ++i) {
         _outref[i] = PUIntegrator(_modules[_integIDs[i][0]])->_outvalue;
         for (int j=int(_integIDs[i].size())-1; j>0; --j)
-            _modules[_integIDs[i][uint(j)]]->Module_Update(_t);
+            _modules[_integIDs[i][uint32_t(j)]]->Module_Update(_t);
         _ode4K[0][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
-    for(uint i=0; i<_cntD; ++i)
+    for(uint32_t i=0; i<_cntD; ++i)
         for (int j=int(_delayIDs[i].size())-1; j>=0; --j)
-            _modules[_delayIDs[i][uint(j)]]->Module_Update(_t);
-    for(uint i=0; i<_cntO; ++i)
+            _modules[_delayIDs[i][uint32_t(j)]]->Module_Update(_t);
+    for(uint32_t i=0; i<_cntO; ++i)
         for (int j=int(_outIDs[i].size())-1; j>=0; --j)
-            _modules[_outIDs[i][uint(j)]]->Module_Update(_t);
+            _modules[_outIDs[i][uint32_t(j)]]->Module_Update(_t);
 
     /* t = t(n)+h/2 */
     _t += _H;
-    for (uint i: _discIDs)
+    for (uint32_t i: _discIDs)
         _modules[i]->Set_Enable(false);
-    for(uint i=0; i<_cntI; ++i)
+    for(uint32_t i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + _H*_ode4K[0][i];
-    for(uint i=0; i<_cntI; ++i){
+    for(uint32_t i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[1][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
-    for(uint i=0; i<_cntI; ++i)
+    for(uint32_t i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + _H*_ode4K[1][i];
-    for(uint i=0; i<_cntI; ++i){
+    for(uint32_t i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[2][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
@@ -247,17 +247,17 @@ int Simulator::Simulate_OneStep() {
 
     /* t = t(n)+h */
     _t += _H;
-    for(uint i=0; i<_cntI; ++i)
+    for(uint32_t i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] + (_H+_H)*_ode4K[2][i];
-    for(uint i=0; i<_cntI; ++i){
+    for(uint32_t i=0; i<_cntI; ++i){
         for (int j=_integIDs[i].size()-1; j>0; --j)
             _modules[_integIDs[i][j]]->Module_Update(_t);
         _ode4K[3][i] = PUIntegrator(_modules[_integIDs[i][0]])->_next->Get_OutValue();
     }
-    for(uint i=0; i<_cntI; ++i)
+    for(uint32_t i=0; i<_cntI; ++i)
         PUIntegrator(_modules[_integIDs[i][0]])->_outvalue = _outref[i] +
             _H/3.0*(_ode4K[0][i] + _ode4K[1][i]+_ode4K[1][i] + _ode4K[2][i]+_ode4K[2][i] + _ode4K[3][i]);
-    for (uint i: _discIDs)
+    for (uint32_t i: _discIDs)
         _modules[i]->Set_Enable(true);
 
     /* Convergence and divergence check */
@@ -274,12 +274,12 @@ The input is a sequence table and has only one element, and this function
  build the connection accroding to the modules' children modules and add
  them to that sequence table and return it.
 **********************/
-void Simulator::Build_Connection(std::vector<uint> &ids) {
+void Simulator::Build_Connection(std::vector<uint32_t> &ids) {
     if (Find_vector(_discIDs, ids[0]))
         TRACELOG(LOG_FATAL, "Simucpp: internal error: connection.");
     _discIDs.push_back(ids[0]);
-    std::stack<uint> idq;  // ids in stack
-    std::vector<uint> idqv;  // compare in idq
+    std::stack<uint32_t> idq;  // ids in stack
+    std::vector<uint32_t> idqv;  // compare in idq
     int id;  // id of child module
     int curid;  // id of module in top of stack
     bool equal = false;  // if repetitive id detected
@@ -294,7 +294,7 @@ void Simulator::Build_Connection(std::vector<uint> &ids) {
             if (id<0) TRACELOG(LOG_FATAL, "Simucpp: internal error: connection.");
             if (typeid(*bm) == typeid(UIntegrator)) continue;
             if (typeid(*bm) == typeid(UUnitDelay)) continue;
-            for (uint j=0; j<_discIDs.size(); ++j){
+            for (uint32_t j=0; j<_discIDs.size(); ++j){
                 if (_discIDs[j] != id) continue;
                 std::stack<int> agq;  // ids in another stack
                 agq.push(id);
@@ -313,7 +313,7 @@ void Simulator::Build_Connection(std::vector<uint> &ids) {
                         agq.push(agid);
                     }
                 }
-                if (Find_vector(ids, (uint)id)) {
+                if (Find_vector(ids, (uint32_t)id)) {
                     std::remove(std::begin(ids), std::end(ids), id);
                     ids.pop_back(); }
                 else
@@ -351,7 +351,7 @@ void Simulator::Plot() {
     if (_outIDs.size() < 1)
         TRACELOG(LOG_FATAL, "Simucpp plot: No output data for plot!");
     PUOutput m;
-    for (uint i=0; i<_outIDs.size(); i++) {
+    for (uint32_t i=0; i<_outIDs.size(); i++) {
         m = PUOutput(_modules[_outIDs[i][0]]);
         if (!m->_store) continue;
         if (m->_values.size() < 3)
@@ -371,7 +371,32 @@ void Simulator::Plot() {
 }
 /**********************
 **********************/
-void Simulator::Print_Modules() {
+void Simulator::Print_Modules_SequenceTable() {
+#if defined(SUPPORT_DEBUG)
+    using namespace std;
+    PUnitModule bm;  // pointer to child module
+    cout << "Model structure print start." << endl;
+    for (uint32_t i = 0; i < _cntI; i++) {
+        for (uint32_t j=0; j<_integIDs[i].size(); j++)
+            cout << _integIDs[i][j] << ", ";
+        cout << endl;
+    }
+    for (uint32_t i = 0; i < _cntD; i++) {
+        for (uint32_t j=0; j<_delayIDs[i].size(); j++)
+            cout << _delayIDs[i][j] << ", ";
+        cout << endl;
+    }
+    for (uint32_t i = 0; i < _cntO; i++) {
+        for (uint32_t j=0; j<_outIDs[i].size(); j++)
+            cout << _outIDs[i][j] << ", ";
+        cout << endl;
+    }
+    cout << "Model structure print finished." << endl;
+#else
+    TRACELOG(LOG_WARNING, "Simulator debug: You didn't add debug functions.");
+#endif  // SUPPORT_DEBUG
+}
+void Simulator::Print_Modules_Information() {
 #if defined(SUPPORT_DEBUG)
     using namespace std;
     PUnitModule bm;  // pointer to child module
@@ -403,13 +428,11 @@ void Simulator::Print_Modules() {
 void Simulator::Set_EnableStore(bool store) {
     if (store) _status |= FLAG_STORE;
     else _status &=~ FLAG_STORE;
-    for (uint i=0; i<_outIDs.size(); i++) PUOutput(_modules[_outIDs[i][0]])->Set_EnableStore(store);}
+    for (uint32_t i=0; i<_outIDs.size(); i++) PUOutput(_modules[_outIDs[i][0]])->Set_EnableStore(store);}
 void Simulator::Set_SampleTime(double time) { _T=time;_ltn=-_T;
-    for (uint i=0; i<_outIDs.size(); i++) PUOutput(_modules[_outIDs[i][0]])->Set_SampleTime(time); }
+    for (uint32_t i=0; i<_outIDs.size(); i++) PUOutput(_modules[_outIDs[i][0]])->Set_SampleTime(time); }
 void Simulator::Set_t(double t) { _t = t; }
 double Simulator::Get_t() { return _t; }
-void Simulator::Set_Endtime(double t) { _endtime=t; }
-double Simulator::Get_Endtime() { return _endtime; }
 void Simulator::Set_SimStep(double step) { _H=0.5*step; }
 double Simulator::Get_SimStep() { return _H+_H; }
 void Simulator::Set_DivergenceCheckMode(int mode) { _divmode=mode; };

@@ -50,3 +50,10 @@
 - [baseclass.hpp] ADDED: `Get_UnitModule()`.
 - [baseclass.hpp] ADDED: `Get_ID()`.
 - [packmodules.cpp] BUGFIXED: `delete`,`c_str()`.
+
+## V2.1.12
+- CHANGED: `uint` to `uint32_t`.
+- [simulator.cpp/hpp] CHANGED: `Simulator()`, `Simulate(double endtime)`.
+- [simulator.cpp/hpp] CHANGED: `Print_Modules()` to `Print_Modules_Information()`.
+- [simulator.cpp/hpp] ADDED: `Print_Modules_SequenceTable()`.
+- [simulator.cpp/hpp] CHANGED: `Initialize(uint32_t print)`.

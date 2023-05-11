@@ -36,55 +36,16 @@ class Simulator
     friend class MSum;
     friend class MTranspose;
 public:
-    // Init a simulator with end time.
-    Simulator(double endtime=10);
+    Simulator();
     ~Simulator();
-
-/**********************
-The following 3 groups of functions are uesd to build connections
-    between modules. Each function accepts 2 parameters of modules "m1"
-    and "m2", and usually 2 parameters of orders "n1" and "n2", means to
-    connect "n1"th output port of "m1" to "n2"th input port of "m2".
-Unit modules and matrix modules don't need to be specified which port
-    of them should be connected.
-As for PackModule, default zero if port is not specified.
-**********************/
-#pragma region connect
-    // The following functions are used to build a single line connection between:
-    //  unit module and unit module
-    //  unit module and pack module
-    //  pack module and pack module
-    void connectU(PUnitModule m1, PUnitModule m2);  // unit to unit
-    void connectU(PUnitModule m1, PPackModule m2, uint n2);  // unit to pack
-    void connectU(PPackModule m1, uint n1, PUnitModule m2);  // pack to unit
-    void connectU(PPackModule m1, uint n1, PPackModule m2, uint n2);  // pack to pack
-
-    // The following functions are used to build a bus connection between:
-    //  matrix module and matrix module
-    //  matrix module and pack module
-    //  pack module and pack module
-    void connectM(PMatModule m1, PMatModule m2);  // mat to mat
-    void connectM(PMatModule m1, PPackModule m2, uint n2);  // mat to pack
-    void connectM(PPackModule m1, uint n1, PMatModule m2);  // pack to mat
-    void connectM(PPackModule m1, uint n1, PPackModule m2, uint n2);  // pack to pack
-
-    // The following functions are used to build a single line connection between:
-    //  unit module and multiplex module
-    //  pack module and multiplex module
-    //  demultiplex module and unit module
-    //  demultiplex module and pack module
-    //  demultiplex module and multiplex module
-    void connectU(PUnitModule m1, PMux m2, BusSize n2);  // unit to mux
-    void connectU(PDeMux m1, BusSize n1, PUnitModule m2);  // demux to unit
-    void connectU(PPackModule m1, uint n1, PMux m2, BusSize n2);  // pack to nux
-    void connectU(PDeMux m1, BusSize n1, PPackModule m2, uint n2);  // demux to pack
-    void connectU(PDeMux m1, BusSize n1, PMux m2, BusSize n2);  // demux to mux
-#pragma endregion connect
 
     // Update the connection between modules which belongs to THIS simulator.
     // It must be called before first simulation and has no need to be called afterward.
-    // @print: Print all modules and their connections.
-    void Initialize(bool print=false);
+    // @print: 
+    //  0: don't print anything.
+    //  1: print all modules and their connections.
+    //  2: only print every Module Sequence Tables.
+    void Initialize(uint32_t print=0);
 
     // Reset the parameters of all modules to those before simulation,
     //  especially those modules whose values will change during simulation.
@@ -92,10 +53,10 @@ As for PackModule, default zero if port is not specified.
     //  and it should be called from the second and subsequent simulation.
     void Simulation_Reset();
 
-    // Run a complete simulation once.
-    // It calls `Simulate_OneStep` but doesn't call `Simulate_FirstStep`
-    //  and `Simulate_FinalStep`.
-    int Simulate();
+    // Run a complete simulation once with end time.
+    // It only calls `Simulate_OneStep` but doesn't call `Simulate_FirstStep`
+    //  or `Simulate_FinalStep`.
+    int Simulate(double endtime=10);
     // Run a simulation step.
     int Simulate_OneStep();
     // Call it if values at time 0 are required.
@@ -119,9 +80,6 @@ As for PackModule, default zero if port is not specified.
     // Get and set current simulation time.
     void Set_t(double t);
     double Get_t();
-    // Get and set simulation end time.
-    void Set_Endtime(double t);
-    double Get_Endtime();
     // Get and set simulation step.
     void Set_SimStep(double step=0.001);
     double Get_SimStep();
@@ -135,21 +93,61 @@ As for PackModule, default zero if port is not specified.
     // other: the same as 2.
     void Set_DivergenceCheckMode(int mode=0);
 
+/**********************
+The following 3 groups of functions are uesd to build connections
+    between modules. Each function accepts 2 parameters of modules "m1"
+    and "m2", and usually 2 parameters of orders "n1" and "n2", means to
+    connect "n1"th output port of "m1" to "n2"th input port of "m2".
+Unit modules and matrix modules don't need to be specified which port
+    of them should be connected.
+As for PackModule, default zero if port is not specified.
+**********************/
+#pragma region connect
+    // The following functions are used to build a single line connection between:
+    //  unit module and unit module
+    //  unit module and pack module
+    //  pack module and pack module
+    void connectU(PUnitModule m1, PUnitModule m2);  // unit to unit
+    void connectU(PUnitModule m1, PPackModule m2, uint32_t n2);  // unit to pack
+    void connectU(PPackModule m1, uint32_t n1, PUnitModule m2);  // pack to unit
+    void connectU(PPackModule m1, uint32_t n1, PPackModule m2, uint32_t n2);  // pack to pack
+
+    // The following functions are used to build a bus connection between:
+    //  matrix module and matrix module
+    //  matrix module and pack module
+    //  pack module and pack module
+    void connectM(PMatModule m1, PMatModule m2);  // mat to mat
+    void connectM(PMatModule m1, PPackModule m2, uint32_t n2);  // mat to pack
+    void connectM(PPackModule m1, uint32_t n1, PMatModule m2);  // pack to mat
+    void connectM(PPackModule m1, uint32_t n1, PPackModule m2, uint32_t n2);  // pack to pack
+
+    // The following functions are used to build a single line connection between:
+    //  unit module and multiplex module
+    //  pack module and multiplex module
+    //  demultiplex module and unit module
+    //  demultiplex module and pack module
+    //  demultiplex module and multiplex module
+    void connectU(PUnitModule m1, PMux m2, BusSize n2);  // unit to mux
+    void connectU(PDeMux m1, BusSize n1, PUnitModule m2);  // demux to unit
+    void connectU(PPackModule m1, uint32_t n1, PMux m2, BusSize n2);  // pack to nux
+    void connectU(PDeMux m1, BusSize n1, PPackModule m2, uint32_t n2);  // demux to pack
+    void connectU(PDeMux m1, BusSize n1, PMux m2, BusSize n2);  // demux to mux
+#pragma endregion connect
+
 private:
     // Add a module to this simulator.
     void Add_Module(const PUnitModule m);
     void Add_Module(const PMatModule m);
 
     // Build connection of Endpoint modules.
-    void Build_Connection(std::vector<uint> &ids);
-    // Print connection information of every modules and their connections.
-    void Print_Modules();
-
-    // Simulation half step, simulation end time.
-    double _H, _endtime;
+    void Build_Connection(std::vector<uint32_t> &ids);
+    // Print informations of every Module Sequence Tables.
+    void Print_Modules_SequenceTable();
+    // Print detailed informations of every modules and their child modules.
+    void Print_Modules_Information();
 
     // Number of total modules, INTEGRATOR/UNITDELAY/OUTPUT modules.
-    uint _cntM, _cntI, _cntD, _cntO;
+    uint32_t _cntM, _cntI, _cntD, _cntO;
 
     // Parameters for 4-order runge-kutta algorithm.
     double *_ode4K[4];
@@ -167,12 +165,13 @@ private:
     // @_discIDs: Its name is "_allIDs" in previous version. Itis used to make
     //  sure that every modules will update only once in every simulation step,
     //  and it will be reused as discrete ids after building sequence table.
-    std::vector<std::vector<uint>> _integIDs, _delayIDs, _outIDs;
-    std::vector<uint> _discIDs;
+    std::vector<std::vector<uint32_t>> _integIDs, _delayIDs, _outIDs;
+    std::vector<uint32_t> _discIDs;
 
     DISCRETE_VARIABLES;  // See public member function "Set_SampleTime".
+    double _H;  // Simulation half step.
     double _t;  // See public member function "Set_t" and "Get_t".
-    std::vector<double> _tvec;
+    std::vector<double> _tvec;  // Time vector consists of every `_t`, used for plot.
     int _divmode;  // See public member function "Set_DivergenceCheckMode".
 
     // BIT0: initialized

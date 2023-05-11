@@ -22,8 +22,8 @@ NAMESPACE_SIMUCPP_L
         virtual void Set_Enable(bool enable=false) override; \
         virtual void Module_Update(double time) override; \
         virtual void Module_Reset() override; \
-        virtual uint Get_childCnt() const override; \
-        virtual PUnitModule Get_child(uint n=0) const override; \
+        virtual uint32_t Get_childCnt() const override; \
+        virtual PUnitModule Get_child(uint32_t n=0) const override; \
         virtual void connect(const PUnitModule m) override;
 typedef std::vector<double>  vecdble;
 
@@ -66,8 +66,8 @@ public:
     // Set the function. param "inparam" is an array, which represents all the input values.
     void Set_Function(std::function<double(double*)> function);
 private:
-    void connect2(const PUnitModule m, uint n=0);
-    void disconnect(uint n=0);
+    void connect2(const PUnitModule m, uint32_t n=0);
+    void disconnect(uint32_t n=0);
     double _outvalue;
     std::function<double(double*)> _f=nullptr;
     std::vector<PUnitModule> _next;
@@ -108,7 +108,7 @@ public:
     void Set_SampleTime(double time=-1);
 private:
     double _outvalue;
-    uint _cnt;  // samples count. Only used when in discrete mode
+    uint32_t _cnt;  // samples count. Only used when in discrete mode
     double _T;  // Sample time. Only used when in discrete mode
     bool _isc;  // Be in continuous mode when it's true
     bool _enable=true;  // Used in discrete mode

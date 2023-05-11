@@ -74,7 +74,7 @@ simulator.cpp
 #define CHECK_SIMULATOR(x, type) \
     if (x->_sim!=this) TRACELOG(LOG_FATAL, #type": Module \"%s\" is added to a wrong simulator!", x->_name.c_str())
 #define CHECK_CONVERGENCE(x, y) \
-    for (uint i=0; i<y.size(); i++) { \
+    for (uint32_t i=0; i<y.size(); i++) { \
         if (x(_modules[y[i][0]])->_outvalue > SIMUCPP_INFINITE1) return 1; \
         if (x(_modules[y[i][0]])->_outvalue < -SIMUCPP_INFINITE1) return 2; \
         if (std::isnan(x(_modules[y[i][0]])->_outvalue)) return 3; \

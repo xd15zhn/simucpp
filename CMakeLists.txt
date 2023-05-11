@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.12)
-project(simucpp VERSION 2.1.11)
+project(simucpp VERSION 2.1.12)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE release)
+set(CMAKE_INSTALL_PREFIX "C:/Users/xd15zhn/Documents/cpplibraries")
 
 message(STATUS "project name: ${CMAKE_PROJECT_NAME}")
 message(STATUS "project version: ${PROJECT_VERSION}")

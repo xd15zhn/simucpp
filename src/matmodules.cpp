@@ -9,7 +9,7 @@ MatModule::~MatModule() {}
 /*********************
 implementation of class BusSize.
 **********************/
-BusSize::BusSize(uint row, uint col): r(row),c(col) {};
+BusSize::BusSize(uint32_t row, uint32_t col): r(row),c(col) {};
 BusSize::BusSize(const BusSize& size): r(size.r),c(size.c) {};
 BusSize& BusSize::operator=(const BusSize &size) { r=size.r, c=size.c; return *this; }
 bool BusSize::operator==(const BusSize &size) const { return ((r==size.r)&&(c==size.c))?true:false; }
@@ -100,14 +100,14 @@ MStateSpace::MStateSpace(Simulator *sim, BusSize size, bool isc, std::string nam
     MATMODULE_INIT();
     if (isc) {
         _intx = new PUIntegrator[_size.r*_size.c];
-        for (uint i=0; i<_size.r; ++i)
-            for (uint j=0; j<_size.c; ++j)
+        for (uint32_t i=0; i<_size.r; ++i)
+            for (uint32_t j=0; j<_size.c; ++j)
             _intx[i*_size.c+j] = new UIntegrator(sim, _name+"_intx_"+std::to_string(i)+"_"+std::to_string(j));
     }
     else {
         _udx = new PUUnitDelay[_size.r*_size.c];
-        for (uint i=0; i<_size.r; ++i)
-            for (uint j=0; j<_size.c; ++j)
+        for (uint32_t i=0; i<_size.r; ++i)
+            for (uint32_t j=0; j<_size.c; ++j)
             _udx[i*_size.c+j] = new UUnitDelay(sim, _name+"_udx_"+std::to_string(i)+"_"+std::to_string(j));
     }
     _state = BUS_GENERATED;
@@ -125,8 +125,8 @@ bool MStateSpace::Initialize() {
     if (!(childSize==_size))
         TRACELOG(LOG_FATAL, "StateSpace: Bus size of \"%s\" and its child modules are mismatch!\n    "
         "child:%d,%d; this:%d,%d", _name.c_str(), childSize.r, childSize.c, _size.r, _size.c);
-    for (uint i=0; i<_size.r; ++i) {
-        for (uint j=0; j<_size.c; ++j) {
+    for (uint32_t i=0; i<_size.r; ++i) {
+        for (uint32_t j=0; j<_size.c; ++j) {
             if (_isc) _sim->connectU(_next->Get_OutputPort(BusSize(i, j)), _intx[i*_size.c+j]);
             else _sim->connectU(_next->Get_OutputPort(BusSize(i, j)), _udx[i*_size.c+j]);
         }
@@ -135,8 +135,8 @@ bool MStateSpace::Initialize() {
 }
 void MStateSpace::Set_SampleTime(double time) {
     if (_isc) return;
-    for (uint i=0; i<_size.r; ++i) {
-        for (uint j=0; j<_size.c; ++j) {
+    for (uint32_t i=0; i<_size.r; ++i) {
+        for (uint32_t j=0; j<_size.c; ++j) {
             _udx[i*_size.c+j]->Set_SampleTime(time);
         }
     }
@@ -144,8 +144,8 @@ void MStateSpace::Set_SampleTime(double time) {
 void MStateSpace::Set_InitialValue(const zhnmat::Mat& value) {
     if ((value.row()!=_size.r) || (value.col()!=_size.c))
         TRACELOG(LOG_FATAL, "StateSpace: \"%s\" accepted mismatched initial values!", _name.c_str());
-    for (uint i=0; i<_size.r; ++i) {
-        for (uint j=0; j<_size.c; ++j) {
+    for (uint32_t i=0; i<_size.r; ++i) {
+        for (uint32_t j=0; j<_size.c; ++j) {
             if (_isc) _intx[i*_size.c+j]->Set_InitialValue(value.at(i, j));
             else _udx[i*_size.c+j]->Set_InitialValue(value.at(i, j));
         }
@@ -153,8 +153,8 @@ void MStateSpace::Set_InitialValue(const zhnmat::Mat& value) {
 }
 zhnmat::Mat MStateSpace::Get_OutValue() {
     zhnmat::Mat ans(_size.r, _size.c);
-    for (uint i=0; i<_size.r; ++i) {
-        for (uint j=0; j<_size.c; ++j) {
+    for (uint32_t i=0; i<_size.r; ++i) {
+        for (uint32_t j=0; j<_size.c; ++j) {
             if (_isc) ans.set(i, j, _intx[i*_size.c+j]->Get_OutValue());
             else ans.set(i, j, _udx[i*_size.c+j]->Get_OutValue());
         }
@@ -182,8 +182,8 @@ MConstant::MConstant(Simulator *sim, const zhnmat::Mat& A, std::string name)
     MATMODULE_INIT();
     _size = BusSize(A.row(), A.col());
     _ucst = new PUConstant[_size.r*_size.c];
-    for (uint i=0; i<_size.r; ++i) {
-        for (uint j=0; j<_size.c; ++j) {
+    for (uint32_t i=0; i<_size.r; ++i) {
+        for (uint32_t j=0; j<_size.c; ++j) {
             _ucst[i*_size.c+j] = new UConstant(_sim, _name+"_ucst_"+std::to_string(i)+"_"+std::to_string(j));
             _ucst[i*_size.c+j]->Set_OutValue(A.at(i, j));
         }
@@ -195,8 +195,8 @@ PUnitModule MConstant::Get_OutputPort(BusSize size) const {
     return _ucst[size.r*_size.c+size.c];
 }
 void MConstant::Set_OutValue(zhnmat::Mat A) {
-    for (uint i=0; i<_size.r; ++i)
-        for (uint j=0; j<_size.c; ++j)
+    for (uint32_t i=0; i<_size.r; ++i)
+        for (uint32_t j=0; j<_size.c; ++j)
             _ucst[i*_size.c+j]->Set_OutValue(A.at(i, j));
 }
 
@@ -214,8 +214,8 @@ MFcnMISO::MFcnMISO(Simulator *sim, BusSize size, std::string name)
     :MatModule(sim, name), _size(size) {
     MATMODULE_INIT();
     _misoy = new PUFcnMISO[_size.r*_size.c];
-    for (uint i=0; i<_size.r; ++i)
-        for (uint j=0; j<_size.c; ++j)
+    for (uint32_t i=0; i<_size.r; ++i)
+        for (uint32_t j=0; j<_size.c; ++j)
             _misoy[i*_size.c+j] = new UFcnMISO(_sim, _name+"_misoy_"+std::to_string(i)+"_"+std::to_string(j));
     _state = BUS_GENERATED;
 }
@@ -231,12 +231,12 @@ bool MFcnMISO::Initialize() {
     for (PMatModule m: _nexts) { if (!(m->Get_State() & BUS_GENERATED)) { success = false; break; } }
     if (!success) return false;
     PUnitModule childPort;
-    for (uint i=0; i<_size.r; ++i) {
-        for (uint j=0; j<_size.c; ++j) {
+    for (uint32_t i=0; i<_size.r; ++i) {
+        for (uint32_t j=0; j<_size.c; ++j) {
             _misoy[i*_size.c+j]->Set_Function([=](double *u){
-                uint cntmat = 0;
+                uint32_t cntmat = 0;
                 zhnmat::Mat *mats = new zhnmat::Mat[_nexts.size()];
-                for (uint n = 0; n < _nexts.size(); n++) {
+                for (uint32_t n = 0; n < _nexts.size(); n++) {
                     BusSize size = _nexts[n]->Get_OutputBusSize();
                     mats[n] = zhnmat::Mat(size.r, size.c);
                     for (int i = 0; i < size.r; i++)
@@ -264,8 +264,8 @@ bool MFcnMISO::Initialize() {
 zhnmat::Mat MFcnMISO::Get_OutValue() {
     if (_state != BUS_INITIALIZED) return zhnmat::Mat();
     zhnmat::Mat ans(_size.r, _size.c);
-    for (uint i=0; i<_size.r; ++i)
-        for (uint j=0; j<_size.c; ++j)
+    for (uint32_t i=0; i<_size.r; ++i)
+        for (uint32_t j=0; j<_size.c; ++j)
             ans.set(i, j, _misoy[i*_size.c+j]->Get_OutValue());
     return ans;
 }
@@ -299,20 +299,20 @@ bool MGain::Initialize() {
         "child:%d,%d; this:%d,%d", _name.c_str(), childSize.r, childSize.c, _size.r, _size.c);
     _size = _isleft ? BusSize(_G.row(), childSize.c) : BusSize(childSize.r, _G.col());
     _sumy = new PUSum[_size.r*_size.c];
-    for (uint i=0; i<_size.r; ++i)
-        for (uint j=0; j<_size.c; ++j)
+    for (uint32_t i=0; i<_size.r; ++i)
+        for (uint32_t j=0; j<_size.c; ++j)
             _sumy[i*_size.c+j] = new USum(_sim, _name+"_inu"+std::to_string(i)+"_"+std::to_string(j));
     _state = BUS_GENERATED;
     if (!(_next->Get_State() & BUS_GENERATED)) return false;
-    for (uint i=0; i<_size.r; ++i) {
-        for (uint j=0; j<_size.c; ++j) {
+    for (uint32_t i=0; i<_size.r; ++i) {
+        for (uint32_t j=0; j<_size.c; ++j) {
             if (_isleft) {
-                for (uint k=0; k<childSize.r; ++k) {
+                for (uint32_t k=0; k<childSize.r; ++k) {
                     _sim->connectU(_next->Get_OutputPort(BusSize(k, j)), _sumy[i*_size.c+j]);
                     _sumy[i*_size.c+j]->Set_InputGain(_G.at(i, k));
                 }
             } else {
-                for (uint k=0; k<childSize.c; ++k) {
+                for (uint32_t k=0; k<childSize.c; ++k) {
                     _sim->connectU(_next->Get_OutputPort(BusSize(i, k)), _sumy[i*_size.c+j]);
                     _sumy[i*_size.c+j]->Set_InputGain(_G.at(k, j));
                 }
@@ -342,8 +342,8 @@ bool MOutput::Initialize() {
     if (!(_next->Get_State() & BUS_SIZED)) return false;
     _size = _next->Get_OutputBusSize();
     _out = new PUOutput[_size.r*_size.c];
-    for (uint i=0; i<_size.r; ++i) {
-        for (uint j=0; j<_size.c; ++j) {
+    for (uint32_t i=0; i<_size.r; ++i) {
+        for (uint32_t j=0; j<_size.c; ++j) {
             _out[i*_size.c+j] = new UOutput(_sim, _name+"_out_"+std::to_string(i)+"_"+std::to_string(j));
             _sim->connectU(_next->Get_OutputPort(BusSize(i, j)), _out[i*_size.c+j]);
         }
@@ -389,8 +389,8 @@ bool MSum::Initialize() {
                 _sumy[i] = new USum(_sim, _name+"_inu"+std::to_string(i));
             _state = BUS_GENERATED;
         }
-        for (uint i=0; i<_size.r; ++i) {
-            for (uint j=0; j<_size.c; ++j) {
+        for (uint32_t i=0; i<_size.r; ++i) {
+            for (uint32_t j=0; j<_size.c; ++j) {
                 childPort = _nexts[b]->Get_OutputPort(BusSize(i, j));
                 _sim->connectU(childPort, _sumy[i*_size.c + j]);
                 _sumy[i*_size.c + j]->Set_InputGain(_ingain[b]);

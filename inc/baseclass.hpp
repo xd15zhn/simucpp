@@ -30,7 +30,6 @@ typedef DeMux*               PDeMux;
 typedef UIntegrator*         PUIntegrator;
 typedef UOutput*             PUOutput;
 typedef UUnitDelay*          PUUnitDelay;
-typedef unsigned int         uint;
 typedef unsigned char        u8;
 
 enum DIVERGENCE_MODE {
@@ -48,7 +47,7 @@ enum DIVERGENCE_MODE {
  */
 class BusSize {
 public:
-    explicit BusSize(uint row=0, uint col=0);
+    explicit BusSize(uint32_t row=0, uint32_t col=0);
     BusSize(const BusSize& size);
     BusSize& operator=(const BusSize& size);
     bool operator==(const BusSize &size) const;
@@ -57,7 +56,7 @@ public:
     //  (2,3)>=(1,1),(2,3)>=(1,3): true
     //  (2,3)>=(3,1),(2,3)>=(2,4): false
     bool operator<(const BusSize &size) const;
-    uint r, c;
+    uint32_t r, c;
 };
 
 
@@ -95,10 +94,10 @@ private:
     virtual void Module_Reset() = 0;
 
     // Return how many child modules does this module have.
-    virtual uint Get_childCnt() const = 0;
+    virtual uint32_t Get_childCnt() const = 0;
 
     // Get the pointer of this module's nth child module.
-    virtual PUnitModule Get_child(uint n=0) const = 0;
+    virtual PUnitModule Get_child(uint32_t n=0) const = 0;
 
     // Connect the output port of "m" to the input port of this module.
     virtual void connect(PUnitModule m) = 0;
@@ -164,10 +163,10 @@ protected:
 private:
     // Get nth input/output module of this PackModule.
     // It is used to build connections with other modules.
-    virtual PUnitModule Get_InputPort(uint n=0) const;
-    virtual PUnitModule Get_OutputPort(uint n=0) const;
-    virtual PMatModule Get_InputBus(uint n=0) const;
-    virtual PMatModule Get_OutputBus(uint n=0) const;
+    virtual PUnitModule Get_InputPort(uint32_t n=0) const;
+    virtual PUnitModule Get_OutputPort(uint32_t n=0) const;
+    virtual PMatModule Get_InputBus(uint32_t n=0) const;
+    virtual PMatModule Get_OutputBus(uint32_t n=0) const;
 };
 
 

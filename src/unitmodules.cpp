@@ -17,8 +17,8 @@ int UConstant::Self_Check() const { return 0; }
 void UConstant::Set_Enable(bool enable) {}
 void UConstant::Module_Update(double time) {}
 void UConstant::Module_Reset() {}
-uint UConstant::Get_childCnt() const { return 0; }
-PUnitModule UConstant::Get_child(uint n) const { return nullptr; }
+uint32_t UConstant::Get_childCnt() const { return 0; }
+PUnitModule UConstant::Get_child(uint32_t n) const { return nullptr; }
 void UConstant::connect(const PUnitModule m) { TRACELOG(LOG_WARNING, "UConstant: cannot add child modules."); }
 void UConstant::Set_OutValue(double v) { _outvalue=v; };
 UConstant::UConstant(Simulator *sim, std::string name): UnitModule(sim, name) {
@@ -35,8 +35,8 @@ double UFcn::Get_OutValue() const { return _outvalue; }
 void UFcn::Set_Enable(bool enable) {}
 void UFcn::Set_Function(std::function<double(double)> function) { _f=function; }
 void UFcn::Module_Reset() {}
-uint UFcn::Get_childCnt() const { return 1; }
-PUnitModule UFcn::Get_child(uint n) const { return n==0?_next:nullptr; }
+uint32_t UFcn::Get_childCnt() const { return 1; }
+PUnitModule UFcn::Get_child(uint32_t n) const { return n==0?_next:nullptr; }
 void UFcn::connect(const PUnitModule m) { _next=m; }
 UFcn::UFcn(Simulator *sim, std::string name): UnitModule(sim, name) {
     _outvalue = 0.0/0.0;
@@ -60,7 +60,7 @@ double UFcnMISO::Get_OutValue() const { return _outvalue; }
 void UFcnMISO::Set_Enable(bool enable) {}
 void UFcnMISO::Set_Function(std::function<double(double*)> function) { _f=function; }
 void UFcnMISO::Module_Reset() {}
-uint UFcnMISO::Get_childCnt() const { return _next.size(); }
+uint32_t UFcnMISO::Get_childCnt() const { return _next.size(); }
 UFcnMISO::UFcnMISO(Simulator *sim, std::string name): UnitModule(sim, name) {
     _outvalue = 0.0/0.0;
     UNITMODULE_INIT();
@@ -76,27 +76,27 @@ int UFcnMISO::Self_Check() const {
     return 0;
 }
 void UFcnMISO::Module_Update(double time) {
-    uint n = _next.size();
+    uint32_t n = _next.size();
     double* param = new double[n];
     for (int i=0; i<n; ++i)
         param[i] = _next[i]->Get_OutValue();
     _outvalue = _f(param);
     delete[] param;
 }
-PUnitModule UFcnMISO::Get_child(uint n) const {
-    if (n >= (uint)_next.size())
+PUnitModule UFcnMISO::Get_child(uint32_t n) const {
+    if (n >= (uint32_t)_next.size())
         return nullptr;
     return _next[n];
 }
 void UFcnMISO::connect(const PUnitModule m) {
     _next.push_back(m);
 }
-void UFcnMISO::connect2(const PUnitModule m, uint n) {
+void UFcnMISO::connect2(const PUnitModule m, uint32_t n) {
     if (n>=_next.size()) TRACELOG(LOG_FATAL, "Simucpp internal error: reconnect.");
     if (_next[n]!=nullptr) TRACELOG(LOG_FATAL, "Simucpp internal error: reconnect.");
     _next[n] = m;
 }
-void UFcnMISO::disconnect(uint n) {
+void UFcnMISO::disconnect(uint32_t n) {
     if (n>=(int)_next.size()) TRACELOG(LOG_FATAL, "Simucpp internal error: disconnect.");
     _next[n] = nullptr;
 }
@@ -110,8 +110,8 @@ double UGain::Get_OutValue() const { return _outvalue; }
 void UGain::Set_Enable(bool enable) {}
 void UGain::Set_Gain(double gain) { _gain=gain; }
 void UGain::Module_Reset() {}
-uint UGain::Get_childCnt() const { return 1; }
-PUnitModule UGain::Get_child(uint n) const { return n==0?_next:nullptr; }
+uint32_t UGain::Get_childCnt() const { return 1; }
+PUnitModule UGain::Get_child(uint32_t n) const { return n==0?_next:nullptr; }
 void UGain::connect(const PUnitModule m) { _next=m; }
 UGain::UGain(Simulator *sim, std::string name): UnitModule(sim, name) {
     _gain = 1;
@@ -134,8 +134,8 @@ INPUT module.
 UInput::~UInput() { _data.clear();_f=nullptr; }
 double UInput::Get_OutValue() const { return _outvalue; }
 void UInput::Set_Enable(bool enable) { _enable=enable; }
-uint UInput::Get_childCnt() const { return 0; }
-PUnitModule UInput::Get_child(uint n) const { return nullptr; }
+uint32_t UInput::Get_childCnt() const { return 0; }
+PUnitModule UInput::Get_child(uint32_t n) const { return nullptr; }
 void UInput::connect(const PUnitModule m) { TRACELOG(LOG_WARNING, "UInput: cannot add child modules."); }
 void UInput::Set_Function(std::function<double(double)> function) { _f=function; }
 void UInput::Set_InputData(const vecdble &data) { _data=data; }
@@ -189,8 +189,8 @@ void UIntegrator::Set_Enable(bool enable) {}
 void UIntegrator::Set_InitialValue(double value) { _outvalue=_iv=value; }
 void UIntegrator::Module_Update(double time) {}
 void UIntegrator::Module_Reset() { _outvalue=_iv; }
-uint UIntegrator::Get_childCnt() const { return 1; }
-PUnitModule UIntegrator::Get_child(uint n) const { return n==0?_next:nullptr; }
+uint32_t UIntegrator::Get_childCnt() const { return 1; }
+PUnitModule UIntegrator::Get_child(uint32_t n) const { return n==0?_next:nullptr; }
 void UIntegrator::connect(const PUnitModule m) { _next=m; }
 UIntegrator::UIntegrator(Simulator *sim, std::string name): UnitModule(sim, name) {
     _outvalue = 0;
@@ -212,8 +212,8 @@ double UNoise::Get_OutValue() const { return _outvalue; }
 int UNoise::Self_Check() const { return 0; }
 void UNoise::Set_Enable(bool enable) { _enable=enable; }
 void UNoise::Module_Reset() { _outvalue=0;_ltn=-_T; }
-uint UNoise::Get_childCnt() const { return 0; }
-PUnitModule UNoise::Get_child(uint n) const { return nullptr; }
+uint32_t UNoise::Get_childCnt() const { return 0; }
+PUnitModule UNoise::Get_child(uint32_t n) const { return nullptr; }
 void UNoise::connect(const PUnitModule m) { TRACELOG(LOG_WARNING, "UNoise: cannot add child modules."); }
 void UNoise::Set_Mean(double mean) { _mean=mean; }
 void UNoise::Set_Variance(double var) { _var=var; }
@@ -242,8 +242,8 @@ UOutput::~UOutput() { _values.clear(); }
 double UOutput::Get_OutValue() const { return _outvalue; }
 void UOutput::Set_Enable(bool enable) {}
 void UOutput::Module_Reset() { _values.clear();_outvalue=0;_ltn=-_T; }
-uint UOutput::Get_childCnt() const { return 1; }
-PUnitModule UOutput::Get_child(uint n) const { return n==0?_next:nullptr; }
+uint32_t UOutput::Get_childCnt() const { return 1; }
+PUnitModule UOutput::Get_child(uint32_t n) const { return n==0?_next:nullptr; }
 void UOutput::connect(const PUnitModule m) { _next=m; }
 vecdble& UOutput::Get_StoredData() { return _values; }
 void UOutput::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
@@ -280,7 +280,7 @@ UProduct::~UProduct() { _next.clear();_ingain.clear(); }
 double UProduct::Get_OutValue() const { return _outvalue; }
 void UProduct::Set_Enable(bool enable) {}
 void UProduct::Module_Reset() {}
-uint UProduct::Get_childCnt() const { return _next.size(); }
+uint32_t UProduct::Get_childCnt() const { return _next.size(); }
 UProduct::UProduct(Simulator *sim, std::string name): UnitModule(sim, name) {
     _outvalue = 0.0/0.0;
     UNITMODULE_INIT();
@@ -311,8 +311,8 @@ void UProduct::Module_Update(double time) {
         ans *= _ingain[i] * _next[i]->Get_OutValue();
     _outvalue = ans;
 }
-PUnitModule UProduct::Get_child(uint n) const {
-    if (n >= (uint)_next.size())
+PUnitModule UProduct::Get_child(uint32_t n) const {
+    if (n >= (uint32_t)_next.size())
         return nullptr;
     return _next[n];
 }
@@ -329,7 +329,7 @@ USum::~USum() { _next.clear();_ingain.clear(); }
 double USum::Get_OutValue() const { return _outvalue; }
 void USum::Set_Enable(bool enable) {}
 void USum::Module_Reset() {}
-uint USum::Get_childCnt() const { return _next.size(); }
+uint32_t USum::Get_childCnt() const { return _next.size(); }
 void USum::Set_Redundant(bool rdnt) { _rdnt=rdnt; };
 USum::USum(Simulator *sim, std::string name): UnitModule(sim, name) {
     _outvalue = 0.0/0.0;
@@ -363,8 +363,8 @@ void USum::Module_Update(double time) {
         ans += _ingain[i] * _next[i]->Get_OutValue();
     _outvalue = ans;
 }
-PUnitModule USum::Get_child(uint n) const {
-    if (n >= (uint)_next.size())
+PUnitModule USum::Get_child(uint32_t n) const {
+    if (n >= (uint32_t)_next.size())
         return nullptr;
     return _next[n];
 }
@@ -381,8 +381,8 @@ UTransportDelay::~UTransportDelay() { _next=nullptr; }
 double UTransportDelay::Get_OutValue() const { return _outvalue; }
 void UTransportDelay::Set_Enable(bool enable) {}
 void UTransportDelay::Set_InitialValue(double value) { _outvalue=_iv=value; }
-uint UTransportDelay::Get_childCnt() const { return 1; }
-PUnitModule UTransportDelay::Get_child(uint n) const { return n==0?_next:nullptr; }
+uint32_t UTransportDelay::Get_childCnt() const { return 1; }
+PUnitModule UTransportDelay::Get_child(uint32_t n) const { return n==0?_next:nullptr; }
 void UTransportDelay::connect(const PUnitModule m) { _next=m; }
 UTransportDelay::UTransportDelay(Simulator *sim, std::string name): UnitModule(sim, name) {
     _outvalue = 0.0/0.0;
@@ -434,8 +434,8 @@ double UUnitDelay::Get_OutValue() const { return _outvalue; }
 void UUnitDelay::Set_Enable(bool enable) {}
 void UUnitDelay::Set_InitialValue(double value) { _outvalue=_lv=_iv=value; }
 void UUnitDelay::Module_Reset() { _outvalue=_lv=_iv; }
-uint UUnitDelay::Get_childCnt() const { return 1; }
-PUnitModule UUnitDelay::Get_child(uint n) const { return n==0?_next:nullptr; }
+uint32_t UUnitDelay::Get_childCnt() const { return 1; }
+PUnitModule UUnitDelay::Get_child(uint32_t n) const { return n==0?_next:nullptr; }
 void UUnitDelay::connect(const PUnitModule m) { _next=m; }
 void UUnitDelay::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 UUnitDelay::UUnitDelay(Simulator *sim, std::string name): UnitModule(sim, name) {
@@ -465,8 +465,8 @@ UZOH::~UZOH() { _next=nullptr; }
 double UZOH::Get_OutValue() const { return _outvalue; }
 void UZOH::Set_Enable(bool enable) { _enable=enable; }
 void UZOH::Module_Reset() { _outvalue=0;_ltn=-_T; }
-uint UZOH::Get_childCnt() const { return 1; }
-PUnitModule UZOH::Get_child(uint n) const { return n==0?_next:nullptr; }
+uint32_t UZOH::Get_childCnt() const { return 1; }
+PUnitModule UZOH::Get_child(uint32_t n) const { return n==0?_next:nullptr; }
 void UZOH::connect(const PUnitModule m) { _next=m; }
 void UZOH::Set_SampleTime(double time) { _T=time;_ltn=-_T; }
 UZOH::UZOH(Simulator *sim, std::string name): UnitModule(sim, name) {
